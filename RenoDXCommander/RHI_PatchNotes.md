@@ -31,6 +31,7 @@
 ### Manifest Updates
 - Added install warning for The Witcher 3: Wild Hunt — Remastered — the RenoDX mod available in RHI is for the original version; the warning links to the Discord thread for the Remastered-specific mod.
 - Fixed Bye Sweet Carole installing 32-bit ReShade — added to the 64-bit override list.
+- Fixed ReShade not installing correctly on NTE: Neverness To Everness — added DLL name override (`d3d12.dll`).
 
 ---
 
