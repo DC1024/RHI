@@ -851,6 +851,7 @@ public partial class MainViewModel : ObservableObject
                     Timestamp     = DateTime.UtcNow,
                     Category      = "RenoDX",
                     ComponentName = record.GameName,
+                    OldVersion    = record.PreviousVersion,
                     NewVersion    = version ?? (string.IsNullOrEmpty(modId) ? record.AddonFileName ?? "" : modId),
                 });
             }

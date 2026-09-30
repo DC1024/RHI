@@ -277,31 +277,6 @@ public partial class DialogService
             return; // Skip regular RenoDX content
         }
 
-        // ── Wiki status badge (reuse existing badge rendering) ────────────────
-        if (result.Source == InfoSourceType.Wiki && !string.IsNullOrEmpty(result.WikiStatusLabel))
-        {
-            var statusBg     = result.WikiStatusBadgeBg ?? card.WikiStatusBadgeBackground;
-            var statusBorder = result.WikiStatusBadgeBorder ?? card.WikiStatusBadgeBorderBrush;
-            var statusFg     = result.WikiStatusBadgeFg ?? card.WikiStatusBadgeForeground;
-
-            var statusBadge = new Border
-            {
-                CornerRadius        = new CornerRadius(6),
-                Padding             = new Thickness(10, 4, 10, 4),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Background          = new SolidColorBrush(ParseColor(statusBg)),
-                BorderBrush         = new SolidColorBrush(ParseColor(statusBorder)),
-                BorderThickness     = new Thickness(1),
-                Child = new TextBlock
-                {
-                    Text       = result.WikiStatusLabel,
-                    FontSize   = 12,
-                    Foreground = new SolidColorBrush(ParseColor(statusFg)),
-                }
-            };
-            panel.Children.Add(statusBadge);
-        }
-
         // ── Wiki notes text ──────────────────────────────────────────────────
         if (!string.IsNullOrWhiteSpace(result.Content))
         {

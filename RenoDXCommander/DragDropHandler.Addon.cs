@@ -449,6 +449,10 @@ public partial class DragDropHandler
         var destPath = Path.Combine(addonDeployPath, effectiveAddonFileName);
         try
         {
+            // Capture the previously-installed version before overwriting — for update log
+            string? previousVersion = null;
+            try { previousVersion = AuxInstallService.ReadInstalledVersion(addonDeployPath, effectiveAddonFileName); } catch { }
+
             File.Copy(addonPath, destPath, overwrite: true);
             _crashReporter.Log($"[DragDropHandler.ProcessDroppedAddon] Installed '{effectiveAddonFileName}' to '{addonDeployPath}'");
 
@@ -468,6 +472,24 @@ public partial class DragDropHandler
                 SnapshotUrl   = isNamedMod ? null : targetCard.Mod?.SnapshotUrl,
             };
             _modInstallService.SaveRecordPublic(installRecord);
+
+            // Record in update log
+            try
+            {
+                var newVersion = AuxInstallService.ReadInstalledVersion(addonDeployPath, effectiveAddonFileName);
+                var modId = System.IO.Path.GetFileNameWithoutExtension(effectiveAddonFileName);
+                if (modId.StartsWith("renodx-", StringComparison.OrdinalIgnoreCase))
+                    modId = modId.Substring(7);
+                App.Services.GetRequiredService<IUpdateLogService>().Record(new Models.UpdateLogEntry
+                {
+                    Timestamp     = DateTime.UtcNow,
+                    Category      = "RenoDX",
+                    ComponentName = gameName,
+                    OldVersion    = previousVersion,
+                    NewVersion    = newVersion ?? (string.IsNullOrEmpty(modId) ? effectiveAddonFileName : modId),
+                });
+            }
+            catch { }
 
             // Deploy Engine.ini LUT setting for Unreal Engine games (same as normal install flow)
             if (targetCard.EngineHint?.Contains("Unreal") == true)

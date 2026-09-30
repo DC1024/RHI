@@ -2,12 +2,17 @@
 
 ### New
 - **NVIDIA panel split** — the "Nvidia Profile Overrides" section is now two independent panels: **DLSS / Streamline** (SR, RR, FG, SL versions and presets) and **Driver Settings** (VSync, Low Latency, Smooth Motion, Power/G-Sync, ReBAR). Each has its own collapse/expand, drag handle for reordering, and collapsed summary line. Each remembers its own collapsed state. Users who had the old section's position saved will see both new sections in that location automatically.
-- **Component update history now includes RenoDX mod updates** — installs and updates applied via Update All are now captured in the Updates log alongside shader packs, ReShade, and other components.
+- **Component update history now includes RenoDX mod updates** — installs and updates applied via Update All, the downloads watcher, and drag-drop are now captured in the Updates log. Each entry shows the version that was replaced and the version that replaced it.
 
 ### Changes
 - Minimum window width set to 1220px.
+- Status badges (Working / May Work / WIP) removed from the RenoDX Info dialog — the same information is shown on the game card itself and the duplication was unnecessary.
+- Install warning dialogs now render URLs as clickable links that open in the browser.
 
 ### Bug Fixes
+
+**Update All**
+- Fixed Update All re-downloading and reinstalling every RenoDX mod on every run, even mods that were already at the latest version. It now only installs mods that have been flagged with an actual update.
 
 **OptiScaler**
 - Fixed OptiScaler uninstall deleting the game's `plugins\` folder — wiping Cyber Engine Tweaks, RED4ext, and other game mods on Cyberpunk 2077. The uninstall now skips the root `plugins\` folder entirely; `OptiPatcher.asi` is still removed correctly via a dedicated step that only deletes that specific file and only removes the folder if it is empty after.
@@ -22,6 +27,9 @@
 - Fixed the UI freezing for 30–60 seconds after clicking Check for Updates when a game with a large NVIDIA driver profile (e.g. Mass Effect Andromeda) was selected. The NVIDIA profile panel now skips its rebuild while the Settings panel is open, since it isn't visible and the expensive layout work is pointless.
 - Fixed the UI freezing during the app update download when a game with DLSS SR+FG+Streamline (e.g. God of War Ragnarök) was selected. The NVIDIA profile and Neural Rendering panels now skip their rebuild while any dialog is open — the user is looking at the dialog, not the game panel.
 - Fixed a permanent UI freeze (requiring task manager to kill) when clicking on games with a full DLSS install (SR+RR+FG+Streamline, e.g. Control, Resident Evil 4, God of War Ragnarök). Root cause: WinUI 3 enters an infinite layout loop when a `Grid` with star columns is nested inside a `StackPanel` inside a `ScrollViewer` — a known engine bug. Fixed by replacing all star column definitions in the NVIDIA Profile and DLSS grids with calculated fixed-pixel widths.
+
+### Manifest Updates
+- Added install warning for The Witcher 3: Wild Hunt — Remastered — the RenoDX mod available in RHI is for the original version; the warning links to the Discord thread for the Remastered-specific mod.
 
 ---
 

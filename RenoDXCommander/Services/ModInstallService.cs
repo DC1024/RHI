@@ -96,6 +96,10 @@ public class ModInstallService : IModInstallService
         var destPath  = Path.Combine(GetAddonDeployPath(gameInstallPath), fileName);
         var cachePath = Path.Combine(DownloadPaths.RenoDX, fileName);
 
+        // Capture the previously-installed version before overwriting — used for update log
+        string? previousVersion = null;
+        try { previousVersion = AuxInstallService.ReadInstalledVersion(GetAddonDeployPath(gameInstallPath), fileName); } catch { }
+
         // ── Step 1: get remote Content-Length (single HEAD) ───────────────────────
         long? remoteSize = null;
         try
@@ -246,8 +250,9 @@ public class ModInstallService : IModInstallService
             AddonFileName  = fileName,
             FileHash       = hash,
             InstalledAt    = DateTime.UtcNow,
-            SnapshotUrl    = resolvedUrl,   // resolved URL ensures future update checks hit the right CDN
-            RemoteFileSize = remoteSize,   // ← stored for stable update detection
+            SnapshotUrl    = resolvedUrl,
+            RemoteFileSize = remoteSize,
+            PreviousVersion = previousVersion,
         };
         SaveRecord(record);
         try { InstallCompleted?.Invoke(record); } catch (Exception ex) { CrashReporter.Log($"[ModInstallService.InstallAsync] InstallCompleted event handler failed — {ex.Message}"); }

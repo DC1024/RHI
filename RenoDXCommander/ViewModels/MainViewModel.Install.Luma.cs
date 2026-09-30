@@ -1366,10 +1366,39 @@ public partial class MainViewModel
             }
             if (xamlRoot == null) return true;
 
+            // Build content: extract any trailing https:// URL into a HyperlinkButton
+            object dialogContent;
+            var urlMatch = System.Text.RegularExpressions.Regex.Match(message, @"https?://\S+$");
+            if (urlMatch.Success)
+            {
+                var textPart = message.Substring(0, urlMatch.Index).TrimEnd();
+                var url = urlMatch.Value;
+                var panel = new Microsoft.UI.Xaml.Controls.StackPanel { Spacing = 10 };
+                panel.Children.Add(new Microsoft.UI.Xaml.Controls.TextBlock
+                {
+                    Text = textPart,
+                    TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                    MaxWidth = 440,
+                });
+                var link = new Microsoft.UI.Xaml.Controls.HyperlinkButton
+                {
+                    Content = url.Length > 60 ? url.Substring(0, 57) + "…" : url,
+                    NavigateUri = new Uri(url),
+                    Padding = new Microsoft.UI.Xaml.Thickness(0),
+                    HorizontalAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left,
+                };
+                panel.Children.Add(link);
+                dialogContent = panel;
+            }
+            else
+            {
+                dialogContent = message;
+            }
+
             var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
             {
                 Title = $"⚠ Install Note — {gameName}",
-                Content = message,
+                Content = dialogContent,
                 PrimaryButtonText = "Continue",
                 CloseButtonText = "Cancel",
                 DefaultButton = Microsoft.UI.Xaml.Controls.ContentDialogButton.Primary,
