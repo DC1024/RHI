@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "game_count": 55335,
-  "generated": "2026-09-29T22:14:13Z",
+  "game_count": 55339,
+  "generated": "2026-09-30T16:56:27Z",
   "name_overrides": {
     "ACE COMBAT 8: WINGS OF THEVE": "Ace Combat 8: Wings of Theve",
     "AFOP": "Avatar: Frontiers of Pandora",
@@ -35792,6 +35792,7 @@
     "Creature Conflict: The Clan Wars": {
       "config_path": "%APPDATA%\\Cenega\\Creature Conflict - The Clan Wars\\save\\creatures.set, %APPDATA%\\Cenega\\Creature Conflict - The Clan Wars\\save\\video.cfg"
     },
+    "Creature Crunch": {},
     "Creature in the Well": {
       "steam_appid": 852300,
       "engine": "Unreal Engine 4"
@@ -50966,6 +50967,8 @@
     },
     "Dynasty Warriors 3: Complete Edition Remastered": {
       "steam_appid": 3841510,
+      "dx12": true,
+      "config_path": "%LOCALAPPDATA%\\DW3CE_RE\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Dynasty Warriors 4: Hyper": {
@@ -55866,7 +55869,7 @@
       "steam_appid": 2253100,
       "dx11": true,
       "dx12": true,
-      "engine": "Unreal Engine 4"
+      "engine": "Unreal Engine 5"
     },
     "Every Day We Fight": {
       "steam_appid": 1546080,
@@ -100311,6 +100314,12 @@
       "steam_appid": 1020980
     },
     "Matchbox Caterpillar Big Dirt Movers": {},
+    "Matchbox Caterpillar Construction Zone": {
+      "config_path": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Mattel Media\\Matchbox\\Caterpillar Construction Zone"
+    },
+    "Matchbox Caterpillar: Adventures in Time": {
+      "config_path": "<path-to-game>\\OPTIONS.DAT"
+    },
     "Matchbox Driving Adventures": {
       "steam_appid": 2322330,
       "config_path": "%USERPROFILE%\\AppData\\LocalLow\\Casual Brothers\\Matchbox\\Matchbox",
@@ -156204,6 +156213,7 @@
       "steam_appid": 597720,
       "engine": "Unreal Engine 4"
     },
+    "Stunt Track Racer": {},
     "Stuntman: Hollywood": {
       "steam_appid": 2487330,
       "engine": "Unreal Engine 5"
