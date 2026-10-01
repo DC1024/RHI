@@ -8,6 +8,9 @@
 
 ### Bug Fixes
 
+**DXVK**
+- Fixed the "Deploy dxvk.conf" button in the DXVK cog always deploying the generic template regardless of variant. For Lilium HDR installs it now deploys the correct preset-specific conf content matching the selected Lilium preset — same as changing the preset in the dropdown already did.
+
 **UI**
 - Fixed a permanent UI freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The Neural Rendering section had the same star-column grid layout bug that was fixed in the NVIDIA panel in v2.8.0 — the four-column Method/Version row was triggering WinUI's infinite layout loop. Fixed with calculated fixed-pixel column widths, same as the NVIDIA fix. All four dropdowns (Method, Feeder/Bridge Version, SF Version, NR DLL Version) also received the `MaxDropDownHeight = 300` cap to prevent the related ComboBox popup measurement loop.
 - Fixed the Extras section rows overflowing their container — the install button and cog/X buttons were sized against the wrong reference width. All column widths in the Extras and Neural Rendering sections now read from their actual section container width.

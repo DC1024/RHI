@@ -741,7 +741,23 @@ public partial class DxvkService
 
             var destPath = Path.Combine(card.InstallPath, "dxvk.conf");
 
-            // Try to copy from the INI presets directory first
+            // For Lilium HDR variant, deploy the preset-specific conf content
+            var record = FindRecord(card.GameName, card.InstallPath);
+            bool isLilium = record?.IsLiliumHdrMode == true;
+            if (isLilium)
+            {
+                bool isDx9 = card.GraphicsApi == GraphicsApiType.DirectX9 ||
+                             (record?.InstalledDlls.Contains("d3d9.dll") == true);
+                int presetIdx = LiliumPresetIndex; // currently set for this card
+                var content = isDx9
+                    ? GetLiliumD3d9ConfContent(presetIdx)
+                    : GetLiliumD3d11ConfContent(presetIdx);
+                File.WriteAllText(destPath, content);
+                CrashReporter.Log($"[DxvkService.CopyConfToGame] Wrote Lilium HDR dxvk.conf (preset {presetIdx}, {(isDx9 ? "DX9" : "DX11")}) to '{card.GameName}'");
+                return;
+            }
+
+            // Non-Lilium: copy from the user's INI template
             if (File.Exists(ConfTemplatePath))
             {
                 File.Copy(ConfTemplatePath, destPath, overwrite: true);
@@ -749,7 +765,6 @@ public partial class DxvkService
             }
             else
             {
-                // Fall back to writing the default template content
                 File.WriteAllText(destPath, DefaultDxvkConfContent);
                 CrashReporter.Log($"[DxvkService.CopyConfToGame] Wrote default dxvk.conf to {card.GameName}");
             }

@@ -271,6 +271,9 @@ public partial class MainViewModel
         if (string.IsNullOrEmpty(card.InstallPath)) return;
         try
         {
+            // Set the correct preset index before calling the service so CopyConfToGame
+            // uses the right Lilium HDR preset content for this specific game.
+            _dxvkService.LiliumPresetIndex = GetLiliumPreset(card.GameName, card.Source ?? "");
             _dxvkService.CopyConfToGame(card);
             card.DxvkActionMessage = "✅ dxvk.conf copied to game folder.";
             card.FadeMessage(m => card.DxvkActionMessage = m, card.DxvkActionMessage);
