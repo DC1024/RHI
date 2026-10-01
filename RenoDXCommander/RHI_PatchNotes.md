@@ -4,6 +4,7 @@
 - **Game Overrides collapsed summary** now shows more active state at a glance: RS Channel override, per-game Shaders/Addons mode (when not set to Global), and any components excluded from Update All. Previously only showed RS channel and API override.
 - **Neural Rendering Remove button** is now a red ✕ icon matching the style of the Extras section, with the ⚙ cog always visible alongside it.
 - **Shader pack version numbers** now appear in the Update History log for packs that have GitHub releases (e.g. Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Previously all shader pack updates showed only "Updated". The old and new version are both shown when both are known.
+- **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale for each component when non-default, e.g. `SR 310.9.1 · M · 75% · RR 310.9.1 · FG 310.9.1 · B · SL 2.14.1`.
 
 ### Bug Fixes
 

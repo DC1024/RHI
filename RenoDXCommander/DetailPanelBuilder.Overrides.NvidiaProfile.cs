@@ -852,14 +852,50 @@ public partial class DetailPanelBuilder
                 _nvHeaderRow.Children.RemoveAt(3);
 
             var nvSummaryEntries = new List<(string, string?)>();
+
+            // Helper: format version + preset + render scale into one string
+            static string FormatDlssEntry(string? version, uint preset, (string Name, uint Value)[] presets, uint renderScale)
+            {
+                var parts = new List<string>();
+                if (!string.IsNullOrEmpty(version)) parts.Add(version!);
+                if (preset != 0)
+                {
+                    var name = presets.FirstOrDefault(p => p.Value == preset).Name;
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        // Show only the letter part — strip " - suffix" (e.g. "M - TF2" → "M")
+                        var letter = name.Contains(" - ") ? name.Substring(0, name.IndexOf(" - ")).Trim() : name;
+                        parts.Add(letter);
+                    }
+                }
+                if (renderScale != 0) parts.Add($"{renderScale}%");
+                return string.Join(" · ", parts);
+            }
+
             if (card.HasDlss)
-                nvSummaryEntries.Add(("SR", card.CachedSrDriverOverride ? "NV Override" : card.DlssInstalledVersion));
+            {
+                var val = card.CachedSrDriverOverride ? "NV Override"
+                    : FormatDlssEntry(card.DlssInstalledVersion, dlssData?.SrPreset ?? 0u, DlssPresetService.SrPresets, dlssData?.SrRenderScale ?? 0u);
+                nvSummaryEntries.Add(("SR", val));
+            }
             if (card.HasDlssd)
-                nvSummaryEntries.Add(("RR", card.CachedRrDriverOverride ? "NV Override" : card.DlssdInstalledVersion));
+            {
+                var val = card.CachedRrDriverOverride ? "NV Override"
+                    : FormatDlssEntry(card.DlssdInstalledVersion, dlssData?.RrPreset ?? 0u, DlssPresetService.RrPresets, dlssData?.RrRenderScale ?? 0u);
+                nvSummaryEntries.Add(("RR", val));
+            }
             if (card.HasDlssg)
-                nvSummaryEntries.Add(("FG", card.CachedFgDriverOverride ? "NV Override" : card.DlssgInstalledVersion));
+            {
+                var val = card.CachedFgDriverOverride ? "NV Override"
+                    : FormatDlssEntry(card.DlssgInstalledVersion, dlssData?.FgPreset ?? 0u, DlssPresetService.FgPresets, 0u);
+                nvSummaryEntries.Add(("FG", val));
+            }
             if (FeatureFlags.DlssNr && card.HasDlssnr)
-                nvSummaryEntries.Add(("NR", card.CachedNrDriverOverride ? "NV Override" : card.DlssnrInstalledVersion));
+            {
+                var val = card.CachedNrDriverOverride ? "NV Override"
+                    : FormatDlssEntry(card.DlssnrInstalledVersion, dlssData?.NrPreset ?? 0u, DlssPresetService.NrPresets, 0u);
+                nvSummaryEntries.Add(("NR", val));
+            }
             if (card.HasStreamline)
                 nvSummaryEntries.Add(("SL", card.StreamlineInstalledVersion));
 
