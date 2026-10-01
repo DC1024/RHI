@@ -413,7 +413,7 @@ public partial class DetailPanelBuilder
                 }
                 nrCol.Children.Add(new TextBlock { Text = " ", FontSize = 10, Margin = new Thickness(0, 2, 0, 0) });
                 var deployRow = new Grid { ColumnSpacing = 6 };
-                deployRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 42)) }); // 36px delete btn + 6px spacing
+                deployRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 deployRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
                 var deployNrBtn = new Button
