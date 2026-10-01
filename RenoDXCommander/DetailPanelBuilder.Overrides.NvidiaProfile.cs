@@ -407,13 +407,13 @@ public partial class DetailPanelBuilder
                 if (!hasDlssnr)
                 {
                     var presetPlaceholderLabel = new TextBlock { Text = "Preset", FontSize = 10, Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush), Margin = new Thickness(0, 2, 0, 0), Opacity = 0 };
-                    var presetPlaceholderCombo = new ComboBox { ItemsSource = new[] { "Default" }, SelectedIndex = 0, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Stretch, IsEnabled = false, Opacity = 0 };
+                    var presetPlaceholderCombo = new ComboBox { ItemsSource = new[] { "Default" }, SelectedIndex = 0, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Stretch, IsEnabled = false, Opacity = 0, MaxDropDownHeight = 300 };
                     nrCol.Children.Add(presetPlaceholderLabel);
                     nrCol.Children.Add(presetPlaceholderCombo);
                 }
                 nrCol.Children.Add(new TextBlock { Text = " ", FontSize = 10, Margin = new Thickness(0, 2, 0, 0) });
                 var deployRow = new Grid { ColumnSpacing = 6 };
-                deployRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                deployRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 42)) }); // 36px delete btn + 6px spacing
                 deployRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
                 var deployNrBtn = new Button

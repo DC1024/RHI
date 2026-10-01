@@ -572,6 +572,23 @@ public partial class DetailPanelBuilder
     /// Index is computed from cumulative Y delta (no TransformToVisual queries mid-drag).
     /// Single Remove+Insert per threshold crossing keeps layout stable.
     /// Order is persisted on PointerReleased.
+    /// <summary>
+    /// Calculates a fixed column width for use in star-column grids inside the detail panel.
+    /// Star columns inside StackPanel/ScrollViewer with HorizontalScrollBarVisibility=Disabled
+    /// cause WinUI to enter an infinite layout loop. Use this instead of GridLength.Star.
+    /// </summary>
+    /// <param name="numCols">Number of equal columns.</param>
+    /// <param name="spacing">ColumnSpacing value on the grid.</param>
+    /// <param name="overhead">Any additional fixed-width columns (sum of their widths + spacings).</param>
+    internal double PanelColW(int numCols, double spacing = 8, double overhead = 0)
+    {
+        var panelW = _window.DetailPanel.ActualWidth;
+        if (panelW <= 0) panelW = 750; // fallback before first layout pass
+        var available = panelW - overhead - (numCols - 1) * spacing;
+        return Math.Max(80, available / numCols);
+    }
+
+    /// <summary>
     /// </summary>
     internal TextBlock MakeDragHandle(Border container)
     {

@@ -212,6 +212,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
             ItemsSource = rsNames,
             SelectedItem = DllDefaultSentinel, // default = no override
+            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(rsNameBox,
             "Override the ReShade DLL filename. Select a name to rename the installed DLL immediately. Select -------- to revert to the default name.");
@@ -237,6 +238,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
             ItemsSource = dcNames,
             SelectedItem = DllDefaultSentinel,
+            MaxDropDownHeight = 300,
         };
         if (!string.IsNullOrEmpty(existingDcName))
         {
@@ -272,6 +274,7 @@ public partial class DetailPanelBuilder
             HorizontalAlignment = HorizontalAlignment.Stretch,
             ItemsSource = availableOsNames,
             SelectedItem = DllDefaultSentinel,
+            MaxDropDownHeight = 300,
         };
         if (!string.IsNullOrEmpty(existingOsName))
         {
@@ -529,17 +532,20 @@ public partial class DetailPanelBuilder
 
         // ── Top Row Grid (3 columns: Star | Auto | Star) ─────────────────────
         var topRowGrid = new Grid { ColumnSpacing = 0 };
-        topRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        const double TopRowDivW = 1 + 24; // divider width + its margins
+        var topColW = PanelColW(2, 0, TopRowDivW);
+        topRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(topColW) });
         topRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        topRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        topRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(topColW) });
 
         // Left column: Game Name + Wiki Name side by side, then Reset + Wiki ComboBox below
         var topLeftColumn = new StackPanel { Spacing = 6 };
 
         // Row 1: Game name + Wiki name side by side
         var nameRow = new Grid { ColumnSpacing = 8 };
-        nameRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        nameRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        var nameColW = PanelColW(2, 8);
+        nameRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nameColW) });
+        nameRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nameColW) });
         Grid.SetColumn(detectedBox, 0);
         Grid.SetColumn(wikiBox, 1);
         nameRow.Children.Add(detectedBox);
@@ -548,8 +554,8 @@ public partial class DetailPanelBuilder
 
         // Row 2: Reset button (half) + Wiki lookup ComboBox (half)
         var resetWikiRow = new Grid { ColumnSpacing = 8 };
-        resetWikiRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        resetWikiRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        resetWikiRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nameColW) });
+        resetWikiRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nameColW) });
 
         // Restyle reset button to blue accent
         resetBtn.Content = "Reset";
@@ -574,6 +580,7 @@ public partial class DetailPanelBuilder
             SelectedItem = _window.ViewModel.IsWikiExcluded(gameName) ? "Excluded" : "Included",
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
+            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(wikiExcludeCombo,
             "Included = this game is looked up on the RenoDX and Luma wikis. Excluded = skip wiki lookups for this game.");
@@ -620,9 +627,10 @@ public partial class DetailPanelBuilder
 
         // 3 DLL name boxes side by side, always visible
         var dllBoxesGrid = new Grid { ColumnSpacing = 8, RowSpacing = 4 };
-        dllBoxesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        dllBoxesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        dllBoxesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        var dllColW = PanelColW(3, 8, TopRowDivW + topColW); // right column only
+        dllBoxesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(dllColW) });
+        dllBoxesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(dllColW) });
+        dllBoxesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(dllColW) });
         dllBoxesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         dllBoxesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
@@ -791,6 +799,7 @@ public partial class DetailPanelBuilder
             SelectedItem = effectiveShaderDisplay,
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
+            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(shaderModeCombo,
             "Global = use global shader selection. Custom = use custom shader directories. Select = pick per-game packs. Off = no shaders.");
@@ -977,6 +986,7 @@ public partial class DetailPanelBuilder
             SelectedItem = defaultBitnessSelection,
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
+            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(bitnessCombo,
             "Override the auto-detected bitness for this game. Auto uses PE header detection. 32-bit or 64-bit forces the value.");
@@ -1049,8 +1059,9 @@ public partial class DetailPanelBuilder
         };
 
         var bitnessPanel = new Grid { ColumnSpacing = 12 };
-        bitnessPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        bitnessPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        var bpColW = PanelColW(2, 12);
+        bitnessPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(bpColW) });
+        bitnessPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(bpColW) });
         bitnessPanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         bitnessPanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
@@ -1102,6 +1113,7 @@ public partial class DetailPanelBuilder
             SelectedItem = defaultApiSelection,
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
+            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(apiCombo,
             "Override the detected graphics API for this game.\nAuto uses PE header scanning. Reset Overrides reverts to auto-detection.");

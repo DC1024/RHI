@@ -189,7 +189,7 @@ public partial class DetailPanelBuilder
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(350) }); // fixed — separator text is centred, exact width doesn't matter
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -251,7 +251,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -451,7 +451,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -710,7 +710,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -1036,7 +1036,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -1184,6 +1184,7 @@ public partial class DetailPanelBuilder
                 ItemsSource = new[] { Dlssg20_30Service.GpuGenRtx30, Dlssg20_30Service.GpuGenRtx20 },
                 SelectedItem = currentGen,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
+                MaxDropDownHeight = 300,
             };
             var dlg = new ContentDialog
             {
@@ -1374,7 +1375,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -1609,7 +1610,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 
@@ -2029,7 +2030,7 @@ public partial class DetailPanelBuilder
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 348)) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
 

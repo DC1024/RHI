@@ -4,6 +4,7 @@
 
 **UI**
 - Fixed a permanent UI freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The Neural Rendering section had the same star-column grid layout bug that was fixed in the NVIDIA panel in v2.8.0 — the four-column Method/Version row was triggering WinUI's infinite layout loop. Fixed with calculated fixed-pixel column widths, same as the NVIDIA fix. All four dropdowns (Method, Feeder/Bridge Version, SF Version, NR DLL Version) also received the `MaxDropDownHeight = 300` cap to prevent the related ComboBox popup measurement loop.
+- Hardened all remaining sections of the Game Overrides panel (Shaders & Addons, DLL Naming, Bitness/API, Management, and Extras rows) against the same WinUI star-column layout loop. Every star-column grid in the detail panel now uses calculated fixed-pixel widths, and every ComboBox has `MaxDropDownHeight = 300`.
 
 ---
 
