@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "game_count": 55344,
-  "generated": "2026-10-01T06:22:02Z",
+  "game_count": 55352,
+  "generated": "2026-10-01T19:25:00Z",
   "name_overrides": {
     "ACE COMBAT 8: WINGS OF THEVE": "Ace Combat 8: Wings of Theve",
     "AFOP": "Avatar: Frontiers of Pandora",
@@ -3423,6 +3423,7 @@
     },
     "Ace Combat 8: Wings of Theve": {
       "steam_appid": 2288340,
+      "config_path": "%LOCALAPPDATA%\\BANDAI NAMCO Entertainment\\ACE COMBAT 8\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Ace Combat Zero: The Belkan War": {
@@ -10081,6 +10082,7 @@
       "config_path": "HKEY_CURRENT_USER\\SOFTWARE\\Stegosoft Games\\Ara Fell, %USERPROFILE%\\AppData\\LocalLow\\Stegosoft Games\\Ara Fell\\Custom Input Config.json",
       "engine": "RPG Maker"
     },
+    "ARA NGC 6397": {},
     "Ara: History Untold": {
       "steam_appid": 2021880
     },
@@ -24929,6 +24931,9 @@
     "Bunker Rush": {
       "steam_appid": 852180
     },
+    "Bunker Tidy Up": {
+      "steam_appid": 5212940
+    },
     "Bunny & Piggy": {
       "steam_appid": 549810
     },
@@ -27699,7 +27704,8 @@
       "engine": "m2engage"
     },
     "Castlevania: Belmont's Curse": {
-      "steam_appid": 4231820
+      "steam_appid": 4231820,
+      "engine": "Unity"
     },
     "Castlevania: Grimoire of Souls": {},
     "Castlevania: Lords of Shadow": {
@@ -28519,6 +28525,7 @@
     "Celtic Kings: Rage of War": {
       "steam_appid": 827000
     },
+    "Celtica": {},
     "Celtreos": {
       "steam_appid": 1065900
     },
@@ -32208,6 +32215,7 @@
     },
     "Code Vein": {
       "steam_appid": 678960,
+      "dx11": true,
       "config_path": "%LOCALAPPDATA%\\CodeVein\\Saved\\Config\\WindowsNoEditor",
       "engine": "Unreal Engine 4"
     },
@@ -69650,6 +69658,9 @@
       "steam_appid": 1351210,
       "engine": "Unreal Engine 4"
     },
+    "Gord@k": {
+      "engine": "Macromedia Director"
+    },
     "Gordian Quest": {
       "steam_appid": 981430,
       "dx11": true,
@@ -94588,6 +94599,7 @@
     },
     "Little Nightmares III": {
       "steam_appid": 1392860,
+      "dx12": true,
       "config_path": "%LOCALAPPDATA%\\LittleNightmaresIII\\Saved\\SaveGames\\OptionSettings.sav",
       "engine": "Unreal Engine 4"
     },
@@ -100322,6 +100334,7 @@
     "Matchbox Caterpillar Construction Zone": {
       "config_path": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Mattel Media\\Matchbox\\Caterpillar Construction Zone"
     },
+    "Matchbox Caterpillar Construction Zone 2: Gold Mining": {},
     "Matchbox Caterpillar: Adventures in Time": {
       "config_path": "<path-to-game>\\OPTIONS.DAT"
     },
@@ -101165,6 +101178,7 @@
       "steam_appid": 345260,
       "dx9": true
     },
+    "MediEvil (MediEvilRecomp)": {},
     "Medium Rare": {
       "steam_appid": 1137190
     },
@@ -176691,6 +176705,9 @@
     "Too Many F*cking Nazis": {
       "steam_appid": 3900950
     },
+    "Too Many Toys!": {
+      "steam_appid": 5028390
+    },
     "Too Many Weapons": {
       "steam_appid": 646280
     },
@@ -178250,6 +178267,7 @@
       "engine": "Unity"
     },
     "Trails in the Sky 1st Chapter": {
+      "dx11": true,
       "config_path": "%USERPROFILE%\\Saved Games\\FALCOM\\Trails in the Sky 1st Chapter\\setting.json, %USERPROFILE%\\Saved Games\\CLE\\Sora_no_Kiseki_the_1st\\setting.json",
       "engine": "Falcom Developer Kit"
     },
@@ -185192,6 +185210,7 @@
     "Viper": {
       "steam_appid": 1140530
     },
+    "Viper (1994)": {},
     "Viper Attack": {
       "steam_appid": 897970
     },
