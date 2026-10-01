@@ -1,10 +1,16 @@
 ## v2.8.1 Beta
 
+### Changes
+- **Game Overrides collapsed summary** now shows more active state at a glance: RS Channel override, per-game Shaders/Addons mode (when not set to Global), and any components excluded from Update All. Previously only showed RS channel and API override.
+- **Neural Rendering Remove button** is now a red ✕ icon matching the style of the Extras section, with the ⚙ cog always visible alongside it.
+- **Shader pack version numbers** now appear in the Update History log for packs that have GitHub releases (e.g. Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Previously all shader pack updates showed only "Updated". The old and new version are both shown when both are known.
+
 ### Bug Fixes
 
 **UI**
 - Fixed a permanent UI freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The Neural Rendering section had the same star-column grid layout bug that was fixed in the NVIDIA panel in v2.8.0 — the four-column Method/Version row was triggering WinUI's infinite layout loop. Fixed with calculated fixed-pixel column widths, same as the NVIDIA fix. All four dropdowns (Method, Feeder/Bridge Version, SF Version, NR DLL Version) also received the `MaxDropDownHeight = 300` cap to prevent the related ComboBox popup measurement loop.
-- Hardened all remaining sections of the Game Overrides panel (Shaders & Addons, DLL Naming, Bitness/API, Management, and Extras rows) against the same WinUI star-column layout loop. Every star-column grid in the detail panel now uses calculated fixed-pixel widths, and every ComboBox has `MaxDropDownHeight = 300`.
+- Fixed the Extras section rows overflowing their container — the install button and cog/X buttons were sized against the wrong reference width. All column widths in the Extras and Neural Rendering sections now read from their actual section container width.
+- Added `MaxDropDownHeight = 300` to all ComboBoxes across the Game Overrides, Shaders & Addons, and DLL Naming sections to prevent the ComboBox popup measurement loop.
 
 ---
 

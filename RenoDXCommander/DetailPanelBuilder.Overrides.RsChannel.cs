@@ -21,8 +21,7 @@ public partial class DetailPanelBuilder
         var bitnessPanel = ctx.BitnessPanel;
 
         // ── ReShade Channel Override ──
-        // Third column of bitnessPanel — same fixed width as the first two (set in BuildOverridesPanel)
-        bitnessPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(2, 12)) });
+        bitnessPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         var channelLabel = new TextBlock
         {
@@ -75,7 +74,6 @@ public partial class DetailPanelBuilder
             SelectedItem = defaultChannelSelection,
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(channelCombo,
             "Override the ReShade build channel for this game.\nVulkan games: changing this affects ALL Vulkan games.");
@@ -596,11 +594,9 @@ public partial class DetailPanelBuilder
 
         // ── Middle Row Grid (3 columns: Star | Auto | Star) — Bitness/API + Global update ──
         var middleRowGrid = new Grid { ColumnSpacing = 0 };
-        const double MidDivW = 1 + 24; // divider width + margins
-        var midColW = PanelColW(2, 0, MidDivW);
-        middleRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(midColW) });
+        middleRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         middleRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        middleRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(midColW) });
+        middleRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         Grid.SetColumn(bitnessPanel, 0);
         Grid.SetColumn(middleRowDivider, 1);

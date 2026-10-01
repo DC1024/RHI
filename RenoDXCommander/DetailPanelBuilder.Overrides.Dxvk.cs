@@ -71,14 +71,13 @@ public partial class DetailPanelBuilder
         };
 
         var mgmtRow = new Grid { ColumnSpacing = 0 };
-        var mgmtColW = PanelColW(4, 0, 51); // 3 dividers × (1px + 16px margin) = 51
-        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(mgmtColW) });
+        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(mgmtColW) });
+        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(mgmtColW) });
+        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(mgmtColW) });
+        mgmtRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         var changeFolderBtn = new Button
         {

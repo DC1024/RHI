@@ -257,8 +257,9 @@ public partial class DetailPanelBuilder
         // Fixed-pixel column widths — star columns inside StackPanel/ScrollViewer cause WinUI infinite layout loops
         const int NrRow1Cols = 4;
         const double NrRow1Spacing = 8.0;
-        double nrColW = containerWidth > NrRow1Cols * NrRow1Spacing
-            ? (containerWidth - (NrRow1Cols - 1) * NrRow1Spacing) / NrRow1Cols
+        const double NrSectionPadding = 28.0 + 2.0; // Border Padding="14,12" (28px) + BorderThickness="1" (2px)
+        double nrColW = containerWidth > NrSectionPadding
+            ? (containerWidth - NrSectionPadding - (NrRow1Cols - 1) * NrRow1Spacing) / NrRow1Cols
             : 160.0;
         row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nrColW) }); // Method
         row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nrColW) }); // Pack version (Feeder/Bridge only)
@@ -979,10 +980,15 @@ public partial class DetailPanelBuilder
         UpdateDescription(effectiveMethod);
 
         // ── Row 2: Install / Remove buttons ──────────────────────────────────
+        // Layout: [Install button (stretch)] [⚙ cog] [✕ red X remove]
+        // Cog and X are each 36px + 8px gap. X only visible when installed.
         var btnRow = new Grid { ColumnSpacing = 8, Margin = new Thickness(0, 8, 0, 0) };
-        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // cog (ShortFuse only)
+        double btnInstallW = containerWidth > NrSectionPadding
+            ? Math.Max(120, containerWidth - NrSectionPadding - 2 - 36 - 36 - 8 - 8) // border(2) + cog(36) + X(36) + 2 gaps(8)
+            : 400.0;
+        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(btnInstallW) });
+        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // cog
+        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // ✕ remove
 
         installBtn = new Button
         {
@@ -995,20 +1001,21 @@ public partial class DetailPanelBuilder
 
         var removeBtn = new Button
         {
-            Content = "Remove",
-            FontSize = 12,
+            Width = 36,
             Height = 34,
+            Padding = new Thickness(0),
             CornerRadius = new CornerRadius(8),
             BorderThickness = new Thickness(1),
             Background = UIFactory.Brush(ResourceKeys.AccentRedBgBrush),
             Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush),
             BorderBrush = UIFactory.Brush(ResourceKeys.AccentRedBrush),
+            Content = new TextBlock { Text = "✕", FontSize = 12, HorizontalAlignment = HorizontalAlignment.Center, Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush) },
         };
 
-        // ShortFuse-only cog button
+        // Cog button — always shown, opens method-specific settings
         var sfCogBtn = new Button
         {
-            Width = 34, Height = 34,
+            Width = 36, Height = 34,
             Padding = new Thickness(0),
             CornerRadius = new CornerRadius(8),
             BorderThickness = new Thickness(1),
@@ -1576,11 +1583,11 @@ public partial class DetailPanelBuilder
         };
 
         Grid.SetColumn(installBtn, 0);
-        Grid.SetColumn(removeBtn,  1);
-        Grid.SetColumn(sfCogBtn,   2);
+        Grid.SetColumn(sfCogBtn,   1);
+        Grid.SetColumn(removeBtn,  2);
         btnRow.Children.Add(installBtn);
-        btnRow.Children.Add(removeBtn);
         btnRow.Children.Add(sfCogBtn);
+        btnRow.Children.Add(removeBtn);
         nrBody.Children.Add(btnRow);
 
         // ── NR Cost Scaler preference toggle ─────────────────────────────────

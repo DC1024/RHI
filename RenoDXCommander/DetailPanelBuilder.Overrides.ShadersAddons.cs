@@ -20,11 +20,9 @@ public partial class DetailPanelBuilder
 
         // ── Combined "Shaders and Addons" Row (3 columns: Star | Auto | Star) ──
         var shadersAddonsRowGrid = new Grid { ColumnSpacing = 0 };
-        const double SaDivW = 1 + 24; // divider + margins
-        var saHalfW = PanelColW(2, 0, SaDivW);
-        shadersAddonsRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(saHalfW) });
+        shadersAddonsRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         shadersAddonsRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        shadersAddonsRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(saHalfW) });
+        shadersAddonsRowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         // ── Left column: "Shaders and Addons" ──
         var shadersAddonsLeftColumn = new StackPanel { Spacing = 6 };
@@ -38,9 +36,8 @@ public partial class DetailPanelBuilder
 
         // Shader + Addon ComboBoxes side by side in a 2-column grid
         var shaderAddonGrid = new Grid { ColumnSpacing = 12 };
-        var saInnerColW = PanelColW(2, 12, SaDivW); // within left half
-        shaderAddonGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(saInnerColW) });
-        shaderAddonGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(saInnerColW) });
+        shaderAddonGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        shaderAddonGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         shaderAddonGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         shaderAddonGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
@@ -67,7 +64,6 @@ public partial class DetailPanelBuilder
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             IsEnabled = !card.UseNormalReShade,
-            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(addonModeCombo,
             "Global = use global addon set. Select = pick per-game addons. Off = no addons for this game.");
@@ -367,9 +363,8 @@ public partial class DetailPanelBuilder
         };
 
         var launchBoxRow = new Grid { ColumnSpacing = 8 };
-        var launchColW = PanelColW(2, 8, SaDivW);
-        launchBoxRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(launchColW) });
-        launchBoxRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(launchColW) });
+        launchBoxRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        launchBoxRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         Grid.SetColumn(launchExeBox, 0);
         Grid.SetColumn(launchArgsBox, 1);
         launchBoxRow.Children.Add(launchExeBox);
@@ -379,8 +374,8 @@ public partial class DetailPanelBuilder
         shadersAddonsRightColumn.Children.Add(launchBoxRow);
 
         var launchBtnRow = new Grid { ColumnSpacing = 8, Margin = new Thickness(0, 8, 0, 0) };
-        launchBtnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(launchColW) });
-        launchBtnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(launchColW) });
+        launchBtnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        launchBtnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         var browseLaunchBtn = new Button
         {
             Content = "Browse",

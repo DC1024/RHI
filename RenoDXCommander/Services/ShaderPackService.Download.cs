@@ -313,6 +313,7 @@ public partial class ShaderPackService
             Timestamp     = DateTime.UtcNow,
             Category      = "Shader Pack",
             ComponentName = pack.DisplayName,
+            OldVersion    = stored,
             NewVersion    = versionToken,
         });
         }
@@ -478,6 +479,9 @@ public partial class ShaderPackService
 
             if (root.TryGetProperty("assets", out var assets))
             {
+                // Always use tag_name as the version token — gives clean readable versions (e.g. "v4.2", "2026.09.10")
+                // The asset filename is only used to find the download URL.
+                var tagName = root.TryGetProperty("tag_name", out var t) ? t.GetString() ?? "unknown" : "unknown";
                 foreach (var asset in assets.EnumerateArray())
                 {
                     var name = asset.GetProperty("name").GetString() ?? "";
@@ -485,7 +489,7 @@ public partial class ShaderPackService
                     bool matches = pack.AssetExt == null ||
                                    name.EndsWith(pack.AssetExt, StringComparison.OrdinalIgnoreCase);
                     if (matches && !string.IsNullOrEmpty(url))
-                        return (url, name);
+                        return (url, tagName);
                 }
             }
 
@@ -495,7 +499,7 @@ public partial class ShaderPackService
                 var tagName = root.TryGetProperty("tag_name", out var t) ? t.GetString() ?? "unknown" : "unknown";
                 var zbUrl = zb.GetString();
                 if (!string.IsNullOrEmpty(zbUrl))
-                    return (zbUrl, $"source_{tagName}.zip");
+                    return (zbUrl, tagName);
             }
 
             CrashReporter.Log($"[ShaderPackService.ResolveGhRelease] [{pack.Id}] No suitable asset found");

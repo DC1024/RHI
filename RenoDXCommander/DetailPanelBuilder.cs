@@ -580,11 +580,12 @@ public partial class DetailPanelBuilder
     /// <param name="numCols">Number of equal columns.</param>
     /// <param name="spacing">ColumnSpacing value on the grid.</param>
     /// <param name="overhead">Any additional fixed-width columns (sum of their widths + spacings).</param>
-    internal double PanelColW(int numCols, double spacing = 8, double overhead = 0)
+    internal double PanelColW(int numCols, double spacing = 8, double overhead = 0, double containerWidth = 0)
     {
-        var panelW = _window.DetailPanel.ActualWidth;
-        if (panelW <= 0) panelW = 750; // fallback before first layout pass
-        var available = panelW - overhead - (numCols - 1) * spacing;
+        double w = containerWidth > 0 ? containerWidth : _window.DetailPanel.ActualWidth;
+        if (w <= 0) w = 750;
+        const double SectionPadding = 28;
+        var available = w - SectionPadding - overhead - (numCols - 1) * spacing;
         return Math.Max(80, available / numCols);
     }
 
@@ -948,11 +949,30 @@ public partial class DetailPanelBuilder
 
         var channel = _window.ViewModel.GetReShadeChannelOverride(card.GameName, card.Source ?? "");
         if (!string.IsNullOrEmpty(channel))
-            entries.Add(("RS:", channel));
+            entries.Add(("RS Channel:", channel));
 
         var apis = _window.ViewModel.GetApiOverride(card.GameName, card.Source ?? "");
         if (apis is { Count: > 0 })
             entries.Add(("API:", string.Join("+", apis)));
+
+        // Shaders / Addons — show when set to non-default
+        var shaderMode = _window.ViewModel.GetPerGameShaderMode(card.GameName, card.Source ?? "");
+        if (!string.IsNullOrEmpty(shaderMode) && shaderMode != "Global")
+            entries.Add(("Shaders:", shaderMode));
+
+        var addonMode = _window.ViewModel.GetPerGameAddonMode(card.GameName, card.Source ?? "");
+        if (!string.IsNullOrEmpty(addonMode) && addonMode != "Global")
+            entries.Add(("Addons:", addonMode));
+
+        // Update inclusion — show only when any component is excluded
+        var excluded = new List<string>();
+        if (_window.ViewModel.IsUpdateAllExcludedReShade(card.GameName, card.Source ?? "")) excluded.Add("RS");
+        if (_window.ViewModel.IsUpdateAllExcludedRenoDx(card.GameName, card.Source ?? "")) excluded.Add("RDX");
+        if (_window.ViewModel.IsUpdateAllExcludedUl(card.GameName, card.Source ?? ""))     excluded.Add("RL");
+        if (_window.ViewModel.IsUpdateAllExcludedDc(card.GameName, card.Source ?? ""))     excluded.Add("DC");
+        if (_window.ViewModel.IsUpdateAllExcludedOs(card.GameName, card.Source ?? ""))     excluded.Add("OS");
+        if (excluded.Count > 0)
+            entries.Add(("Excluded:", string.Join(" ", excluded)));
 
         var launchArgs = _gameNameService.LaunchArgsOverrides.TryGetValue(card.GameName, out var la)
             ? la : null;

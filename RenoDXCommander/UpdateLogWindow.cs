@@ -282,16 +282,24 @@ public sealed class UpdateLogWindow : Window
 
     private static string BuildVersionString(UpdateLogEntry entry)
     {
-        // Shader pack version tokens are either filenames (source_v4.2.zip) or content hashes.
-        // Show the filename if it looks like one, otherwise just "Updated".
+        // GhRelease packs now store tag_name directly (e.g. "v4.2", "2026.09.10").
+        // DirectUrl packs store an ETag or Last-Modified header — unreadable, show "Updated".
         string FormatVersion(string? v)
         {
             if (string.IsNullOrEmpty(v)) return "";
-            // Hash: 40+ hex chars — not user-friendly
-            if (v.Length >= 32 && v.All(c => "0123456789abcdefABCDEF\"".Contains(c)))
+            // Strip surrounding quotes (ETag format)
+            v = v.Trim('"');
+            // Hash / ETag: 32+ hex chars — not user-friendly
+            if (v.Length >= 32 && v.All(c => "0123456789abcdefABCDEF-".Contains(c)))
                 return "Updated";
-            // Strip surrounding quotes if present
-            return v.Trim('"');
+            // Last-Modified date string (HTTP date format: "Wed, 01 Jan 2025 00:00:00 GMT")
+            if (v.Contains(',') && v.Contains(':'))
+                return "Updated";
+            // Legacy: old tokens were asset filenames — try to extract a version number
+            var vMatch = System.Text.RegularExpressions.Regex.Match(v, @"v?(\d+\.\d+(?:\.\d+)*)");
+            if (vMatch.Success)
+                return vMatch.Value.StartsWith("v") ? vMatch.Value : "v" + vMatch.Groups[1].Value;
+            return v;
         }
 
         var newVer = FormatVersion(entry.NewVersion);
