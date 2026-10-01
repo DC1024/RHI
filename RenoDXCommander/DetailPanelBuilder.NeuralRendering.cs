@@ -92,8 +92,9 @@ public partial class DetailPanelBuilder
 
                 _window.ViewModel.SetLastUiAction($"BuildNeuralRenderingSectionWithData({card.GameName})");
                 var __sw = System.Diagnostics.Stopwatch.StartNew();
+                var nrContainerWidth = _window.NeuralRenderingContainer.ActualWidth;
                 BuildNeuralRenderingSectionWithData(card, dlss5Installed, sfInstalled,
-                    nrDllPresent, nrDllOwnedByRhi, nrDllVersion, bridgePresent, feederPresent);
+                    nrDllPresent, nrDllOwnedByRhi, nrDllVersion, bridgePresent, feederPresent, nrContainerWidth);
                 __sw.Stop();
                 if (__sw.ElapsedMilliseconds > 30)
                     CrashReporter.Log($"[BuildNeuralRenderingSectionWithData] SLOW: '{card.GameName}' took {__sw.ElapsedMilliseconds}ms on UI thread");
@@ -107,7 +108,8 @@ public partial class DetailPanelBuilder
         GameCardViewModel card,
         bool dlss5Installed, bool sfInstalled,
         bool nrDllPresent, bool nrDllOwnedByRhi, string? nrDllVersion,
-        bool bridgePresent, bool feederPresent)
+        bool bridgePresent, bool feederPresent,
+        double containerWidth = 0)
     {
         // Guard: if the user navigated away before the background scan finished, bail out
         if (_window.ViewModel.SelectedGame != card) return;
@@ -252,10 +254,16 @@ public partial class DetailPanelBuilder
         // 3 columns for DLSS5Tool/ShortFuse; 4 columns for Feeder/Bridge (adds pack version col)
         bool isFeederOrBridge = effectiveMethod == NrMethodFeeder || effectiveMethod == NrMethodDlss5ToolBridge;
         var row1 = new Grid { ColumnSpacing = 8 };
-        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Method
-        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Pack version (Feeder/Bridge only)
-        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // DLSS5 Tool / SF version
-        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // NR DLL version
+        // Fixed-pixel column widths — star columns inside StackPanel/ScrollViewer cause WinUI infinite layout loops
+        const int NrRow1Cols = 4;
+        const double NrRow1Spacing = 8.0;
+        double nrColW = containerWidth > NrRow1Cols * NrRow1Spacing
+            ? (containerWidth - (NrRow1Cols - 1) * NrRow1Spacing) / NrRow1Cols
+            : 160.0;
+        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nrColW) }); // Method
+        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nrColW) }); // Pack version (Feeder/Bridge only)
+        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nrColW) }); // DLSS5 Tool / SF version
+        row1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(nrColW) }); // NR DLL version
 
         // Method combo (col 0)
         var methodStack = new StackPanel { Spacing = 2 };
@@ -266,6 +274,7 @@ public partial class DetailPanelBuilder
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             CornerRadius = new CornerRadius(6),
+            MaxDropDownHeight = 300,
         };
         foreach (var item in methodItems)
         {
@@ -295,6 +304,7 @@ public partial class DetailPanelBuilder
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             CornerRadius = new CornerRadius(6),
+            MaxDropDownHeight = 300,
         };
         // Pack version combo — populate from staged version list, wire persistence
         bool addonSwapInProgress  = false;  // shared guard — prevents re-entrant swaps across both combo handlers
@@ -475,6 +485,7 @@ public partial class DetailPanelBuilder
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             CornerRadius = new CornerRadius(6),
+            MaxDropDownHeight = 300,
         };
 
         // Swap-in-progress guard — declared above near PackVersionCombo (shared across both handlers)
@@ -635,6 +646,7 @@ public partial class DetailPanelBuilder
             FontSize = 11,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             CornerRadius = new CornerRadius(6),
+            MaxDropDownHeight = 300,
         };
         ToolTipService.SetToolTip(nrVersionCombo, "NR DLL version to deploy. 'Latest' always uses the newest available. Change while installed to swap the NR DLL in-place.");
         nrVersionStack.Children.Add(nrVersionCombo);
@@ -968,7 +980,7 @@ public partial class DetailPanelBuilder
 
         // ── Row 2: Install / Remove buttons ──────────────────────────────────
         var btnRow = new Grid { ColumnSpacing = 8, Margin = new Thickness(0, 8, 0, 0) };
-        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         btnRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // cog (ShortFuse only)
 
