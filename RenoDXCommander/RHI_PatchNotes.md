@@ -1,24 +1,32 @@
 ## v2.8.1 Beta
 
+### New
+- **dgVoodoo2** — now available as a standalone install in the Extras section (under API Upgrades) for any DX9 game. Deploys the DX9→DX11 translation layer directly to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Tracks coexistence with Luma and Feeder — if any component still needs dgVoodoo2, it stays in place when you uninstall another.
+- **Control Ultimate Edition — OptiScaler FG** — the install dialog now has two new options. "Install OptiScaler FG" installs OptiScaler Nightly pre-configured for Frame Generation: Streamline deployed, DLLs renamed correctly (OptiScaler → winmm.dll, ReShade → dxgi.dll), and all required INI settings written automatically. "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset. Everything is wired up in one click.
+
 ### Changes
-- **Game Overrides collapsed summary** now shows more active state at a glance: RS Channel override, per-game Shaders/Addons mode (when not set to Global), and any components excluded from Update All. Previously only showed RS channel and API override.
-- **Neural Rendering Remove button** is now a red ✕ icon matching the style of the Extras section, with the ⚙ cog always visible alongside it.
-- **Shader pack version numbers** now appear in the Update History log for packs that have GitHub releases (e.g. Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Previously all shader pack updates showed only "Updated". The old and new version are both shown when both are known.
-- **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale for each component when non-default, e.g. `SR 310.9.1 · M · 75% · RR 310.9.1 · FG 310.9.1 · B · SL 2.14.1`.
-- **dgVoodoo2 standalone install** — dgVoodoo2 is now available as a standalone component in the Extras section under API Upgrades, for any DX9 game. Deploys `D3D9.dll` and `dgVoodoo.conf` directly to the game folder, translating DX9 calls to DX11. This enables ReShade compute shaders and DLSS5 Feeder on DX9 games without requiring Luma. Fully tracks coexistence with Luma and Feeder — uninstalling any one component preserves dgVoodoo2 if another component still needs it.
-- **OptiScaler Nightly FG cog** — new settings in the Frame Generation section: FG Enabled (master on/off), Force Reflex (Auto / Force Disable / Force Enable), and Use Games Reflex Markers (True / False). These write directly to the game's OptiScaler.ini.
-- **Streamline deployment now includes `nvngx_dlssg.dll`** — whenever Streamline is deployed to a game folder (install, preset load, background redeploy), RHI also copies the newest cached `nvngx_dlssg.dll` into the `OptiScaler/Streamline/` subfolder for FG support.
-- **Control Ultimate Edition — OptiScaler FG integration** — the install dialog now includes two new options: "Install OptiScaler FG" (No / Yes) and "Using HDR?" (greyed out unless OptiScaler is Yes). Selecting Yes installs OptiScaler Nightly pre-configured for FG with the correct DLL naming (OptiScaler → winmm.dll, ReShade → dxgi.dll), Streamline deployed, and all INI settings applied automatically. The HDR option writes `FgSlHdr10=1` or `FgSlHdr10=0` to the RenoDX preset in reshade.ini.
+- **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions — so you can see active overrides at a glance without expanding the section.
+- **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale when non-default, e.g. `SR 310.9.1 · M · 75% · RR 310.9.1 · FG 310.9.1 · B · SL 2.14.1`.
+- **Shader pack update log** now shows real version numbers for packs with GitHub releases (Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Other packs still show "Updated" since they have no version tags.
+- **Streamline deployment now includes `nvngx_dlssg.dll`** — copied into the `OptiScaler/Streamline/` subfolder on every Streamline deploy for FG support.
+- **OptiScaler Nightly FG cog** — three new Frame Generation settings: FG Enabled (on/off master switch), Force Reflex, and Use Games Reflex Markers. Changes write to OptiScaler.ini immediately.
+- **Neural Rendering remove button** is now a ✕ red icon with the ⚙ cog always shown beside it, matching the Extras section style.
 
 ### Bug Fixes
 
-**DXVK**
-- Fixed the "Deploy dxvk.conf" button in the DXVK cog always deploying the generic template regardless of variant. For Lilium HDR installs it now deploys the correct preset-specific conf content matching the selected Lilium preset — same as changing the preset in the dropdown already did.
+**UI Freezes**
+- Fixed a permanent freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The NR section was using the same star-column grid layout that caused the NVIDIA panel freeze in v2.8.0. Fixed the same way — calculated fixed-pixel column widths.
+- Fixed the Extras and Neural Rendering sections overflowing their containers, pushing cog and ✕ buttons off-screen.
 
-**UI**
-- Fixed a permanent UI freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The Neural Rendering section had the same star-column grid layout bug that was fixed in the NVIDIA panel in v2.8.0 — the four-column Method/Version row was triggering WinUI's infinite layout loop. Fixed with calculated fixed-pixel column widths, same as the NVIDIA fix. All four dropdowns (Method, Feeder/Bridge Version, SF Version, NR DLL Version) also received the `MaxDropDownHeight = 300` cap to prevent the related ComboBox popup measurement loop.
-- Fixed the Extras section rows overflowing their container — the install button and cog/X buttons were sized against the wrong reference width. All column widths in the Extras and Neural Rendering sections now read from their actual section container width.
-- Added `MaxDropDownHeight = 300` to all ComboBoxes across the Game Overrides, Shaders & Addons, and DLL Naming sections to prevent the ComboBox popup measurement loop.
+**DXVK**
+- Fixed the "Deploy dxvk.conf" button in the DXVK cog always deploying a generic conf. For Lilium HDR it now deploys the correct preset-specific content matching your selected preset.
+
+### Manifest Updates
+- Fixed Saints Row 2 using 64-bit ReShade — added to 32-bit list.
+- Fixed Assassin's Creed Unity using 32-bit ReShade — added to 64-bit list.
+- Fixed Bye Sweet Carole using 32-bit ReShade — added to 64-bit list.
+- Fixed ReShade not loading on NTE: Neverness To Everness — added `d3d12.dll` name override.
+- Added install warning for The Witcher 3: Wild Hunt — Remastered — the available RenoDX mod is for the original version, not the Remastered Edition. The warning links to the Discord thread for the Remastered mod.
 
 ---
 
