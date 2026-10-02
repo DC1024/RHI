@@ -5,6 +5,7 @@
 - **Neural Rendering Remove button** is now a red ✕ icon matching the style of the Extras section, with the ⚙ cog always visible alongside it.
 - **Shader pack version numbers** now appear in the Update History log for packs that have GitHub releases (e.g. Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Previously all shader pack updates showed only "Updated". The old and new version are both shown when both are known.
 - **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale for each component when non-default, e.g. `SR 310.9.1 · M · 75% · RR 310.9.1 · FG 310.9.1 · B · SL 2.14.1`.
+- **dgVoodoo2 standalone install** — dgVoodoo2 is now available as a standalone component in the Extras section under API Upgrades, for any DX9 game. Deploys `D3D9.dll` and `dgVoodoo.conf` directly to the game folder, translating DX9 calls to DX11. This enables ReShade compute shaders and DLSS5 Feeder on DX9 games without requiring Luma. Fully tracks coexistence with Luma and Feeder — uninstalling any one component preserves dgVoodoo2 if another component still needs it.
 
 ### Bug Fixes
 

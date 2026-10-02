@@ -425,11 +425,34 @@ public partial class MainViewModel
         SaveNameMappings();
     }
 
+    // ── dgVoodoo2 Standalone ─────────────────────────────────────────────────
+
+    /// <summary>Returns whether dgVoodoo2 has been standalone-installed for this game via the Extras panel.</summary>
+    public bool GetDgVoodooStandalone(string gameName, string store = "")
+    {
+        var key = GameKey.From(gameName, store).ToKey();
+        return _gameNameService.DgVoodooStandaloneGames.Contains(key)
+            || _gameNameService.DgVoodooStandaloneGames.Contains(gameName);
+    }
+
+    /// <summary>Sets whether dgVoodoo2 has been standalone-installed for this game.</summary>
+    public void SetDgVoodooStandalone(string gameName, bool value, string store = "")
+    {
+        var key = GameKey.From(gameName, store).ToKey();
+        if (value)
+            _gameNameService.DgVoodooStandaloneGames.Add(key);
+        else
+        {
+            _gameNameService.DgVoodooStandaloneGames.Remove(key);
+            _gameNameService.DgVoodooStandaloneGames.Remove(gameName);
+        }
+        SaveNameMappings();
+    }
+
     // ── Dilated Motion Vectors ────────────────────────────────────────────────
 
     /// <summary>Returns whether Dilated Motion Vectors is set to Off for a game.</summary>
-    public bool GetOsDilatedMotionVectorsOff(string gameName, string store = "")
-    {
+    public bool GetOsDilatedMotionVectorsOff(string gameName, string store = "")    {
         var key = GameKey.From(gameName, store).ToKey();
         return _gameNameService.OsDilatedMotionVectorsOff.Contains(key)
             || _gameNameService.OsDilatedMotionVectorsOff.Contains(gameName);

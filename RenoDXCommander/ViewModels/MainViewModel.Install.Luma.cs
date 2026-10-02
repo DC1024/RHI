@@ -1191,11 +1191,12 @@ public partial class MainViewModel
             {
                 bool feederInstalled = File.Exists(Path.Combine(card.InstallPath ?? "", "dlss5-feed.addon32"))
                                     || File.Exists(Path.Combine(card.InstallPath ?? "", "dlss5-feed.addon64"));
-                if (feederInstalled)
+                bool standaloneInstalled = GetDgVoodooStandalone(card.GameName, card.Source ?? "");
+                if (feederInstalled || standaloneInstalled)
                 {
                     card.LumaRecord.InstalledFiles.RemoveAll(f => f.Equals("D3D9.dll", StringComparison.OrdinalIgnoreCase)
                                                                 || f.Equals("dgVoodoo.conf", StringComparison.OrdinalIgnoreCase));
-                    _crashReporter.Log($"[UninstallLuma] Feeder still installed — preserving dgVoodoo2 files for '{card.GameName}'");
+                    _crashReporter.Log($"[UninstallLuma] {(feederInstalled ? "Feeder" : "Standalone")} still installed — preserving dgVoodoo2 files for '{card.GameName}'");
                     wasDgVoodoo = false; // dgVoodoo stays — don't change ReShade filename
                 }
             }

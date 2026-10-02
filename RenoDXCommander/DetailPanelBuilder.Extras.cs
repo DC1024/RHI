@@ -140,6 +140,20 @@ public partial class DetailPanelBuilder
             CrashReporter.Log($"[BuildExtrasSection] DxvkRow: {__exSw.ElapsedMilliseconds - __t0}ms '{card.GameName}'");
         }
 
+        // ── dgVoodoo2 standalone row — DX9 games or already installed ─────────
+        bool isDx9ForDgv = card.DetectedApis.Contains(GraphicsApiType.DirectX9)
+                        || (card.DetectedApis.Count == 0 && card.GraphicsApi == GraphicsApiType.DirectX9);
+        var dgSvcCheck = App.Services.GetRequiredService<DgVoodooService>();
+        bool dgvInstalled = !string.IsNullOrEmpty(card.InstallPath) && dgSvcCheck.IsDeployed(card.InstallPath);
+        if (isDx9ForDgv || dgvInstalled)
+        {
+            if (!card.IsDxvkToggleVisible) // Show separator only if DXVK row wasn't shown
+                exBody.Children.Add(MakeExtrasSeparator("API Upgrades"));
+            __t0 = __exSw.ElapsedMilliseconds;
+            BuildDgVoodooRow(card, exBody);
+            CrashReporter.Log($"[BuildExtrasSection] DgVoodooRow: {__exSw.ElapsedMilliseconds - __t0}ms '{card.GameName}'");
+        }
+
         UpdateOsFeedback(card);
         __exSw.Stop();
         CrashReporter.Log($"[BuildExtrasSection] Total: {__exSw.ElapsedMilliseconds}ms '{card.GameName}'");
@@ -2158,6 +2172,217 @@ public partial class DetailPanelBuilder
         deleteBtn.Click += (s, e) => _window.UninstallDxvkButton_Click(s, e);
         Grid.SetColumn(deleteBtn, 5);
         row.Children.Add(deleteBtn);
+
+        body.Children.Add(row);
+    }
+
+    private void BuildDgVoodooRow(GameCardViewModel card, StackPanel body)
+    {
+        _window.ViewModel.SetLastUiAction($"BuildDgVoodooRow({card.GameName})");
+        var gameName    = card.GameName;
+        var store       = card.Source ?? "";
+        var installPath = card.InstallPath ?? "";
+
+        var dgSvc   = App.Services.GetRequiredService<DgVoodooService>();
+        var manifest = _window.ViewModel.Manifest;
+
+        bool isInstalled = dgSvc.IsDeployed(installPath);
+
+        // Status: show deployed version from the manifest dgVoodooVersions dict
+        string? stagedVersion = manifest?.DgVoodooVersions?.Keys.FirstOrDefault();
+        string statusText  = isInstalled ? (stagedVersion != null ? $"v{stagedVersion}" : "Installed") : "Ready";
+        string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
+
+        // ── Row grid ──────────────────────────────────────────────────────────
+        var row = new Grid { ColumnSpacing = 8 };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(PanelColW(1, 0, 350, _window.ExtrasContainer.ActualWidth)) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(36) });
+
+        // Col 0 — label
+        var label = new TextBlock
+        {
+            Text = "dgVoodoo2",
+            FontSize = 12,
+            Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        ToolTipService.SetToolTip(label,
+            "dgVoodoo2 — translates DX9 calls to DX11, enabling ReShade compute shaders and DLSS5 Feeder on DX9 games.\nDeploys D3D9.dll + dgVoodoo.conf to the game folder.");
+        Grid.SetColumn(label, 0);
+        row.Children.Add(label);
+
+        // Col 1 — status
+        var statusBlock = new TextBlock
+        {
+            Text = statusText,
+            FontSize = 12,
+            Foreground = UIFactory.GetBrush(statusColor),
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalTextAlignment = Microsoft.UI.Xaml.TextAlignment.Center,
+            TextDecorations = isInstalled ? Windows.UI.Text.TextDecorations.Underline : Windows.UI.Text.TextDecorations.None,
+        };
+        if (isInstalled)
+        {
+            ToolTipService.SetToolTip(statusBlock, "Click to open dgVoodoo2 releases page");
+            statusBlock.PointerPressed += (s, e) =>
+                _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dege-diosg/dgVoodoo2/releases"));
+            statusBlock.PointerEntered += (s, e) => _window.LinkText_PointerEntered(s, e);
+            statusBlock.PointerExited  += (s, e) => _window.LinkText_PointerExited(s, e);
+        }
+        Grid.SetColumn(statusBlock, 1);
+        row.Children.Add(statusBlock);
+
+        // Col 2 — Info button
+        var infoBtn = new Button
+        {
+            Content = "Info",
+            FontSize = 11,
+            Padding = new Thickness(6, 2, 6, 2),
+            Width = 36,
+            Height = 32,
+            Background = UIFactory.Brush(ResourceKeys.AccentBlueBgBrush),
+            Foreground = UIFactory.Brush(ResourceKeys.AccentBlueBrush),
+            BorderBrush = UIFactory.Brush(ResourceKeys.AccentBlueBorderBrush),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+        };
+        ToolTipService.SetToolTip(infoBtn, "Open dgVoodoo2 releases page");
+        infoBtn.Click += (s, e) =>
+            _ = Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/dege-diosg/dgVoodoo2/releases"));
+        Grid.SetColumn(infoBtn, 2);
+        row.Children.Add(infoBtn);
+
+        // Col 3 — Install button
+        var installBtn = new Button
+        {
+            Content = isInstalled ? "↺  Redeploy dgVoodoo2" : "⬇  Install dgVoodoo2",
+            FontSize = 12,
+            Height = 32,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            CornerRadius = new CornerRadius(8),
+            Background = isInstalled
+                ? UIFactory.GetBrush("#182840")
+                : UIFactory.Brush(ResourceKeys.AccentBlueBgBrush),
+            Foreground = isInstalled
+                ? UIFactory.GetBrush("#7AACDD")
+                : UIFactory.Brush(ResourceKeys.AccentBlueBrush),
+            BorderBrush = isInstalled
+                ? UIFactory.GetBrush("#2A4468")
+                : UIFactory.Brush(ResourceKeys.AccentBlueBorderBrush),
+            BorderThickness = new Thickness(1),
+            IsEnabled = manifest?.DgVoodooVersions?.Count > 0,
+        };
+        ToolTipService.SetToolTip(installBtn,
+            isInstalled ? "Redeploy dgVoodoo2 — refreshes D3D9.dll and dgVoodoo.conf from staged version"
+                        : "Install dgVoodoo2 — deploys D3D9.dll and dgVoodoo.conf to the game folder");
+
+        installBtn.Click += async (s, ev) =>
+        {
+            if (string.IsNullOrEmpty(installPath) || manifest?.DgVoodooVersions == null) return;
+            installBtn.IsEnabled = false;
+            installBtn.Content   = "Installing...";
+            try
+            {
+                // Pick version: prefer a game-specific Luma version recommendation if this
+                // game happens to be in the lumaRequiresDgVoodoo list with a specific version.
+                // Otherwise use the latest (first) entry from dgVoodooVersions.
+                KeyValuePair<string, string> versionEntry;
+                bool inLumaList = manifest.LumaRequiresDgVoodoo?.Contains(gameName, StringComparer.OrdinalIgnoreCase) == true;
+                // Check if any LumaMod for this card recommends a specific version
+                string? preferredVersion = inLumaList ? card.LumaMod?.DgVoodooVersion : null;
+                if (!string.IsNullOrEmpty(preferredVersion)
+                    && manifest.DgVoodooVersions.TryGetValue(preferredVersion, out var prefUrl))
+                    versionEntry = new KeyValuePair<string, string>(preferredVersion, prefUrl);
+                else
+                    versionEntry = manifest.DgVoodooVersions.First();
+
+                await dgSvc.EnsureStagedAsync(versionEntry.Key, versionEntry.Value).ConfigureAwait(false);
+                var deployed = await Task.Run(() =>
+                    dgSvc.DeployToGame(installPath, versionEntry.Key, is64Bit: !card.Is32Bit));
+
+                if (deployed.Count > 0)
+                {
+                    _window.ViewModel.SetDgVoodooStandalone(gameName, true, store);
+                    CrashReporter.Log($"[BuildDgVoodooRow] dgVoodoo2 v{versionEntry.Key} deployed standalone for '{gameName}'");
+                    RequestExtrasRebuild(card);
+                }
+                else
+                {
+                    installBtn.Content = "❌ Deploy failed";
+                    installBtn.IsEnabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                CrashReporter.Log($"[BuildDgVoodooRow] Install failed for '{gameName}' — {ex.Message}");
+                installBtn.Content   = "❌ Failed";
+                installBtn.IsEnabled = true;
+            }
+        };
+        Grid.SetColumn(installBtn, 3);
+        row.Children.Add(installBtn);
+
+        // Col 4 — placeholder cog (no settings needed — conf is always the same)
+        var cogBtn = new Button
+        {
+            Width = 36,
+            Height = 32,
+            Padding = new Thickness(0),
+            Background = UIFactory.Brush(ResourceKeys.SurfaceOverlayBrush),
+            Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
+            BorderBrush = UIFactory.Brush(ResourceKeys.BorderDefaultBrush),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Content = new TextBlock { Text = "⚙", FontSize = 14, HorizontalAlignment = HorizontalAlignment.Center },
+            Opacity = 0,
+            IsHitTestVisible = false,
+        };
+        Grid.SetColumn(cogBtn, 4);
+        row.Children.Add(cogBtn);
+
+        // Col 5 — Remove button (visible only when installed)
+        var removeBtn = new Button
+        {
+            Width = 36,
+            Height = 32,
+            Padding = new Thickness(0),
+            Background = UIFactory.Brush(ResourceKeys.AccentRedBgBrush),
+            Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush),
+            BorderBrush = UIFactory.Brush(ResourceKeys.AccentPurpleBorderBrush),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Content = new TextBlock { Text = "✕", FontSize = 12, HorizontalAlignment = HorizontalAlignment.Center, Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush) },
+            Opacity = isInstalled ? 1.0 : 0.0,
+            IsHitTestVisible = isInstalled,
+        };
+        ToolTipService.SetToolTip(removeBtn, "Remove dgVoodoo2 from this game");
+        removeBtn.Click += (s, ev) =>
+        {
+            if (string.IsNullOrEmpty(installPath)) return;
+            // Coexistence guard: don't remove if Luma or Feeder also needs dgVoodoo2
+            bool lumaNeeds    = card.LumaStatus == GameStatus.Installed;
+            bool feederNeeds  = File.Exists(Path.Combine(installPath, "dlss5-feed.addon32"))
+                             || File.Exists(Path.Combine(installPath, "dlss5-feed.addon64"));
+            if (lumaNeeds || feederNeeds)
+            {
+                CrashReporter.Log($"[BuildDgVoodooRow] {(lumaNeeds ? "Luma" : "Feeder")} still installed — only clearing standalone flag for '{gameName}'");
+                // Just clear the standalone flag; the files stay for the other component
+                _window.ViewModel.SetDgVoodooStandalone(gameName, false, store);
+                RequestExtrasRebuild(card);
+                return;
+            }
+            dgSvc.RemoveFromGame(installPath);
+            _window.ViewModel.SetDgVoodooStandalone(gameName, false, store);
+            CrashReporter.Log($"[BuildDgVoodooRow] dgVoodoo2 removed for '{gameName}'");
+            RequestExtrasRebuild(card);
+        };
+        Grid.SetColumn(removeBtn, 5);
+        row.Children.Add(removeBtn);
 
         body.Children.Add(row);
     }

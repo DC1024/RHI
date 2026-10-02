@@ -93,6 +93,9 @@ public class GameNameService : IGameNameService
     /// <summary>Games where Streamline should be deployed to the OptiScaler subfolder. Composite-keyed "GameName|Store".</summary>
     private HashSet<string> _osDeployStreamline = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Games where dgVoodoo2 has been standalone-installed (not via Luma or Feeder). Composite-keyed "GameName|Store".</summary>
+    private HashSet<string> _dgVoodooStandaloneGames = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>Games where DLSS Enabler should be deployed to the OptiScaler subfolder. Composite-keyed "GameName|Store".</summary>
     private HashSet<string> _osDeployDlssEnabler = new(StringComparer.OrdinalIgnoreCase);
 
@@ -209,6 +212,9 @@ public class GameNameService : IGameNameService
 
     /// <summary>Games where Streamline should be deployed. Composite-keyed "GameName|Store".</summary>
     public HashSet<string> OsDeployStreamline => _osDeployStreamline;
+
+    /// <summary>Games where dgVoodoo2 has been standalone-installed via the Extras panel. Composite-keyed "GameName|Store".</summary>
+    public HashSet<string> DgVoodooStandaloneGames => _dgVoodooStandaloneGames;
 
     /// <summary>Games where DLSS Enabler should be deployed. Composite-keyed "GameName|Store".</summary>
     public HashSet<string> OsDeployDlssEnabler => _osDeployDlssEnabler;
@@ -602,6 +608,9 @@ public class GameNameService : IGameNameService
         _osDeployStreamline = new HashSet<string>(
             Load<List<string>>("OsDeployStreamline", new()), StringComparer.OrdinalIgnoreCase);
 
+        _dgVoodooStandaloneGames = new HashSet<string>(
+            Load<List<string>>("DgVoodooStandaloneGames", new()), StringComparer.OrdinalIgnoreCase);
+
         _osDeployDlssEnabler = new HashSet<string>(
             Load<List<string>>("OsDeployDlssEnabler", new()), StringComparer.OrdinalIgnoreCase);
 
@@ -838,6 +847,8 @@ public class GameNameService : IGameNameService
                 s["FavouriteGames"]      = JsonSerializer.Serialize(_favouriteGames?.ToList() ?? new List<string>());
                 s["RtxHdrGames"]         = JsonSerializer.Serialize(_rtxHdrGames?.ToList() ?? new List<string>());
                 s["OsDeployStreamline"]  = JsonSerializer.Serialize(_osDeployStreamline.ToList());
+                if (_dgVoodooStandaloneGames.Count > 0) s["DgVoodooStandaloneGames"] = JsonSerializer.Serialize(_dgVoodooStandaloneGames.ToList());
+                else s.Remove("DgVoodooStandaloneGames");
                 s["OsDeployDlssEnabler"] = JsonSerializer.Serialize(_osDeployDlssEnabler.ToList());
                 s["OsDilatedMotionVectorsOff"] = JsonSerializer.Serialize(_osDilatedMotionVectorsOff.ToList());
                 s["OsFsrCrashFix"] = JsonSerializer.Serialize(_osFsrCrashFix);
@@ -988,6 +999,7 @@ public class GameNameService : IGameNameService
         MigrateCompositeHashSet(_normalReShadeGames, oldName, newName);
         MigrateCompositeHashSet(_rsIniLockedGames, oldName, newName);
         MigrateCompositeHashSet(_osDeployStreamline, oldName, newName);
+        MigrateCompositeHashSet(_dgVoodooStandaloneGames, oldName, newName);
         MigrateCompositeHashSet(_osDeployDlssEnabler, oldName, newName);
         MigrateCompositeHashSet(_osDilatedMotionVectorsOff, oldName, newName);
         MigrateCompositeDict(_osFsrCrashFix, oldName, newName);
