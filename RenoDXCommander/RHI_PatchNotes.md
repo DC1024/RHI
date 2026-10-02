@@ -1,7 +1,7 @@
 ## v2.8.1 Beta 2
 
 ### New
-- **dgVoodoo2** — now available as a standalone install in the Extras section (under API Upgrades) for any DX9 game. Deploys the DX9→DX11 translation layer directly to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Tracks coexistence with Luma and Feeder — if any component still needs dgVoodoo2, it stays in place when you uninstall another.
+- **dgVoodoo2** — now available as a standalone install in the Extras section (under API Upgrades) for any DX9 game. Deploys the DX9→DX11 translation layer directly to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Tracks coexistence with Luma and Feeder — if any component still needs dgVoodoo2, it stays in place when you uninstall another. The ⚙ cog lets you pick which version to deploy — useful for games that work better with older builds.
 - **Control Ultimate Edition — OptiScaler FG** — the install dialog now has two new options. "Install OptiScaler FG" installs OptiScaler Nightly pre-configured for Frame Generation: Streamline deployed, DLLs renamed correctly (OptiScaler → winmm.dll, ReShade → dxgi.dll), and all required INI settings written automatically. "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset. Everything is wired up in one click.
 
 ### Changes
