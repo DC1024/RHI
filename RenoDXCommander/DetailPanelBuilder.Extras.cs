@@ -2307,14 +2307,41 @@ public partial class DetailPanelBuilder
                     _window.ViewModel.SetDgVoodooStandalone(gameName, true, store);
                     CrashReporter.Log($"[BuildDgVoodooRow] dgVoodoo2 v{versionEntry.Key} deployed standalone for '{gameName}'");
 
-                    // If ReShade is installed as d3d9.dll it now conflicts with dgVoodoo2.
-                    // Reinstall ReShade as dxgi.dll so it hooks dgVoodoo2's DX11 output instead.
+                    // If ReShade was at d3d9.dll, dgVoodoo2's SentinelBackup has already saved it
+                    // as D3D9.dll.original. Copy it to dxgi.dll so ReShade hooks dgVoodoo2's DX11 output.
+                    // Do NOT move D3D9.dll (that's now dgVoodoo2).
                     if (card.IsRsInstalled
                         && (card.RsInstalledFile?.Equals("d3d9.dll", StringComparison.OrdinalIgnoreCase) == true
                             || card.RsInstalledFile?.Equals("D3D9.dll", StringComparison.OrdinalIgnoreCase) == true))
                     {
-                        CrashReporter.Log($"[BuildDgVoodooRow] ReShade is d3d9.dll — reinstalling as dxgi.dll for dgVoodoo2 coexistence on '{gameName}'");
-                        await _window.ViewModel.InstallReShadeInternalAsync(card, forceFilename: "dxgi.dll").ConfigureAwait(false);
+                        CrashReporter.Log($"[BuildDgVoodooRow] Copying ReShade from D3D9.dll.original → dxgi.dll for dgVoodoo2 coexistence on '{gameName}'");
+                        try
+                        {
+                            var sentinelPath = Path.Combine(installPath, "D3D9.dll.original");
+                            var dxgiPath     = Path.Combine(installPath, "dxgi.dll");
+                            if (File.Exists(sentinelPath))
+                            {
+                                // Back up any existing dxgi.dll before overwriting
+                                AuxInstallService.SentinelBackup(dxgiPath);
+                                File.Copy(sentinelPath, dxgiPath, overwrite: true);
+                                // Update ReShade tracking record
+                                if (card.RsRecord != null)
+                                {
+                                    card.RsRecord.InstalledAs = "dxgi.dll";
+                                    App.Services.GetRequiredService<AuxInstallService>().SaveAuxRecord(card.RsRecord);
+                                }
+                                card.RsInstalledFile = "dxgi.dll";
+                                CrashReporter.Log($"[BuildDgVoodooRow] ReShade copied to dxgi.dll for '{gameName}'");
+                            }
+                            else
+                            {
+                                CrashReporter.Log($"[BuildDgVoodooRow] D3D9.dll.original not found — ReShade may need manual reinstall for '{gameName}'");
+                            }
+                        }
+                        catch (Exception rsEx)
+                        {
+                            CrashReporter.Log($"[BuildDgVoodooRow] Failed to copy ReShade to dxgi.dll for '{gameName}' — {rsEx.Message}");
+                        }
                     }
 
                     // Rebuild after everything (including ReShade reinstall) is complete
