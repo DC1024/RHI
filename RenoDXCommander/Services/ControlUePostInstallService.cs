@@ -74,7 +74,8 @@ public static class ControlUePostInstallService
                 Text = "It fixes RT noise using Ray Reconstruction. Two strategies (pick one, they are mutually exclusive):\n"
                      + "  •  Turn off the in-game RT denoiser and use DLSS Super Resolution preset M or L\n"
                      + "  •  Use Ray Reconstruction with extra inputs derived from the game's shaders "
-                     + "(game denoiser is turned off here too — RR needs that)",
+                     + "(game denoiser is turned off here too — RR needs that)\n\n"
+                     + "⚠ DLSS, Ray Tracing, and SSAO must all be enabled in-game for Ray Reconstruction to work correctly.",
                 TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                 FontSize = 13,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -94,7 +95,8 @@ public static class ControlUePostInstallService
                 Text = "  •  Upgrade nvngx_dlss.dll to the newest available version\n"
                      + "  •  Deploy nvngx_dlssd.dll (DLSS Ray Reconstruction runtime)\n"
                      + "  •  Set renderer.ini HDR preset to the correct value\n"
-                     + "  •  Clear the DLSS SR preset set in the NVIDIA driver profile for this game",
+                     + "  •  Clear the DLSS SR preset set in the NVIDIA driver profile for this game\n"
+                     + "  •  If OptiScaler FG = Yes: installs OptiScaler Nightly with Frame Generation pre-configured, deploys Streamline and nvngx_dlssg.dll, renames OptiScaler to winmm.dll and ReShade to dxgi.dll, and applies all required FG INI settings",
                 TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                 FontSize = 13,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
