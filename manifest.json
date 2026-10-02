@@ -796,8 +796,7 @@
   "dgVoodooVersions": {
     "2.87.5": "https://github.com/dege-diosg/dgVoodoo2/releases/download/v2.87.5/dgVoodoo2_87_5.zip",
     "2.87.4": "https://github.com/dege-diosg/dgVoodoo2/releases/download/v2.87.4/dgVoodoo2_87_4.zip",
-    "2.87.3": "https://github.com/dege-diosg/dgVoodoo2/releases/download/v2.87.3/dgVoodoo2_87_3.zip",
-    "2.81.3": "https://github.com/dege-diosg/dgVoodoo2/releases/download/v2.81.3/dgVoodoo2_81_3.zip"
+    "2.87.3": "https://github.com/dege-diosg/dgVoodoo2/releases/download/v2.87.3/dgVoodoo2_87_3.zip"
   },
   "_comment_install_behaviour": "=== INSTALL BEHAVIOUR ===\nControls what happens when the user clicks Install for a component.\ninstallWarnings shows a blocking confirm dialog before proceeding (keys: reshade, renodx, relimiter, dc, optiscaler, luma, reframework, dxvk).\nforceExternalOnly redirects the install button to an external URL instead of downloading.\nsnapshotOverrides injects or overrides the addon download URL when wiki scraping fails.\ndllNameOverrides forces specific proxy DLL filenames (e.g. winmm.dll instead of dxgi.dll).\ngacSymlinkGames routes XNA Framework games through a GAC symlink install (requires admin).\nlaunchExeOverrides sets the relative exe path used when clicking Launch and for NVIDIA profile matching.\nrenodxIniOverrides injects keys into [renodx] reshade.ini section on install/update.\nlegacyReShadeVersions auto-assigns a locked ReShade version channel to specific games.",
   "installWarnings": {
