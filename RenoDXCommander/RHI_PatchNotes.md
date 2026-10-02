@@ -8,7 +8,7 @@
 - **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions — so you can see active overrides at a glance without expanding the section.
 - **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale when non-default, e.g. `SR 310.9.1 · M · 75% · RR 310.9.1 · FG 310.9.1 · B · SL 2.14.1`.
 - **Shader pack update log** now shows real version numbers for packs with GitHub releases (Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Other packs still show "Updated" since they have no version tags.
-- **Streamline deployment now includes `nvngx_dlssg.dll`** — copied into the `OptiScaler/Streamline/` subfolder on every Streamline deploy for FG support.
+- **Streamline deployment now includes nvngx_dlssg.dll** — copied into the OptiScaler/Streamline/ subfolder on every Streamline deploy for FG support.
 - **OptiScaler Nightly FG cog** — three new Frame Generation settings: FG Enabled (on/off master switch), Force Reflex, and Use Games Reflex Markers. Changes write to OptiScaler.ini immediately.
 - **Neural Rendering remove button** is now a ✕ red icon with the ⚙ cog always shown beside it, matching the Extras section style.
 
@@ -25,7 +25,7 @@
 - Fixed Saints Row 2 using 64-bit ReShade — added to 32-bit list.
 - Fixed Assassin's Creed Unity using 32-bit ReShade — added to 64-bit list.
 - Fixed Bye Sweet Carole using 32-bit ReShade — added to 64-bit list.
-- Fixed ReShade not loading on NTE: Neverness To Everness — added `d3d12.dll` name override.
+- Fixed ReShade not loading on NTE: Neverness To Everness — added d3d12.dll name override.
 - Added install warning for The Witcher 3: Wild Hunt — Remastered — the available RenoDX mod is for the original version, not the Remastered Edition. The warning links to the Discord thread for the Remastered mod.
 
 ---
