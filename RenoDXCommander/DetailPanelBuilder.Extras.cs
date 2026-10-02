@@ -2327,7 +2327,7 @@ public partial class DetailPanelBuilder
         Grid.SetColumn(installBtn, 3);
         row.Children.Add(installBtn);
 
-        // Col 4 — placeholder cog (no settings needed — conf is always the same)
+        // Col 4 — Cog
         var cogBtn = new Button
         {
             Width = 36,
@@ -2339,8 +2339,19 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             Content = new TextBlock { Text = "⚙", FontSize = 14, HorizontalAlignment = HorizontalAlignment.Center },
-            Opacity = 0,
-            IsHitTestVisible = false,
+        };
+        ToolTipService.SetToolTip(cogBtn, "dgVoodoo2 Settings");
+        cogBtn.Click += async (s, ev) =>
+        {
+            var dlg = new ContentDialog
+            {
+                Title = "dgVoodoo2 Settings",
+                Content = new TextBlock { Text = "No settings available yet.", FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) },
+                CloseButtonText = "Close",
+                XamlRoot = _window.Content.XamlRoot,
+                RequestedTheme = ElementTheme.Dark,
+            };
+            await DialogService.ShowSafeAsync(dlg);
         };
         Grid.SetColumn(cogBtn, 4);
         row.Children.Add(cogBtn);

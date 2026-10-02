@@ -2359,6 +2359,17 @@ public sealed partial class MainWindow
             Grid.SetRow(fgHeading, 3); Grid.SetColumn(fgHeading, 0); Grid.SetColumnSpan(fgHeading, 4);
             unifiedGrid.Children.Add(fgHeading);
 
+            // Row 4: FG Enabled — master on/off, first option in the FG section
+            var currentFgEnabled = ReadOsIniValue("FrameGen", "Enabled");
+            var fgEnabledCombo = new ComboBox
+            {
+                ItemsSource = new[] { "Auto (false)", "True" },
+                SelectedItem = currentFgEnabled.Equals("true", StringComparison.OrdinalIgnoreCase) ? "True" : "Auto (false)",
+            };
+            ToolTipService.SetToolTip(fgEnabledCombo,
+                "Enables Frame Generation. Default (auto) is false — set to True to enable.");
+            AddRow(unifiedGrid, 4, "FG Enabled", fgEnabledCombo, null, null);
+
             // All nightly rows go into the same unifiedGrid so columns align with the version row above
             // Row 2: Streamline/DLSS Enabler (combined) | Streamline Version
             var dlssStreamlineSvc = App.Services.GetRequiredService<IDlssStreamlineService>();
@@ -2376,7 +2387,7 @@ public sealed partial class MainWindow
             combinedCombo = new ComboBox { ItemsSource = new[] { "No", "Yes" }, SelectedItem = combinedOn ? "Yes" : "No" };
             ToolTipService.SetToolTip(combinedCombo, "Deploys Streamline and DLSS Enabler to the game's OptiScaler folder. Required for DLSS Frame Generation with OptiScaler.");
             var slVersionCombo = new ComboBox { ItemsSource = slVersions.Count > 0 ? (IEnumerable<string>)slVersions : new[] { slVersionDefault }, SelectedItem = slVersionDefault, IsEnabled = combinedOn };
-            AddRow(unifiedGrid, 4, "Streamline/DLSS Enabler", combinedCombo, "Streamline Version", slVersionCombo);
+            AddRow(unifiedGrid, 5, "Streamline/DLSS Enabler", combinedCombo, "Streamline Version", slVersionCombo);
 
             // Row 4: FG Input (left) | HUD Fix (right)
             fgInputCombo = new ComboBox { ItemsSource = new[] { "Auto (Default)", "OptiFG (Upscaler)", "DLSSG via Streamline", "DLSSG via Nvngx", "FSR 3.1 FG", "FSR 3.0 FG", "XeFG" }, SelectedItem = IniToFgInput(ViewModel.GetOsFgInput(card.GameName, card.Source ?? "")) };
@@ -2404,7 +2415,7 @@ public sealed partial class MainWindow
             hudFixCombo = new ComboBox { ItemsSource = new[] { "Default", "On", "Off" }, SelectedItem = hudFixSelected };
             ToolTipService.SetToolTip(hudFixCombo!, "HUD Fix: enables hudless resource tracking for Frame Generation. On = HUDFix=true in [OptiFG].");
 
-            AddRow(unifiedGrid, 5, "FG Input", fgInputCombo!, "HUD Fix", hudFixCombo!);
+            AddRow(unifiedGrid, 6, "FG Input", fgInputCombo!, "HUD Fix", hudFixCombo!);
 
             // Row 5: FG Output (left) | FG Nvngx Override (right)
             fgOutputCombo = new ComboBox { ItemsSource = new[] { "Auto (Default)", "FSR FG", "DLSSG", "XeFG" }, SelectedItem = IniToFgOutput(ViewModel.GetOsFgOutput(card.GameName, card.Source ?? "")) };
@@ -2414,12 +2425,54 @@ public sealed partial class MainWindow
             object? nvngxSelected = nvngxItems.FirstOrDefault(i => i is ComboBoxItem cb ? (cb.Content as string) == currentNvngxDisplay : (i as string) == currentNvngxDisplay) ?? nvngxItems[0];
             fgNvngxCombo = new ComboBox { ItemsSource = nvngxItems, SelectedItem = nvngxSelected };
             ToolTipService.SetToolTip(fgNvngxCombo!, "Only relevant when FG Output = DLSSG. Enabler requires Deploy Streamline + Deploy DLSS Enabler.");
-            AddRow(unifiedGrid, 6, "FG Output", fgOutputCombo!, "FG Nvngx Override", fgNvngxCombo!);
+            AddRow(unifiedGrid, 7, "FG Output", fgOutputCombo!, "FG Nvngx Override", fgNvngxCombo!);
 
             bool fgOutputIsDlssg = fgOutputCombo!.SelectedItem as string == "DLSSG";
             fgNvngxCombo!.Opacity = fgOutputIsDlssg ? 1.0 : 0.35;
             fgNvngxCombo!.IsHitTestVisible = fgOutputIsDlssg;
             fgNvngxCombo!.IsEnabled = fgOutputIsDlssg;
+
+            // Row 8: ForceReflex (left) | UseGamesReflexMarkers (right)
+            // Read current values directly from OptiScaler.ini
+            // ForceReflex lives in [fakenvapi], UseGamesReflexMarkers in [DLSSG]
+            string ReadOsIniValue(string sectionName, string key)
+            {
+                if (string.IsNullOrEmpty(card.InstallPath)) return "";
+                var p = Path.Combine(card.InstallPath, OptiScalerService.IniFileName);
+                if (!File.Exists(p)) return "";
+                bool inSec = false;
+                foreach (var line in File.ReadAllLines(p))
+                {
+                    var t = line.Trim();
+                    if (t.StartsWith("[")) inSec = t.Equals($"[{sectionName}]", StringComparison.OrdinalIgnoreCase);
+                    else if (inSec && !t.StartsWith(";"))
+                    {
+                        var pfx1 = key + "="; var pfx2 = key + " =";
+                        if (t.StartsWith(pfx1, StringComparison.OrdinalIgnoreCase)) return t.Substring(pfx1.Length).Trim();
+                        if (t.StartsWith(pfx2, StringComparison.OrdinalIgnoreCase)) return t.Substring(pfx2.Length).Trim();
+                    }
+                }
+                return "";
+            }
+            var currentForceReflex = ReadOsIniValue("fakenvapi", "ForceReflex");
+            var forceReflexCombo = new ComboBox
+            {
+                ItemsSource = new[] { "Auto (0)", "Force Disable (1)", "Force Enable (2)" },
+                SelectedItem = currentForceReflex switch { "1" => "Force Disable (1)", "2" => "Force Enable (2)", _ => "Auto (0)" },
+            };
+            ToolTipService.SetToolTip(forceReflexCombo,
+                "ForceReflex: controls Reflex state when using DLSS FG.\n0 = follow in-game setting (default), 1 = force disable, 2 = force enable.");
+
+            var currentReflexMarkers = ReadOsIniValue("DLSSG", "UseGamesReflexMarkers");
+            var reflexMarkersCombo = new ComboBox
+            {
+                ItemsSource = new[] { "True", "False" },
+                SelectedItem = currentReflexMarkers.Equals("false", StringComparison.OrdinalIgnoreCase) ? "False" : "True",
+            };
+            ToolTipService.SetToolTip(reflexMarkersCombo,
+                "UseGamesReflexMarkers: whether to use the game's Reflex markers for Frame Generation timing. Default is true.");
+
+            AddRow(unifiedGrid, 8, "Force Reflex", forceReflexCombo, "Use Games Reflex Markers", reflexMarkersCombo);
 
             // ── Wire handlers ──────────────────────────────────────────────
             combinedCombo!.SelectionChanged += (s, ev) =>
@@ -2495,6 +2548,29 @@ public sealed partial class MainWindow
                 var v = FgNvngxToIni!(display); ViewModel.SetOsFgNvngxReplacement(card.GameName, v, card.Source ?? "");
                 if (!string.IsNullOrEmpty(card.InstallPath) && string.Equals(ViewModel.GetOsFgOutput(card.GameName, card.Source ?? ""), "dlssg", StringComparison.OrdinalIgnoreCase))
                     OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "FrameGen", "FGNvngxReplacement", v);
+            };
+            fgEnabledCombo.SelectionChanged += (s, ev) =>
+            {
+                if (string.IsNullOrEmpty(card.InstallPath)) return;
+                var v = fgEnabledCombo.SelectedItem as string == "True" ? "true" : "false";
+                OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "FrameGen", "Enabled", v);
+            };
+            forceReflexCombo.SelectionChanged += (s, ev) =>
+            {
+                if (string.IsNullOrEmpty(card.InstallPath)) return;
+                var v = forceReflexCombo.SelectedItem as string switch
+                {
+                    "Force Disable (1)" => "1",
+                    "Force Enable (2)"  => "2",
+                    _                   => "0",
+                };
+                OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "fakenvapi", "ForceReflex", v);
+            };
+            reflexMarkersCombo.SelectionChanged += (s, ev) =>
+            {
+                if (string.IsNullOrEmpty(card.InstallPath)) return;
+                var v = reflexMarkersCombo.SelectedItem as string == "False" ? "false" : "true";
+                OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "DLSSG", "UseGamesReflexMarkers", v);
             };
 
             // ── Additional Settings ────────────────────────────────────────
