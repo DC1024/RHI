@@ -2188,9 +2188,10 @@ public partial class DetailPanelBuilder
 
         bool isInstalled = dgSvc.IsDeployed(installPath);
 
-        // Status: show deployed version from the manifest dgVoodooVersions dict
-        string? stagedVersion = manifest?.DgVoodooVersions?.Keys.FirstOrDefault();
-        string statusText  = isInstalled ? (stagedVersion != null ? $"v{stagedVersion}" : "Installed") : "Ready";
+        // Status: show deployed version — prefer stored per-game override, else latest from manifest
+        string? latestVersion = manifest?.DgVoodooVersions?.Keys.FirstOrDefault();
+        var activeVersion = _window.ViewModel.GetDgVoodooVersion(gameName, store) ?? latestVersion;
+        string statusText  = isInstalled ? (activeVersion != null ? $"v{activeVersion}" : "Installed") : "Ready";
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
         // ── Row grid ──────────────────────────────────────────────────────────
@@ -2288,16 +2289,12 @@ public partial class DetailPanelBuilder
             installBtn.Content   = "Installing...";
             try
             {
-                // Pick version: prefer a game-specific Luma version recommendation if this
-                // game happens to be in the lumaRequiresDgVoodoo list with a specific version.
-                // Otherwise use the latest (first) entry from dgVoodooVersions.
+                // Pick version: prefer stored per-game override, then latest from manifest
                 KeyValuePair<string, string> versionEntry;
-                bool inLumaList = manifest.LumaRequiresDgVoodoo?.Contains(gameName, StringComparer.OrdinalIgnoreCase) == true;
-                // Check if any LumaMod for this card recommends a specific version
-                string? preferredVersion = inLumaList ? card.LumaMod?.DgVoodooVersion : null;
-                if (!string.IsNullOrEmpty(preferredVersion)
-                    && manifest.DgVoodooVersions.TryGetValue(preferredVersion, out var prefUrl))
-                    versionEntry = new KeyValuePair<string, string>(preferredVersion, prefUrl);
+                var storedVersion = _window.ViewModel.GetDgVoodooVersion(gameName, store);
+                if (!string.IsNullOrEmpty(storedVersion)
+                    && manifest.DgVoodooVersions.TryGetValue(storedVersion, out var storedUrl))
+                    versionEntry = new KeyValuePair<string, string>(storedVersion, storedUrl);
                 else
                     versionEntry = manifest.DgVoodooVersions.First();
 
@@ -2309,6 +2306,18 @@ public partial class DetailPanelBuilder
                 {
                     _window.ViewModel.SetDgVoodooStandalone(gameName, true, store);
                     CrashReporter.Log($"[BuildDgVoodooRow] dgVoodoo2 v{versionEntry.Key} deployed standalone for '{gameName}'");
+
+                    // If ReShade is installed as d3d9.dll it now conflicts with dgVoodoo2.
+                    // Reinstall ReShade as dxgi.dll so it hooks dgVoodoo2's DX11 output instead.
+                    if (card.IsRsInstalled
+                        && (card.RsInstalledFile?.Equals("d3d9.dll", StringComparison.OrdinalIgnoreCase) == true
+                            || card.RsInstalledFile?.Equals("D3D9.dll", StringComparison.OrdinalIgnoreCase) == true))
+                    {
+                        CrashReporter.Log($"[BuildDgVoodooRow] ReShade is d3d9.dll — reinstalling as dxgi.dll for dgVoodoo2 coexistence on '{gameName}'");
+                        await _window.ViewModel.InstallReShadeInternalAsync(card, forceFilename: "dxgi.dll").ConfigureAwait(false);
+                    }
+
+                    // Rebuild after everything (including ReShade reinstall) is complete
                     RequestExtrasRebuild(card);
                 }
                 else
@@ -2343,15 +2352,86 @@ public partial class DetailPanelBuilder
         ToolTipService.SetToolTip(cogBtn, "dgVoodoo2 Settings");
         cogBtn.Click += async (s, ev) =>
         {
-            var dlg = new ContentDialog
+            // Build version list from manifest
+            var versions = manifest?.DgVoodooVersions?.Keys.ToList() ?? new List<string>();
+            if (versions.Count == 0)
+            {
+                var noVerDlg = new ContentDialog
+                {
+                    Title = "dgVoodoo2 Settings",
+                    Content = new TextBlock { Text = "No versions available in manifest.", FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) },
+                    CloseButtonText = "Close",
+                    XamlRoot = _window.Content.XamlRoot,
+                    RequestedTheme = ElementTheme.Dark,
+                };
+                await DialogService.ShowSafeAsync(noVerDlg);
+                return;
+            }
+
+            var currentVersion = _window.ViewModel.GetDgVoodooVersion(gameName, store) ?? versions[0];
+
+            var versionStack = new StackPanel { Spacing = 6 };
+            versionStack.Children.Add(new TextBlock
+            {
+                Text = "Version",
+                FontSize = 12,
+                Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
+            });
+            var versionCombo = new ComboBox
+            {
+                ItemsSource = versions,
+                SelectedItem = versions.Contains(currentVersion) ? currentVersion : versions[0],
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                MaxDropDownHeight = 300,
+            };
+            ToolTipService.SetToolTip(versionCombo,
+                "dgVoodoo2 version to deploy. Older versions may work better with certain games (e.g. 2.87.3 for Mass Effect).");
+            versionStack.Children.Add(versionCombo);
+
+            versionStack.Children.Add(new TextBlock
+            {
+                Text = "Changing version will immediately redeploy dgVoodoo2 to the game folder.",
+                FontSize = 11,
+                Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 4, 0, 0),
+            });
+
+            var cogDlg = new ContentDialog
             {
                 Title = "dgVoodoo2 Settings",
-                Content = new TextBlock { Text = "No settings available yet.", FontSize = 12, Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush) },
-                CloseButtonText = "Close",
+                Content = versionStack,
+                PrimaryButtonText = "Apply",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
                 XamlRoot = _window.Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
             };
-            await DialogService.ShowSafeAsync(dlg);
+
+            var result = await DialogService.ShowSafeAsync(cogDlg);
+            if (result != ContentDialogResult.Primary) return;
+
+            var selectedVersion = versionCombo.SelectedItem as string;
+            if (string.IsNullOrEmpty(selectedVersion)) return;
+
+            _window.ViewModel.SetDgVoodooVersion(gameName, selectedVersion, store);
+
+            // Redeploy if already installed
+            if (isInstalled && manifest?.DgVoodooVersions?.TryGetValue(selectedVersion, out var versionUrl) == true)
+            {
+                try
+                {
+                    await dgSvc.EnsureStagedAsync(selectedVersion, versionUrl).ConfigureAwait(false);
+                    var redeployed = await Task.Run(() => dgSvc.DeployToGame(installPath, selectedVersion, is64Bit: !card.Is32Bit));
+                    if (redeployed.Count > 0)
+                        CrashReporter.Log($"[BuildDgVoodooRow] Redeployed dgVoodoo2 v{selectedVersion} for '{gameName}'");
+                }
+                catch (Exception ex)
+                {
+                    CrashReporter.Log($"[BuildDgVoodooRow] Redeploy failed — {ex.Message}");
+                }
+                RequestExtrasRebuild(card);
+            }
         };
         Grid.SetColumn(cogBtn, 4);
         row.Children.Add(cogBtn);
@@ -2372,7 +2452,7 @@ public partial class DetailPanelBuilder
             IsHitTestVisible = isInstalled,
         };
         ToolTipService.SetToolTip(removeBtn, "Remove dgVoodoo2 from this game");
-        removeBtn.Click += (s, ev) =>
+        removeBtn.Click += async (s, ev) =>
         {
             if (string.IsNullOrEmpty(installPath)) return;
             // Coexistence guard: don't remove if Luma or Feeder also needs dgVoodoo2
@@ -2382,7 +2462,6 @@ public partial class DetailPanelBuilder
             if (lumaNeeds || feederNeeds)
             {
                 CrashReporter.Log($"[BuildDgVoodooRow] {(lumaNeeds ? "Luma" : "Feeder")} still installed — only clearing standalone flag for '{gameName}'");
-                // Just clear the standalone flag; the files stay for the other component
                 _window.ViewModel.SetDgVoodooStandalone(gameName, false, store);
                 RequestExtrasRebuild(card);
                 return;
@@ -2390,6 +2469,16 @@ public partial class DetailPanelBuilder
             dgSvc.RemoveFromGame(installPath);
             _window.ViewModel.SetDgVoodooStandalone(gameName, false, store);
             CrashReporter.Log($"[BuildDgVoodooRow] dgVoodoo2 removed for '{gameName}'");
+
+            // If ReShade was coexisting as dxgi.dll, reinstall it as d3d9.dll now that
+            // dgVoodoo2 is gone and d3d9.dll is available again.
+            if (card.IsRsInstalled
+                && (card.RsInstalledFile?.Equals("dxgi.dll", StringComparison.OrdinalIgnoreCase) == true))
+            {
+                CrashReporter.Log($"[BuildDgVoodooRow] ReShade was dxgi.dll — reinstalling as d3d9.dll after dgVoodoo2 removal for '{gameName}'");
+                await _window.ViewModel.InstallReShadeInternalAsync(card, forceFilename: null).ConfigureAwait(false);
+            }
+
             RequestExtrasRebuild(card);
         };
         Grid.SetColumn(removeBtn, 5);

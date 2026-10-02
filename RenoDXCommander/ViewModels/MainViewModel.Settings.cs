@@ -449,6 +449,29 @@ public partial class MainViewModel
         SaveNameMappings();
     }
 
+    /// <summary>Returns the per-game dgVoodoo2 version override, or null if using the latest.</summary>
+    public string? GetDgVoodooVersion(string gameName, string store = "")
+    {
+        var key = GameKey.From(gameName, store).ToKey();
+        if (_gameNameService.DgVoodooVersionOverride.TryGetValue(key, out var v) && !string.IsNullOrEmpty(v)) return v;
+        if (_gameNameService.DgVoodooVersionOverride.TryGetValue(gameName, out var v2) && !string.IsNullOrEmpty(v2)) return v2;
+        return null;
+    }
+
+    /// <summary>Sets the per-game dgVoodoo2 version override. Null or empty clears it (use latest).</summary>
+    public void SetDgVoodooVersion(string gameName, string? version, string store = "")
+    {
+        var key = GameKey.From(gameName, store).ToKey();
+        if (string.IsNullOrEmpty(version))
+        {
+            _gameNameService.DgVoodooVersionOverride.Remove(key);
+            _gameNameService.DgVoodooVersionOverride.Remove(gameName);
+        }
+        else
+            _gameNameService.DgVoodooVersionOverride[key] = version;
+        SaveNameMappings();
+    }
+
     // ── Dilated Motion Vectors ────────────────────────────────────────────────
 
     /// <summary>Returns whether Dilated Motion Vectors is set to Off for a game.</summary>

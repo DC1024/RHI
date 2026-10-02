@@ -210,11 +210,14 @@ public class DgVoodooService
     }
 
     /// <summary>
-    /// Returns true if RHI has deployed dgVoodoo2 to this game folder
-    /// (detected by the presence of our sentinel marker D3D9.dll.original).
+    /// Returns true if RHI has deployed dgVoodoo2 to this game folder.
+    /// Checks for dgVoodoo.conf (always deployed by RHI alongside D3D9.dll)
+    /// as the primary indicator — more reliable than the sentinel which can be
+    /// removed by ReShade's foreign DLL restore step.
     /// </summary>
     public bool IsDeployed(string installPath)
-        => File.Exists(Path.Combine(installPath, D3D9Dll + ".original"));
+        => File.Exists(Path.Combine(installPath, ConfFile))
+        || File.Exists(Path.Combine(installPath, D3D9Dll + ".original"));
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
