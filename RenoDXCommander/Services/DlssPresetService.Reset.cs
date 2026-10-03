@@ -225,6 +225,7 @@ public partial class DlssPresetService
 
     private void ReloadSession()
     {
+        _sessionLock.Wait();
         try
         {
             _session = DriverSettingsSession.CreateAndLoad();
@@ -236,6 +237,10 @@ public partial class DlssPresetService
         catch (Exception reloadEx)
         {
             CrashReporter.Log($"[DlssPresetService.ReloadSession] Session reload failed — {reloadEx.Message}");
+        }
+        finally
+        {
+            _sessionLock.Release();
         }
     }
 

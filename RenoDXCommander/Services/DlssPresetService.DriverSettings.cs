@@ -1274,6 +1274,7 @@ $session.Save()
     private bool SetRtxHdrRaw(string gameName, string installPath, uint settingId, uint value)
     {
         if (!_isSupported || _session == null) return false;
+        _sessionLock.Wait();
         try
         {
             var profile = FindProfile(gameName, installPath);
@@ -1303,6 +1304,10 @@ $session.Save()
         {
             CrashReporter.Log($"[DlssPresetService.SetRtxHdrRaw] Error for '{gameName}' — {ex.Message}");
             return false;
+        }
+        finally
+        {
+            _sessionLock.Release();
         }
     }
 
@@ -1334,29 +1339,37 @@ $session.Save()
         {
             var fetchTask = Task.Run(() =>
             {
-                CrashReporter.Log("[DlssPresetService.FetchNvApiSettingsAsync] Starting NVAPI reads on background thread");
-                var sw = Stopwatch.StartNew();
-
-                var snapshot = new NvApiSettingsSnapshot
+                _sessionLock.Wait();
+                try
                 {
-                    ShaderCacheSize = GetShaderCacheSize(),
-                    ShaderPrecompile = GetShaderPrecompile(),
-                    GSyncMode = GetGSyncMode(),
-                    GSyncEnabled = GetGlobalGSyncEnabled(),
-                    GSyncIndicator = GetGSyncIndicator(),
-                    FpsLimit = GetGlobalFpsLimit(),
-                    PreferredRefreshRate = GetPreferredRefreshRate(),
-                    DmfgFrameCount = GetGlobalDmfgFrameCount(),
-                    DmfgTargetFps = GetGlobalDmfgTargetFps(),
-                    ReBarEnableMode = GetGlobalReBarEnableMode(),
-                    ReBarSizeLimit = GetGlobalReBarSizeLimit(),
-                    VSyncMode = GetGlobalVSyncMode(),
-                    PowerMode = GetGlobalPowerMode()
-                };
+                    CrashReporter.Log("[DlssPresetService.FetchNvApiSettingsAsync] Starting NVAPI reads on background thread");
+                    var sw = Stopwatch.StartNew();
 
-                sw.Stop();
-                CrashReporter.Log($"[DlssPresetService.FetchNvApiSettingsAsync] NVAPI reads completed in {sw.ElapsedMilliseconds}ms");
-                return snapshot;
+                    var snapshot = new NvApiSettingsSnapshot
+                    {
+                        ShaderCacheSize = GetShaderCacheSize(),
+                        ShaderPrecompile = GetShaderPrecompile(),
+                        GSyncMode = GetGSyncMode(),
+                        GSyncEnabled = GetGlobalGSyncEnabled(),
+                        GSyncIndicator = GetGSyncIndicator(),
+                        FpsLimit = GetGlobalFpsLimit(),
+                        PreferredRefreshRate = GetPreferredRefreshRate(),
+                        DmfgFrameCount = GetGlobalDmfgFrameCount(),
+                        DmfgTargetFps = GetGlobalDmfgTargetFps(),
+                        ReBarEnableMode = GetGlobalReBarEnableMode(),
+                        ReBarSizeLimit = GetGlobalReBarSizeLimit(),
+                        VSyncMode = GetGlobalVSyncMode(),
+                        PowerMode = GetGlobalPowerMode()
+                    };
+
+                    sw.Stop();
+                    CrashReporter.Log($"[DlssPresetService.FetchNvApiSettingsAsync] NVAPI reads completed in {sw.ElapsedMilliseconds}ms");
+                    return snapshot;
+                }
+                finally
+                {
+                    _sessionLock.Release();
+                }
             });
 
             var completedTask = await Task.WhenAny(fetchTask, Task.Delay(timeoutMs));
