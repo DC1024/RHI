@@ -6,7 +6,7 @@
 每个版本两个包，都附同名 `.sha256` 校验文件：
 
 - `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB）—— 完整绿色版
-- `RHI-zh-CN-patch-<tag>.zip`（约 1.6MB）—— 中文补丁包，见下节
+- `RHI-zh-CN-patch-<tag>.zip`（约 45MB）—— 中文补丁包，见下节
 
 产物由 `.github/workflows/build-zh-cn.yml` 在打 `v*` 标签时自动构建发布。
 
@@ -19,13 +19,29 @@ git push <remote> v2.8.1-zh-cn-3     # CI 自动构建 + 发 Release
 
 ## 中文补丁包（给已装官方版的用户）
 
-每次 Release 同时产出 `RHI-zh-CN-patch-<tag>.zip`，**只含 2 个文件**：
-`RHI.dll`（主程序集，中文词条表 + 语言切换逻辑）和 `resources.pri`（编译后的 XAML，
-设置页新增的 Language 下拉卡片）。覆盖进官方安装目录即可变中文，不用重装。
+每次 Release 同时产出 `RHI-zh-CN-patch-<tag>.zip`，**只含一个 `RHI.exe`**。
+覆盖进官方安装目录（默认 `C:\Program Files\RHI`）即可变中文，不用重装。
 
 说明文档：`.github/patch/README-patch.md`（随补丁包一起打包）。
-判断依据：用 UTF-16 字节比对确认 `Simplified Chinese` 等新增 XAML 串只落在 `resources.pri`，
-`简体中文` 等词条只落在 `RHI.dll`，其余文件与官方一致。
+
+### 为什么是 exe 而不是 dll + pri（踩过的坑）
+
+**官方 RHI 是 .NET 单文件发布**（`PublishSingleFile` + `WindowsAppSDKSelfContained`，
+见 `RenoDXCommander.csproj` 里 `SelfContained=false` + `WindowsAppSDKSelfContained=true`
+以及各 Content 项的 `ExcludeFromSingleFile=true`）。`RHI.dll` 和 `resources.pri`
+**都打包在 `RHI.exe` 内部**；安装目录里散落的那两份只是打包残留，**运行时不加载**。
+
+实测证据（官方 `C:\Program Files\RHI\RHI.exe`，104,738,462 字节）：exe 内可搜到 UTF-16 的
+`Back to Games` / `Component Updates`（来自 pri 的 XAML）以及 `RenoDXCommander` / `MainWindow`
+（来自 RHI.dll），并记录了 `resources.pri`、`RHI.dll` 的 bundle 条目名。
+早先只比对磁盘上 dll/pri 的 UTF-16 字串得出的「2 文件补丁」结论是错的，已作废。
+
+因此补丁必须与官方同形态：单文件 exe，用
+`dotnet publish -r win-x64 --self-contained false -p:PublishSingleFile=true -p:WindowsAppSDKSelfContained=true`
+产出（本地产出 104,896,579 字节，与官方 104,738,462 基本吻合）。
+
+注意：单文件 publish 不会复制 `ExcludeFromSingleFile=true` 的内容文件（7z、ini、图标等），
+所以**完整绿色版仍用 portable 目录发布**（`PUBLISH_DIR`），单文件产物只用于补丁包。
 
 ## 手工构建
 

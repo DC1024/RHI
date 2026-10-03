@@ -9,7 +9,7 @@
 > | 包 | 大小 | 适用 |
 > | --- | --- | --- |
 > | `RHI-zh-CN-<tag>-win-x64.zip` | 约 35 MB | **全新安装**：整目录解压后运行 `RHI.exe`（不要只拷 exe） |
-> | `RHI-zh-CN-patch-<tag>.zip` | 约 1.6 MB | **已装原版**：只含 `RHI.dll` + `resources.pri`，覆盖到安装目录即可变中文 |
+> | `RHI-zh-CN-patch-<tag>.zip` | 约 45 MB | **已装原版**：只含一个 `RHI.exe`，覆盖进安装目录即可变中文（官方是单文件发布，改 dll/pri 无效） |
 >
 > 本仓库是 [RankFTW/RHI](https://github.com/RankFTW/RHI) 的非官方分支，**唯一改动是增加简体中文界面**，
 > 其余代码保持与上游同步。上游原作者不参与本分支，官方暂未提供中文支持（见 upstream issue #5 / #25 / #68，

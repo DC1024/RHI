@@ -24,6 +24,7 @@ jobs:
       DOTNET_NOLOGO: 1
       PROJECT: RenoDXCommander/RenoDXCommander.csproj
       PUBLISH_DIR: artifacts/publish/RHI-win-x64-portable
+      PUBLISH_SINGLE_DIR: artifacts/publish-single
 
     steps:
       - name: Checkout
@@ -49,6 +50,16 @@ jobs:
           dotnet publish $env:PROJECT -c Release -p:Platform=x64 -r win-x64
           --self-contained false -o $env:PUBLISH_DIR
 
+      # The official installer ships RHI as a .NET single-file bundle:
+      # RHI.dll and resources.pri are packed INSIDE RHI.exe, so the loose copies
+      # next to it are never loaded. That is why the patch zip has to replace the
+      # exe itself, built the same way (single-file + WindowsAppSDK self-contained).
+      - name: Publish (single-file exe for the patch zip)
+        run: >
+          dotnet publish $env:PROJECT -c Release -p:Platform=x64 -r win-x64
+          --self-contained false -p:PublishSingleFile=true -p:WindowsAppSDKSelfContained=true
+          -o $env:PUBLISH_SINGLE_DIR
+
       - name: Zip portable build
         shell: pwsh
         run: |
@@ -61,18 +72,21 @@ jobs:
           "ASSET_ZIP=$zip"   | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Get-Item $zip | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} | Format-List
 
-      # Drop-in patch for users who already installed the official RHI:
-      # RHI.dll  = main assembly, holds the zh-CN dictionary + language switch
-      # resources.pri = compiled XAML, holds the new Settings > Language card
-      - name: Build patch zip (2 files, overwrites an official install)
+      # Drop-in patch for users who already installed the official RHI.
+      # One single file: RHI.exe. The official build is a .NET single-file bundle,
+      # so RHI.dll + resources.pri live inside the exe. Replacing the exe is the
+      # only thing that works; everything else in the install folder stays put.
+      - name: Build patch zip (one file: RHI.exe)
         shell: pwsh
         run: |
           $patchName = "RHI-zh-CN-patch-$($env:GITHUB_REF_NAME)"
           $stage = Join-Path $env:RUNNER_TEMP $patchName
           New-Item -ItemType Directory -Path $stage -Force | Out-Null
-          Copy-Item "$env:PUBLISH_DIR\RHI.dll"        -Destination $stage
-          Copy-Item "$env:PUBLISH_DIR\resources.pri"  -Destination $stage
+          Copy-Item "$env:PUBLISH_SINGLE_DIR\RHI.exe" -Destination $stage
           Copy-Item ".github/patch/README-patch.md"   -Destination $stage
+          if (-not (Test-Path "$stage\RHI.exe")) { throw "single-file RHI.exe missing" }
+          $exe = Get-Item "$stage\RHI.exe"
+          if ($exe.Length -lt 50MB) { throw "RHI.exe looks like a stub ($($exe.Length) bytes) - not a single-file bundle" }
           Get-ChildItem $stage | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,2)}} | Format-Table
           $zip = "$patchName.zip"
           Compress-Archive -Path "$stage\*" -DestinationPath $zip -CompressionLevel Optimal
@@ -108,12 +122,14 @@ jobs:
             唯一改动是新增简体中文界面：词条源自社区 PR [#20](https://github.com/RankFTW/RHI/pull/20)，
             由本分支 rebase 到当前主线。遵循上游 **GPL-3.0** 许可，源码随仓库开放。
 
-            ### 已经装了官方版？下补丁包（约 5 MB）
+            ### 已经装了官方版？下补丁包（只换一个 `RHI.exe`）
 
-            `RHI-zh-CN-patch-${{ github.ref_name }}.zip` —— 只含 `RHI.dll` 与 `resources.pri`，
-            覆盖进安装目录（默认 `C:\Program Files\RHI`）即可变中文，不用重装、设置与已装模组都保留。
-            步骤见包内 `README-patch.md`：**退出 RHI → 备份原两个文件 → 覆盖 → Settings → Language → 简体中文**。
-            回滚只要把 `.bak` 改回原名。
+            `RHI-zh-CN-patch-${{ github.ref_name }}.zip` —— 只含一个 `RHI.exe`。
+            官方版是 .NET 单文件发布，`RHI.dll` 和 `resources.pri` 都打包在 exe 内部，
+            所以**只有替换 exe 才会生效**，旁边散落的那两个文件改了没用。
+            退出 RHI → 把 `RHI.exe` 覆盖进安装目录（默认 `C:\Program Files\RHI`）→ 启动 →
+            Settings → Language → 简体中文。设置、已装模组、游戏列表全部保留，回滚把备份的 exe 改回来即可。
+            详细步骤见包内 `README-patch.md`。
 
             ### 全新安装？下完整便携版（约 35 MB）
 
@@ -126,7 +142,9 @@ jobs:
 
             ### 注意
 
-            RHI 自带自动更新，官方一更新就会把 `RHI.dll` 覆盖回英文版，届时重新打一次补丁即可。
+            RHI 自带自动更新，官方一更新就会把 `RHI.exe` 整个换回英文版，届时重新打一次补丁即可。
+            另外本版本与官方同为 **framework-dependent**，需要系统装有 .NET 8 桌面运行时
+            （能跑官方版就能跑这个）。
 
             ### 已知仍为英文
 
