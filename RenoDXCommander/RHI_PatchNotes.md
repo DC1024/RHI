@@ -12,6 +12,7 @@
 - **OptiScaler Nightly FG cog** — three new Frame Generation settings: FG Enabled (on/off master switch), Force Reflex, and Use Games Reflex Markers. Changes write to OptiScaler.ini immediately.
 - **Neural Rendering remove button** is now a ✕ red icon with the ⚙ cog always shown beside it, matching the Extras section style.
 - **Background Update Checks** — new setting in the Updates section of Settings. "On" (default) keeps the current behaviour: all component update checks run on startup and every 4 hours. "Minimal" skips all background component checks entirely — only manifests, PCGW data, and DLSS versions update automatically. Update checks for ReShade, RenoDX, OptiScaler, Nexus Mods, and everything else only run when you explicitly click Refresh or Update All.
+- **GitHub API** — new section in the RenoDX Data Source settings card. Sign in with GitHub using a one-time browser code to raise the automatic API rate limit from 60 to 5,000 requests per hour. Improves reliability of update checks, manifest fetches, and DLSS version lookups. Stored in settings and applied automatically on launch.
 
 ### Bug Fixes
 

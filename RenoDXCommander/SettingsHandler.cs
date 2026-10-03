@@ -240,6 +240,7 @@ public class SettingsHandler
         // RenoDX Data Source card — always visible now that RHI Database is the default
         _window.RenoDxDbSourceCard.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         InitRenoDxDbSourceCombo();
+        RefreshGitHubStatus();
     }
 
     /// <summary>
@@ -2303,6 +2304,132 @@ public class SettingsHandler
         }
 
         RefreshNexusStatus();
+    }
+
+    // ── GitHub OAuth ──────────────────────────────────────────────────────────
+
+    public void RefreshGitHubStatus()
+    {
+        var token    = ViewModel.Settings.GitHubOAuthToken;
+        var username = ViewModel.Settings.GitHubUsername;
+        bool connected = !string.IsNullOrEmpty(token);
+
+        if (connected)
+        {
+            var display = string.IsNullOrEmpty(username) ? "GitHub" : $"@{username}";
+            _window.GitHubStatusText.Text       = $"Connected as {display} · 5,000 req/hr";
+            _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentGreenBrush);
+            _window.GitHubConnectBtn.Content    = "Re-connect";
+            _window.GitHubDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+        }
+        else
+        {
+            _window.GitHubStatusText.Text       = "Not connected · 60 req/hr";
+            _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
+            _window.GitHubConnectBtn.Content    = "Connect GitHub";
+            _window.GitHubDisconnectRow.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        }
+
+        _window.GitHubDeviceCodePanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        _window.GitHubConnectBtn.IsEnabled = true;
+    }
+
+    public async void GitHubConnectBtn_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        var authSvc = App.Services.GetRequiredService<GitHubAuthService>();
+        var http    = App.Services.GetRequiredService<HttpClient>();
+
+        _window.GitHubConnectBtn.IsEnabled = false;
+        _window.GitHubConnectBtn.Content   = "Connecting...";
+        _window.GitHubStatusText.Text      = "Requesting device code...";
+        _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
+        _window.GitHubDeviceCodePanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+
+        using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(300));
+
+        // Step 1: get device code
+        var deviceCode = await authSvc.RequestDeviceCodeAsync(cts.Token).ConfigureAwait(false);
+
+        if (deviceCode == null)
+        {
+            _window.DispatcherQueue?.TryEnqueue(() =>
+            {
+                _window.GitHubStatusText.Text      = "Failed to start authorisation. Check your connection and try again.";
+                _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
+                _window.GitHubConnectBtn.IsEnabled  = true;
+                _window.GitHubConnectBtn.Content    = "Connect GitHub";
+            });
+            return;
+        }
+
+        // Step 2: show the code and open browser
+        _window.DispatcherQueue?.TryEnqueue(() =>
+        {
+            _window.GitHubUserCodeText.Text = deviceCode.UserCode;
+            _window.GitHubVerificationLink.NavigateUri = new Uri(deviceCode.VerificationUri);
+            _window.GitHubVerificationLink.Content     = deviceCode.VerificationUri;
+            _window.GitHubDeviceCodePanel.Visibility   = Microsoft.UI.Xaml.Visibility.Visible;
+            _window.GitHubStatusText.Text       = "Enter the code above at the link — waiting for authorisation...";
+            _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush);
+        });
+
+        // Open the verification URL in the default browser
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(deviceCode.VerificationUri) { UseShellExecute = true }); }
+        catch (Exception ex) { CrashReporter.Log($"[SettingsHandler.GitHubConnectBtn_Click] Failed to open browser — {ex.Message}"); }
+
+        // Step 3: poll for the token
+        var progress = new Progress<string>(msg =>
+            _window.DispatcherQueue?.TryEnqueue(() => _window.GitHubStatusText.Text = msg));
+
+        var token = await authSvc.PollForTokenAsync(deviceCode, progress, cts.Token).ConfigureAwait(false);
+
+        if (string.IsNullOrEmpty(token))
+        {
+            _window.DispatcherQueue?.TryEnqueue(() =>
+            {
+                _window.GitHubStatusText.Text       = "Authorisation timed out or was cancelled.";
+                _window.GitHubStatusText.Foreground = UIFactory.Brush(ResourceKeys.AccentRedBrush);
+                _window.GitHubDeviceCodePanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                _window.GitHubConnectBtn.IsEnabled  = true;
+                _window.GitHubConnectBtn.Content    = "Connect GitHub";
+            });
+            return;
+        }
+
+        // Step 4: fetch username, apply token, persist
+        var username = await authSvc.GetUsernameAsync(token, cts.Token).ConfigureAwait(false);
+
+        _window.DispatcherQueue?.TryEnqueue(() =>
+        {
+            ViewModel.Settings.GitHubOAuthToken = token;
+            ViewModel.Settings.GitHubUsername   = username ?? "";
+            ViewModel.SaveSettingsPublic();
+
+            // Apply to DevUnlockService and the live HttpClient
+            DevUnlockService.UpdateToken(token);
+            GitHubAuthService.ApplyTokenToHttpClient(http, token);
+
+            CrashReporter.Log($"[SettingsHandler.GitHubConnectBtn_Click] Connected as {username ?? "(unknown)"}");
+            RefreshGitHubStatus();
+        });
+    }
+
+    public void GitHubDisconnectBtn_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        var http = App.Services.GetRequiredService<HttpClient>();
+
+        ViewModel.Settings.GitHubOAuthToken = "";
+        ViewModel.Settings.GitHubUsername   = "";
+        ViewModel.SaveSettingsPublic();
+
+        // Clear token from DevUnlockService and HttpClient
+        // Reset the DevUnlockService cache so it re-reads from disk (may find a file-based token)
+        DevUnlockService.ResetTokenCache();
+        var fileToken = DevUnlockService.GitHubApiToken; // re-reads github_api.txt / unlock.txt
+        GitHubAuthService.ApplyTokenToHttpClient(http, fileToken);
+
+        CrashReporter.Log("[SettingsHandler.GitHubDisconnectBtn_Click] GitHub OAuth token removed");
+        RefreshGitHubStatus();
     }
 
 

@@ -1697,23 +1697,95 @@
                             <StackPanel Spacing="12">
                                 <TextBlock Text="RenoDX Data Source" FontSize="15" FontWeight="Bold"
                                            Foreground="{StaticResource TextPrimaryBrush}"/>
-                                <TextBlock TextWrapping="Wrap" FontSize="11"
-                                           Foreground="{StaticResource InlineDescriptionBrush}" LineHeight="18"
-                                           Text="Controls where RHI fetches mod data. RHI Database uses the community-maintained RHI database (recommended). RenoDX Wiki falls back to the RenoDX wiki scraper. Changing this setting triggers an immediate refresh."/>
-                                <Grid ColumnSpacing="12">
+                                <Grid ColumnSpacing="0" RowSpacing="0">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="Source" FontSize="13"
-                                               Foreground="{StaticResource TextPrimaryBrush}"
-                                               VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="RenoDxDbSourceCombo" x:FieldModifier="internal"
-                                              Grid.Column="1" FontSize="12"
-                                              HorizontalAlignment="Left" MinWidth="160">
-                                        <ComboBoxItem Content="RHI Database" Tag="DbOnly"/>
-                                        <ComboBoxItem Content="RenoDX Wiki" Tag="WikiOnly"/>
-                                    </ComboBox>
+
+                                    <!-- Left: Data Source combo -->
+                                    <StackPanel Grid.Column="0" Spacing="8">
+                                        <TextBlock Text="Mod Data Source" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock TextWrapping="Wrap" FontSize="11"
+                                                   Foreground="{StaticResource InlineDescriptionBrush}" LineHeight="18"
+                                                   Text="Controls where RHI fetches mod data. RHI Database uses the community-maintained RHI database (recommended). RenoDX Wiki falls back to the RenoDX wiki scraper. Changing this setting triggers an immediate refresh."/>
+                                        <Grid ColumnSpacing="8" Margin="0,4,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Source" FontSize="12"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       VerticalAlignment="Center"/>
+                                            <ComboBox x:Name="RenoDxDbSourceCombo" x:FieldModifier="internal"
+                                                      Grid.Column="1" FontSize="12"
+                                                      HorizontalAlignment="Left" MinWidth="160">
+                                                <ComboBoxItem Content="RHI Database" Tag="DbOnly"/>
+                                                <ComboBoxItem Content="RenoDX Wiki" Tag="WikiOnly"/>
+                                            </ComboBox>
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- Divider -->
+                                    <Border Grid.Column="1" Width="1"
+                                            Background="{StaticResource BorderDefaultBrush}"
+                                            VerticalAlignment="Stretch" Margin="20,0,20,0"/>
+
+                                    <!-- Right: GitHub API Rate Limit -->
+                                    <StackPanel Grid.Column="2" Spacing="8">
+                                        <TextBlock Text="GitHub API" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock TextWrapping="Wrap" FontSize="11"
+                                                   Foreground="{StaticResource InlineDescriptionBrush}" LineHeight="18"
+                                                   Text="Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour. This improves reliability of update checks, DLSS version lookups, and manifest fetches."/>
+
+                                        <!-- Connect button -->
+                                        <Button x:Name="GitHubConnectBtn" x:FieldModifier="internal"
+                                                Content="Connect GitHub"
+                                                Click="GitHubConnectBtn_Click"
+                                                Background="{StaticResource AccentBlueBgBrush}"
+                                                Foreground="{StaticResource AccentBlueBrush}"
+                                                BorderBrush="{StaticResource AccentBlueBorderBrush}" BorderThickness="1"
+                                                CornerRadius="6" Padding="12,6" MinWidth="0"
+                                                FontSize="12" HorizontalAlignment="Left"/>
+
+                                        <!-- Status text (connected / code display / error) -->
+                                        <TextBlock x:Name="GitHubStatusText" x:FieldModifier="internal"
+                                                   FontSize="11" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource TextTertiaryBrush}"
+                                                   Text="Not connected (60 req/hr)"/>
+
+                                        <!-- Device code panel — shown during auth flow -->
+                                        <StackPanel x:Name="GitHubDeviceCodePanel" x:FieldModifier="internal"
+                                                    Spacing="6" Visibility="Collapsed">
+                                            <TextBlock FontSize="11" TextWrapping="Wrap"
+                                                       Foreground="{StaticResource InlineDescriptionBrush}"
+                                                       Text="Open the link below and enter this code:"/>
+                                            <TextBlock x:Name="GitHubUserCodeText" x:FieldModifier="internal"
+                                                       FontSize="20" FontWeight="Bold"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       Text="XXXX-XXXX"
+                                                       CharacterSpacing="200"/>
+                                            <HyperlinkButton x:Name="GitHubVerificationLink" x:FieldModifier="internal"
+                                                             Content="github.com/login/device"
+                                                             NavigateUri="https://github.com/login/device"
+                                                             FontSize="11" Padding="0"/>
+                                        </StackPanel>
+
+                                        <!-- Disconnect row — shown only when connected -->
+                                        <StackPanel x:Name="GitHubDisconnectRow" x:FieldModifier="internal"
+                                                    Spacing="4" Visibility="Collapsed">
+                                            <Button Content="Disconnect"
+                                                    Click="GitHubDisconnectBtn_Click"
+                                                    Background="Transparent"
+                                                    Foreground="{StaticResource AccentRedBrush}"
+                                                    BorderBrush="{StaticResource AccentRedBrush}" BorderThickness="1"
+                                                    CornerRadius="6" Padding="12,4" MinWidth="0"
+                                                    FontSize="11" HorizontalAlignment="Left"/>
+                                        </StackPanel>
+                                    </StackPanel>
                                 </Grid>
                             </StackPanel>
                         </Border>

@@ -129,6 +129,7 @@ public partial class App : Application
         services.AddSingleton<IRenoDXDbService, RenoDXDbService>();
         services.AddSingleton<NexusDownloadService>();
         services.AddSingleton<NexusSsoService>();
+        services.AddSingleton<GitHubAuthService>();
         // Lazy<IDlssStreamlineService> breaks the circular dependency between OptiScalerService ↔ DlssStreamlineService
         services.AddSingleton<Lazy<IDlssStreamlineService>>(sp => new Lazy<IDlssStreamlineService>(() => sp.GetRequiredService<IDlssStreamlineService>()));
 
@@ -251,6 +252,10 @@ public partial class App : Application
         CrashReporter.Log("[App.OnLaunched] Creating MainWindow");
         GraphicsApiDetector.LoadCache();
         MainViewModel.LoadGameApiCache();
+
+        // Apply any stored GitHub OAuth token to the shared HttpClient before the window loads.
+        // The HttpClient singleton was built before settings were loaded — patch it here.
+        ApplyStoredGitHubToken();
 
         // Check if first-launch setup is needed
         // Check if first-launch setup is needed.
@@ -419,6 +424,37 @@ public partial class App : Application
         using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
         var principal = new System.Security.Principal.WindowsPrincipal(identity);
         return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+    }
+
+    /// <summary>
+    /// If a GitHub OAuth token is stored in settings (and no file-based token takes priority),
+    /// apply it to DevUnlockService and the shared HttpClient so all API calls benefit from
+    /// the higher rate limit (5,000/hr instead of 60/hr) right from startup.
+    /// </summary>
+    private void ApplyStoredGitHubToken()
+    {
+        try
+        {
+            // If a file-based token already exists (github_api.txt or unlock.txt), it takes priority
+            // and was already applied during HttpClient construction — nothing to do.
+            if (!string.IsNullOrEmpty(DevUnlockService.GitHubApiToken)) return;
+
+            var settings = SettingsViewModel.LoadSettingsFile();
+            if (!settings.TryGetValue("GitHubOAuthToken", out var token) || string.IsNullOrEmpty(token)) return;
+
+            // Apply to DevUnlockService cache so per-request callers (GitHubETagCache etc.) pick it up
+            DevUnlockService.UpdateToken(token);
+
+            // Patch the singleton HttpClient (already built — no Authorization header yet)
+            var http = Services.GetRequiredService<HttpClient>();
+            GitHubAuthService.ApplyTokenToHttpClient(http, token);
+
+            CrashReporter.Log("[App.ApplyStoredGitHubToken] GitHub OAuth token applied from settings");
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Log($"[App.ApplyStoredGitHubToken] Failed — {ex.Message}");
+        }
     }
 
     private static bool IsAdminTaskRegistered()

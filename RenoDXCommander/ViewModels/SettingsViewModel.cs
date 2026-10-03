@@ -93,6 +93,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _nexusIsPremium;
     [ObservableProperty] private string _nexusUsername = "";
 
+    // ── GitHub OAuth (device flow) ─────────────────────────────────────────────
+    /// <summary>OAuth token obtained via GitHub Device Flow. Never logged.</summary>
+    [ObservableProperty] private string _gitHubOAuthToken = "";
+    /// <summary>GitHub login name of the authenticated user.</summary>
+    [ObservableProperty] private string _gitHubUsername = "";
+
     // ── Digital Vibrance ──────────────────────────────────────────────────────
     /// <summary>Per-display DVC values. Key = display index (string), Value = 0-100.</summary>
     public Dictionary<string, int> DigitalVibranceSettings { get; set; } = new();
@@ -372,6 +378,10 @@ public partial class SettingsViewModel : ObservableObject
         if (s.TryGetValue("NexusIsPremium", out var nipVal)) NexusIsPremium = nipVal == "true";
         if (s.TryGetValue("NexusUsername",  out var nunVal)) NexusUsername  = nunVal ?? "";
 
+        // GitHub OAuth token — never logged, applied to HttpClient after load
+        if (s.TryGetValue("GitHubOAuthToken", out var ghotVal) && !string.IsNullOrEmpty(ghotVal)) GitHubOAuthToken = ghotVal;
+        if (s.TryGetValue("GitHubUsername",   out var ghuVal)  && !string.IsNullOrEmpty(ghuVal))  GitHubUsername  = ghuVal;
+
         // DLSS/Streamline defaults
         if (s.TryGetValue("DefaultDlssVersion", out var ddv)) DefaultDlssVersion = ddv ?? "";
         if (s.TryGetValue("DefaultDlssdVersion", out var ddrv)) DefaultDlssdVersion = ddrv ?? "";
@@ -521,6 +531,10 @@ public partial class SettingsViewModel : ObservableObject
         if (!string.IsNullOrEmpty(NexusApiKey))    s["NexusApiKey"]    = NexusApiKey;
         if (NexusIsPremium)                        s["NexusIsPremium"] = "true";
         if (!string.IsNullOrEmpty(NexusUsername))  s["NexusUsername"]  = NexusUsername;
+
+        // GitHub OAuth token — never logged
+        if (!string.IsNullOrEmpty(GitHubOAuthToken)) s["GitHubOAuthToken"] = GitHubOAuthToken; else s.Remove("GitHubOAuthToken");
+        if (!string.IsNullOrEmpty(GitHubUsername))   s["GitHubUsername"]   = GitHubUsername;   else s.Remove("GitHubUsername");
 
         // DLSS/Streamline defaults
         if (!string.IsNullOrEmpty(DefaultDlssVersion)) s["DefaultDlssVersion"] = DefaultDlssVersion;

@@ -758,6 +758,14 @@ public sealed partial class MainWindow
     private void NxmRegisterBtn_Click(object sender, RoutedEventArgs e)
         => _settingsHandler.NxmRegisterBtn_Click(sender, e);
 
+    // ── GitHub OAuth button forwarders ────────────────────────────────────────
+
+    private void GitHubConnectBtn_Click(object sender, RoutedEventArgs e)
+        => _settingsHandler.GitHubConnectBtn_Click(sender, e);
+
+    private void GitHubDisconnectBtn_Click(object sender, RoutedEventArgs e)
+        => _settingsHandler.GitHubDisconnectBtn_Click(sender, e);
+
     private async void NexusModsLink_Click(object sender, RoutedEventArgs e)
     {
         var card = GetCardFromSender(sender);
