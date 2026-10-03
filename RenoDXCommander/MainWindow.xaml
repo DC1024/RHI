@@ -127,6 +127,13 @@
                         </Button.Flyout>
                     </Button>
 
+                    <Button x:Name="DonateBtn" Content="Donate"
+                            Click="DonateButton_Click"
+                            Background="{StaticResource SurfaceInputBrush}" Foreground="{StaticResource AccentTealBrush}"
+                            BorderBrush="{StaticResource AccentTealBorderBrush}" BorderThickness="1"
+                            CornerRadius="8" Padding="12,7" FontSize="12"
+                            ToolTipService.ToolTip="Support the mod authors"/>
+
                     <Border Width="1" Height="20" Background="{StaticResource BorderSubtleBrush}" Margin="4,0"/>
 
                     <Button x:Name="SettingsBtn" Content="Settings"

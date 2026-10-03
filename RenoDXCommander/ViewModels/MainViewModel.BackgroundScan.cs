@@ -358,7 +358,7 @@ public partial class MainViewModel
             }
 
             if (_manifest != null)
-                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames);
+                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames, _manifest.AuthorRoles);
             ApplyManifestStatusOverrides();
 
             // Remove manifest-blacklisted entries

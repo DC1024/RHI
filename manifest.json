@@ -1267,6 +1267,21 @@
     "speedlemur": "https://ko-fi.com/speedlemur87816",
     "Voosh": "https://ko-fi.com/notvoosh"
   },
+  "authorRoles": {
+    "Bit Viper": "RenoDX mods",
+    "DristoforColumb": "RenoDX mods, Luma mods",
+    "Forge": "RenoDX mods",
+    "Jon": "RenoDX mods, Luma mods",
+    "Lilium": "Lilium HDR Shaders",
+    "Musa": "RenoDX mods, Luma mods",
+    "Nukem": "OptiScaler",
+    "Pumbo": "Luma Framework, Luma mods, PumboAutoHDR",
+    "RankFTW": "RHI, RenoDX mods",
+    "Ritsu": "RenoDX mods",
+    "ShortFuse": "RenoDX, RenoDX mods",
+    "speedlemur": "RenoDX mods",
+    "Voosh": "RenoDX mods"
+  },
   "authorOverrides": {
     "Assassin\u0027s Creed": "Musa",
     "Death\u0027s Door": "Voosh",

@@ -625,7 +625,7 @@ public partial class MainViewModel
 
             // Merge manifest-provided author donation URLs and display names
             if (_manifest != null)
-                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames);
+                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames, _manifest.AuthorRoles);
 
             // Apply manifest-driven wiki status overrides to mod list
             ApplyManifestStatusOverrides();
