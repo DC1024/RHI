@@ -17,6 +17,7 @@
 
 **Freezes**
 - Fixed a UI freeze that affected games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR). The Settings panel was writing driver values back during initialisation — before it had finished loading — which collided with the NVIDIA panel reading those same values. The app would lock up completely. Fixed by keeping the protection flag active until all NVIDIA combos are fully populated.
+- Fixed a persistent UI freeze affecting games with a full DLSS install (SR + RR + FG + NR). The NVIDIA driver session object is not thread-safe, but multiple background tasks were accessing it simultaneously without any synchronisation. Panel reads and background writes would race each other and corrupt the driver state, permanently stalling the UI. All NVAPI session access is now serialised through a single lock.
 - Fixed a freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3).
 - Fixed the Extras and Neural Rendering sections overflowing their containers and pushing buttons off-screen.
 
