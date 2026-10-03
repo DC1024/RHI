@@ -143,6 +143,10 @@ public sealed partial class MainWindow
 
     private Border BuildFaqSection(string? badge, string title, string titleBrush, string description, string? tip)
     {
+        title = RenoDXCommander.Services.LocalizationService.Text(title);
+        description = RenoDXCommander.Services.LocalizationService.Text(description);
+        if (tip != null) tip = RenoDXCommander.Services.LocalizationService.Text(tip);
+
         var stack = new StackPanel { Spacing = 10 };
 
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
@@ -220,6 +224,10 @@ public sealed partial class MainWindow
 
     private Border BuildFaqStep(int step, string title, string description, string? tip)
     {
+        title = RenoDXCommander.Services.LocalizationService.Text(title);
+        description = RenoDXCommander.Services.LocalizationService.Text(description);
+        if (tip != null) tip = RenoDXCommander.Services.LocalizationService.Text(tip);
+
         var stack = new StackPanel { Spacing = 8 };
 
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
@@ -296,6 +304,10 @@ public sealed partial class MainWindow
 
     private Border BuildFaqInfoSection(string title, string description, string[] bullets, string? tip = null)
     {
+        title = RenoDXCommander.Services.LocalizationService.Text(title);
+        description = RenoDXCommander.Services.LocalizationService.Text(description);
+        if (tip != null) tip = RenoDXCommander.Services.LocalizationService.Text(tip);
+
         var stack = new StackPanel { Spacing = 8 };
 
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
@@ -341,7 +353,7 @@ public sealed partial class MainWindow
         {
             bulletStack.Children.Add(new TextBlock
             {
-                Text = $"• {bullet}",
+                Text = $"• {RenoDXCommander.Services.LocalizationService.Text(bullet)}",
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 11,
                 Foreground = (Brush)Application.Current.Resources["TextSecondaryBrush"],
@@ -386,6 +398,10 @@ public sealed partial class MainWindow
 
     private Border BuildFaqSpecialSection(string badge, string badgeBrush, string title, string description, string? tip)
     {
+        title = RenoDXCommander.Services.LocalizationService.Text(title);
+        description = RenoDXCommander.Services.LocalizationService.Text(description);
+        if (tip != null) tip = RenoDXCommander.Services.LocalizationService.Text(tip);
+
         var stack = new StackPanel { Spacing = 8 };
 
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
@@ -467,7 +483,7 @@ public sealed partial class MainWindow
 
         stack.Children.Add(new TextBlock
         {
-            Text = "Need More Help?",
+            Text = RenoDXCommander.Services.LocalizationService.Text("Need More Help?"),
             FontSize = 14,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = (Brush)Application.Current.Resources["AccentTealBrush"]
@@ -475,7 +491,7 @@ public sealed partial class MainWindow
 
         stack.Children.Add(new TextBlock
         {
-            Text = "Support is available on Discord — join the community for help, mod updates, and discussion.",
+            Text = RenoDXCommander.Services.LocalizationService.Text("Support is available on Discord — join the community for help, mod updates, and discussion."),
             TextWrapping = TextWrapping.Wrap,
             FontSize = 12,
             Foreground = (Brush)Application.Current.Resources["TextSecondaryBrush"],
@@ -491,7 +507,7 @@ public sealed partial class MainWindow
         };
         discordLink.Content = new TextBlock
         {
-            Text = "Join the Ultra+ Discord (main community)",
+            Text = RenoDXCommander.Services.LocalizationService.Text("Join the Ultra+ Discord (main community)"),
             Foreground = (Brush)Application.Current.Resources["AccentBlueBrush"],
             FontSize = 12
         };
@@ -504,7 +520,7 @@ public sealed partial class MainWindow
         };
         renodxDiscordLink.Content = new TextBlock
         {
-            Text = "RenoDX Discord (mod development)",
+            Text = RenoDXCommander.Services.LocalizationService.Text("RenoDX Discord (mod development)"),
             Foreground = (Brush)Application.Current.Resources["AccentBlueBrush"],
             FontSize = 12
         };
@@ -517,7 +533,7 @@ public sealed partial class MainWindow
         };
         wikiLink.Content = new TextBlock
         {
-            Text = "Browse the RenoDX Mod Wiki",
+            Text = RenoDXCommander.Services.LocalizationService.Text("Browse the RenoDX Mod Wiki"),
             Foreground = (Brush)Application.Current.Resources["AccentBlueBrush"],
             FontSize = 12
         };
@@ -530,7 +546,7 @@ public sealed partial class MainWindow
         };
         githubLink.Content = new TextBlock
         {
-            Text = "RHI GitHub — Report issues or request features",
+            Text = RenoDXCommander.Services.LocalizationService.Text("RHI GitHub — Report issues or request features"),
             Foreground = (Brush)Application.Current.Resources["AccentBlueBrush"],
             FontSize = 12
         };

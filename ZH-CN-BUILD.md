@@ -5,8 +5,7 @@
 <https://github.com/DC1024/RHI/releases>（因为是 prerelease，`/releases/latest` 会 404，要点进去选最新的 `v*-zh-cn-*`）。
 每个版本两个包，都附同名 `.sha256` 校验文件：
 
-- `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB）—— 完整绿色版
-- `RHI-zh-CN-patch-<tag>.zip`（约 34MB）—— 中文补丁包，见下节
+- `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB）—— 唯一产物，见下节两种用法
 
 产物由 `.github/workflows/build-zh-cn.yml` 在打 `v*` 标签时自动构建发布。
 
@@ -19,29 +18,38 @@ git push <remote> v2.8.1-zh-cn-3     # CI 自动构建 + 发 Release
 
 ## 中文补丁包（给已装官方版的用户）
 
-每次 Release 同时产出 `RHI-zh-CN-patch-<tag>.zip`，**只含一个 `RHI.exe`**。
-覆盖进官方安装目录（默认 `C:\Program Files\RHI`）即可变中文，不用重装。
+**全新安装**：整目录解压后运行 `RHI.exe`（不要只拷 exe）。
 
-说明文档：`.github/patch/README-patch.md`（随补丁包一起打包）。
+**已装官方版**：解压后把**全部文件覆盖**进安装目录（默认 `C:\Program Files\RHI`）——
+不用卸载，游戏列表、已装模组、设置全部保留。说明文档 `.github/patch/README-patch.md` 随包打包。
 
-### 为什么是 exe 而不是 dll + pri（踩过的坑）
+### 为什么只有「整目录覆盖」这一条路（两次踩坑）
 
-**官方 RHI 是 .NET 单文件发布**（`PublishSingleFile` + `WindowsAppSDKSelfContained`，
-见 `RenoDXCommander.csproj` 里 `SelfContained=false` + `WindowsAppSDKSelfContained=true`
-以及各 Content 项的 `ExcludeFromSingleFile=true`）。`RHI.dll` 和 `resources.pri`
-**都打包在 `RHI.exe` 内部**；安装目录里散落的那两份只是打包残留，**运行时不加载**。
+**坑 1：只替换 `RHI.dll` + `resources.pri` 无效。**
+官方 RHI 是 .NET 单文件发布（`PublishSingleFile` + `WindowsAppSDKSelfContained`，
+见 csproj 里 `SelfContained=false` + `WindowsAppSDKSelfContained=true` 及各 Content 项的
+`ExcludeFromSingleFile=true`）。`RHI.dll` 和 `resources.pri` **都打包在 `RHI.exe` 内部**，
+安装目录里散落的那两份只是打包残留，**运行时不加载**。
+实测证据（官方 `RHI.exe`，104,738,462 字节）：exe 内可搜到 UTF-16 的
+`Back to Games` / `Component Updates`（来自 pri）以及 `RenoDXCommander` / `MainWindow`（来自 dll）。
 
-实测证据（官方 `C:\Program Files\RHI\RHI.exe`，104,738,462 字节）：exe 内可搜到 UTF-16 的
-`Back to Games` / `Component Updates`（来自 pri 的 XAML）以及 `RenoDXCommander` / `MainWindow`
-（来自 RHI.dll），并记录了 `resources.pri`、`RHI.dll` 的 bundle 条目名。
-早先只比对磁盘上 dll/pri 的 UTF-16 字串得出的「2 文件补丁」结论是错的，已作废。
+**坑 2：照同样参数重打包单文件 exe，启动即崩。**
+用 `-p:PublishSingleFile=true -p:WindowsAppSDKSelfContained=true` 打出的 exe
+（104,896,579 字节，与官方体积几乎一致）一运行就抛：
 
-因此补丁必须与官方同形态：单文件 exe，用
-`dotnet publish -r win-x64 --self-contained false -p:PublishSingleFile=true -p:WindowsAppSDKSelfContained=true`
-产出（本地产出 104,896,579 字节，与官方 104,738,462 基本吻合）。
+```
+COMException (0x80040111): ClassFactory 无法供应请求的类
+   at WinRT.ActivationFactory.Get(...)
+   at Microsoft.UI.Xaml.Application.Start(...)
+```
 
-注意：单文件 publish 不会复制 `ExcludeFromSingleFile=true` 的内容文件（7z、ini、图标等），
-所以**完整绿色版仍用 portable 目录发布**（`PUBLISH_DIR`），单文件产物只用于补丁包。
+原因：**WinAppSDK 的 WinRT 组件是 COM 从磁盘上的真实文件激活的**，打进 bundle 后 COM 找不到类工厂。
+`-p:IncludeNativeLibrariesForSelfExtract=true` 无效（产物字节数完全不变）；
+改成 `-p:WindowsAppSDKSelfContained=false` 让 WinAppSDK 用系统框架包也起不来
+（本机没有匹配的 Windows App Runtime）。
+
+结论：**WinAppSDK 的文件必须散落在 exe 旁边**，所以只能整目录覆盖，不存在"换一个文件"的补丁。
+（`v2.8.1-zh-cn-3` 曾发布过单文件 exe 补丁包，已作废。）
 
 ## 手工构建
 

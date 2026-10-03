@@ -50,15 +50,15 @@ jobs:
           dotnet publish $env:PROJECT -c Release -p:Platform=x64 -r win-x64
           --self-contained false -o $env:PUBLISH_DIR
 
-      # The official installer ships RHI as a .NET single-file bundle:
-      # RHI.dll and resources.pri are packed INSIDE RHI.exe, so the loose copies
-      # next to it are never loaded. That is why the patch zip has to replace the
-      # exe itself, built the same way (single-file + WindowsAppSDK self-contained).
-      - name: Publish (single-file exe for the patch zip)
-        run: >
-          dotnet publish $env:PROJECT -c Release -p:Platform=x64 -r win-x64
-          --self-contained false -p:PublishSingleFile=true -p:WindowsAppSDKSelfContained=true
-          -o $env:PUBLISH_SINGLE_DIR
+      # NOTE: do NOT try to ship a single-file RHI.exe as a "patch".
+      # The official build looks like a single-file bundle (RHI.dll + resources.pri
+      # are packed inside the exe), but rebuilding it that way fails at startup with
+      # COMException 0x80040111 (ClassFactory) — WindowsAppSDK's WinRT components are
+      # activated by COM from real files on disk, so they cannot live inside a bundle.
+      # Shipping the whole folder is the only layout that runs. See ZH-CN-BUILD.md.
+      - name: Copy the usage notes into the build
+        shell: pwsh
+        run: Copy-Item ".github/patch/README-patch.md" -Destination $env:PUBLISH_DIR
 
       - name: Zip portable build
         shell: pwsh
@@ -72,27 +72,6 @@ jobs:
           "ASSET_ZIP=$zip"   | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Get-Item $zip | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} | Format-List
 
-      # Drop-in patch for users who already installed the official RHI.
-      # One single file: RHI.exe. The official build is a .NET single-file bundle,
-      # so RHI.dll + resources.pri live inside the exe. Replacing the exe is the
-      # only thing that works; everything else in the install folder stays put.
-      - name: 'Build patch zip (one file: RHI.exe)'
-        shell: pwsh
-        run: |
-          $patchName = "RHI-zh-CN-patch-$($env:GITHUB_REF_NAME)"
-          $stage = Join-Path $env:RUNNER_TEMP $patchName
-          New-Item -ItemType Directory -Path $stage -Force | Out-Null
-          Copy-Item "$env:PUBLISH_SINGLE_DIR\RHI.exe" -Destination $stage
-          Copy-Item ".github/patch/README-patch.md"   -Destination $stage
-          if (-not (Test-Path "$stage\RHI.exe")) { throw "single-file RHI.exe missing" }
-          $exe = Get-Item "$stage\RHI.exe"
-          if ($exe.Length -lt 50MB) { throw "RHI.exe looks like a stub ($($exe.Length) bytes) - not a single-file bundle" }
-          Get-ChildItem $stage | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,2)}} | Format-Table
-          $zip = "$patchName.zip"
-          Compress-Archive -Path "$stage\*" -DestinationPath $zip -CompressionLevel Optimal
-          (Get-FileHash $zip -Algorithm SHA256).Hash | Out-File -FilePath "$zip.sha256" -Encoding utf8
-          "PATCH_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
@@ -100,8 +79,6 @@ jobs:
           path: |
             ${{ env.ASSET_ZIP }}
             ${{ env.ASSET_ZIP }}.sha256
-            ${{ env.PATCH_ZIP }}
-            ${{ env.PATCH_ZIP }}.sha256
           if-no-files-found: error
 
       - name: Release
@@ -113,8 +90,6 @@ jobs:
           files: |
             ${{ env.ASSET_ZIP }}
             ${{ env.ASSET_ZIP }}.sha256
-            ${{ env.PATCH_ZIP }}
-            ${{ env.PATCH_ZIP }}.sha256
           body: |
             ## RHI 简体中文版 ${{ github.ref_name }}
 
@@ -122,19 +97,22 @@ jobs:
             唯一改动是新增简体中文界面：词条源自社区 PR [#20](https://github.com/RankFTW/RHI/pull/20)，
             由本分支 rebase 到当前主线。遵循上游 **GPL-3.0** 许可，源码随仓库开放。
 
-            ### 已经装了官方版？下补丁包（只换一个 `RHI.exe`）
+            ### 下载
 
-            `RHI-zh-CN-patch-${{ github.ref_name }}.zip` —— 只含一个 `RHI.exe`。
-            官方版是 .NET 单文件发布，`RHI.dll` 和 `resources.pri` 都打包在 exe 内部，
-            所以**只有替换 exe 才会生效**，旁边散落的那两个文件改了没用。
-            退出 RHI → 把 `RHI.exe` 覆盖进安装目录（默认 `C:\Program Files\RHI`）→ 启动 →
-            Settings → Language → 简体中文。设置、已装模组、游戏列表全部保留，回滚把备份的 exe 改回来即可。
+            `RHI-zh-CN-${{ github.ref_name }}-win-x64.zip`（约 35MB）**解压后运行 `RHI.exe`**。
+            请整目录解压，**不要只拷贝 exe** —— WinAppSDK 的组件必须作为真实文件放在 exe 旁边，
+            否则启动会报 `0x80040111 ClassFactory` 并直接退出。
+
+            ### 已经装了官方版？覆盖安装目录即可
+
+            官方版看着像一个独立的大 `RHI.exe`（约 100MB，`RHI.dll` 和 `resources.pri` 都打包在里面），
+            但**只替换那一个 exe 是没用的**：按同样方式重新打出来的单文件 exe 启动就会崩
+            （COM 无法从 bundle 内激活 WinAppSDK 的 WinRT 组件）。
+
+            正确做法是**把解压出来的全部文件覆盖进安装目录**（默认 `C:\Program Files\RHI`）：
+            退出 RHI → 全选解压内容 → 复制覆盖（管理员权限点「继续」）→ 启动 →
+            Settings → Language → 简体中文。设置、已装模组、游戏列表全部保留。
             详细步骤见包内 `README-patch.md`。
-
-            ### 全新安装？下完整便携版（约 35 MB）
-
-            `RHI-zh-CN-${{ github.ref_name }}-win-x64.zip` —— 解压后运行 `RHI.exe`
-            （**请整目录解压，不要只拷贝 exe**）。
 
             ### 切换中文
 
@@ -142,9 +120,8 @@ jobs:
 
             ### 注意
 
-            RHI 自带自动更新，官方一更新就会把 `RHI.exe` 整个换回英文版，届时重新打一次补丁即可。
-            另外本版本与官方同为 **framework-dependent**，需要系统装有 .NET 8 桌面运行时
-            （能跑官方版就能跑这个）。
+            本版本为 **framework-dependent**，需要系统装有 **.NET 8 桌面运行时**（能跑官方版就能跑这个）。
+            RHI 自带自动更新，官方一更新会把安装目录换回英文版，届时重新覆盖一次即可。
 
             ### 已知仍为英文
 

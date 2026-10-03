@@ -6,10 +6,14 @@
 >
 > **下载中文版**：[Releases 页面](https://github.com/DC1024/RHI/releases)（选最新的 `v*-zh-cn-*`）。每次打 `v*` 标签由 GitHub Actions 自动构建发布，每个版本提供两个包：
 >
-> | 包 | 大小 | 适用 |
-> | --- | --- | --- |
-> | `RHI-zh-CN-<tag>-win-x64.zip` | 约 35 MB | **全新安装**：整目录解压后运行 `RHI.exe`（不要只拷 exe） |
-> | `RHI-zh-CN-patch-<tag>.zip` | 约 34 MB | **已装原版**：只含一个 `RHI.exe`，覆盖进安装目录即可变中文（官方是单文件发布，改 dll/pri 无效） |
+> `RHI-zh-CN-<tag>-win-x64.zip`（约 35 MB）：
+>
+> - **全新安装**：整目录解压后运行 `RHI.exe`（**不要只拷 exe**）。
+> - **已装官方版**：解压后把**全部文件覆盖**进安装目录（默认 `C:\Program Files\RHI`）即可变中文，
+>   不用重装，游戏列表、已装模组、设置全部保留。步骤见包内 `README-patch.md`。
+>
+> 官方那个约 100 MB 的 `RHI.exe` 是单文件发布，但**只替换 exe 是无效的**
+> （重新打包的单文件 exe 启动即崩 `0x80040111`），所以只能整目录覆盖。
 >
 > 本仓库是 [RankFTW/RHI](https://github.com/RankFTW/RHI) 的非官方分支，**唯一改动是增加简体中文界面**，
 > 其余代码保持与上游同步。上游原作者不参与本分支，官方暂未提供中文支持（见 upstream issue #5 / #25 / #68，
