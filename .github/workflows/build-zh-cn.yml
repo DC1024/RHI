@@ -61,6 +61,24 @@ jobs:
           "ASSET_ZIP=$zip"   | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Get-Item $zip | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} | Format-List
 
+      # Drop-in patch for users who already installed the official RHI:
+      # RHI.dll  = main assembly, holds the zh-CN dictionary + language switch
+      # resources.pri = compiled XAML, holds the new Settings > Language card
+      - name: Build patch zip (2 files, overwrites an official install)
+        shell: pwsh
+        run: |
+          $patchName = "RHI-zh-CN-patch-$($env:GITHUB_REF_NAME)"
+          $stage = Join-Path $env:RUNNER_TEMP $patchName
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item "$env:PUBLISH_DIR\RHI.dll"        -Destination $stage
+          Copy-Item "$env:PUBLISH_DIR\resources.pri"  -Destination $stage
+          Copy-Item ".github/patch/README-patch.md"   -Destination $stage
+          Get-ChildItem $stage | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,2)}} | Format-Table
+          $zip = "$patchName.zip"
+          Compress-Archive -Path "$stage\*" -DestinationPath $zip -CompressionLevel Optimal
+          (Get-FileHash $zip -Algorithm SHA256).Hash | Out-File -FilePath "$zip.sha256" -Encoding utf8
+          "PATCH_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
@@ -68,6 +86,8 @@ jobs:
           path: |
             ${{ env.ASSET_ZIP }}
             ${{ env.ASSET_ZIP }}.sha256
+            ${{ env.PATCH_ZIP }}
+            ${{ env.PATCH_ZIP }}.sha256
           if-no-files-found: error
 
       - name: Release
@@ -79,6 +99,8 @@ jobs:
           files: |
             ${{ env.ASSET_ZIP }}
             ${{ env.ASSET_ZIP }}.sha256
+            ${{ env.PATCH_ZIP }}
+            ${{ env.PATCH_ZIP }}.sha256
           body: |
             ## RHI 简体中文版 ${{ github.ref_name }}
 
@@ -86,14 +108,25 @@ jobs:
             唯一改动是新增简体中文界面：词条源自社区 PR [#20](https://github.com/RankFTW/RHI/pull/20)，
             由本分支 rebase 到当前主线。遵循上游 **GPL-3.0** 许可，源码随仓库开放。
 
-            ### 安装
+            ### 已经装了官方版？下补丁包（约 5 MB）
 
-            下载 `RHI-zh-CN-${{ github.ref_name }}-win-x64.zip`，解压后运行 `RHI.exe`
+            `RHI-zh-CN-patch-${{ github.ref_name }}.zip` —— 只含 `RHI.dll` 与 `resources.pri`，
+            覆盖进安装目录（默认 `C:\Program Files\RHI`）即可变中文，不用重装、设置与已装模组都保留。
+            步骤见包内 `README-patch.md`：**退出 RHI → 备份原两个文件 → 覆盖 → Settings → Language → 简体中文**。
+            回滚只要把 `.bak` 改回原名。
+
+            ### 全新安装？下完整便携版（约 35 MB）
+
+            `RHI-zh-CN-${{ github.ref_name }}-win-x64.zip` —— 解压后运行 `RHI.exe`
             （**请整目录解压，不要只拷贝 exe**）。
 
             ### 切换中文
 
             启动 → Settings → Language → 简体中文，即时生效。
+
+            ### 注意
+
+            RHI 自带自动更新，官方一更新就会把 `RHI.dll` 覆盖回英文版，届时重新打一次补丁即可。
 
             ### 已知仍为英文
 

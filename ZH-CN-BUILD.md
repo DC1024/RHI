@@ -12,6 +12,18 @@ git tag -a v2.8.1-zh-cn-2 -m "说明"
 git push <remote> v2.8.1-zh-cn-2     # CI 自动构建 + 发 Release
 ```
 
+## 中文补丁包（给已装官方版的用户）
+
+每次 Release 同时产出 `RHI-zh-CN-patch-<tag>.zip`，**只含 2 个文件**：
+`RHI.dll`（主程序集，中文词条表 + 语言切换逻辑）和 `resources.pri`（编译后的 XAML，
+设置页新增的 Language 下拉卡片）。覆盖进官方安装目录即可变中文，不用重装。
+
+说明文档：`.github/patch/README-patch.md`（随补丁包一起打包）。
+判断依据：用 UTF-16 字节比对确认 `Simplified Chinese` 等新增 XAML 串只落在 `resources.pri`，
+`简体中文` 等词条只落在 `RHI.dll`，其余文件与官方一致。
+
+## 手工构建
+
 下面是手工构建的方式，CI 用的也是同一套命令。
 
 本目录是把社区 PR [RankFTW/RHI#20](https://github.com/RankFTW/RHI/pull/20)（作者 HexBen123）的简体中文方案，
