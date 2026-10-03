@@ -1,38 +1,37 @@
 ## v2.8.1 Beta 2
 
 ### New
-- **dgVoodoo2** — now available as a standalone install in the Extras section (under API Upgrades) for any DX9 game. Deploys the DX9→DX11 translation layer directly to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Tracks coexistence with Luma and Feeder — if any component still needs dgVoodoo2, it stays in place when you uninstall another. The ⚙ cog lets you pick which version to deploy — useful for games that work better with older builds.
-- **Control Ultimate Edition — OptiScaler FG** — the install dialog now has two new options. "Install OptiScaler FG" installs OptiScaler Nightly pre-configured for Frame Generation: Streamline deployed, DLLs renamed correctly (OptiScaler → winmm.dll, ReShade → dxgi.dll), and all required INI settings written automatically. "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset. Everything is wired up in one click.
+- **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder — neither will remove it while the other still needs it. The ⚙ cog lets you pick which version to use, useful for games that work better with an older build.
+- **Control Ultimate Edition — OptiScaler FG** — the install dialog has two new options: "Install OptiScaler FG" sets up OptiScaler Nightly for Frame Generation in one click (Streamline deployed, DLLs renamed, INI settings all written), and "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset.
+- **GitHub API** — new section in Settings. Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour, improving reliability of update checks, manifest fetches, and DLSS version lookups. Token is stored in settings and applied automatically on next launch.
 
 ### Changes
-- **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions — so you can see active overrides at a glance without expanding the section.
-- **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale when non-default, e.g. `SR 310.9.1 · M · 75% · RR 310.9.1 · FG 310.9.1 · B · SL 2.14.1`.
-- **Shader pack update log** now shows real version numbers for packs with GitHub releases (Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass). Other packs still show "Updated" since they have no version tags.
-- **Streamline deployment now includes nvngx_dlssg.dll** — copied into the OptiScaler/Streamline/ subfolder on every Streamline deploy for FG support.
-- **OptiScaler Nightly FG cog** — three new Frame Generation settings: FG Enabled (on/off master switch), Force Reflex, and Use Games Reflex Markers. Changes write to OptiScaler.ini immediately.
-- **Neural Rendering remove button** is now a ✕ red icon with the ⚙ cog always shown beside it, matching the Extras section style.
-- **Background Update Checks** — new setting in the Updates section of Settings. "On" (default) keeps the current behaviour: all component update checks run on startup and every 4 hours. "Minimal" skips all background component checks entirely — only manifests, PCGW data, and DLSS versions update automatically. Update checks for ReShade, RenoDX, OptiScaler, Nexus Mods, and everything else only run when you explicitly click Refresh or Update All.
-- **GitHub API** — new section in Settings alongside the data source options. Sign in with GitHub to raise the automatic API rate limit from 60 to 5,000 requests per hour. Improves reliability of update checks, manifest fetches, and DLSS version lookups. Stored in settings and applied automatically on launch.
+- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you don't want RHI checking for updates unless you ask it to.
+- **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions at a glance.
+- **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale when non-default.
+- **Shader pack update log** now shows real version numbers for packs that have GitHub releases (Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass).
+- **Streamline deployment** now includes nvngx_dlssg.dll in the OptiScaler/Streamline subfolder for FG support.
+- **OptiScaler Nightly FG cog** — three new settings: FG Enabled, Force Reflex, and Use Games Reflex Markers.
 
 ### Bug Fixes
 
-**UI Freezes**
-- Fixed a permanent freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The NR section was using the same star-column grid layout that caused the NVIDIA panel freeze in v2.8.0. Fixed the same way — calculated fixed-pixel column widths.
-- Fixed the Extras and Neural Rendering sections overflowing their containers, pushing cog and ✕ buttons off-screen.
-- Fixed a UI deadlock that has caused the app to freeze completely on startup or after changing settings, particularly on games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR). The Settings panel initializes several NVIDIA driver combos (G-Sync indicator, G-Sync mode, VSync, etc.) and was accidentally writing those values back to the driver during initialization — before the protection flag was cleared. This write happened concurrently with the NVIDIA panel reading driver settings for the selected game, causing an unsynchronized concurrent NVAPI access that locked up the driver API and froze the UI. The protection flag now stays active until all NVIDIA combos are fully populated.
+**Freezes**
+- Fixed a UI freeze that affected games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR). The Settings panel was writing driver values back during initialisation — before it had finished loading — which collided with the NVIDIA panel reading those same values. The app would lock up completely. Fixed by keeping the protection flag active until all NVIDIA combos are fully populated.
+- Fixed a freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3).
+- Fixed the Extras and Neural Rendering sections overflowing their containers and pushing buttons off-screen.
 
-**Privacy**
-- Session logs now sanitise paths before writing to disk — usernames are replaced with %USERPROFILE%, Steam user IDs in paths are masked, and Xbox package AUMIDs are truncated. Logs are local-only and never transmitted, but this keeps them clean.
+**dgVoodoo2 + ReShade coexistence**
+- Fixed coexistence failing when installing dgVoodoo2 on a game that already had ReShade at d3d9.dll. ReShade is now correctly moved to dxgi.dll so it hooks dgVoodoo2's DX11 output. Uninstall now correctly cleans up without a full ReShade reinstall.
 
-**DXVK**
-- Fixed the "Deploy dxvk.conf" button in the DXVK cog always deploying a generic conf. For Lilium HDR it now deploys the correct preset-specific content matching your selected preset.
+**Other**
+- Fixed the DXVK "Deploy dxvk.conf" button always deploying a generic config. For Lilium HDR it now deploys the correct preset-specific content.
+- Session logs now mask usernames, Steam user IDs, and Xbox package names before writing to disk.
 
 ### Manifest Updates
-- Fixed Saints Row 2 using 64-bit ReShade — added to 32-bit list.
-- Fixed Assassin's Creed Unity using 32-bit ReShade — added to 64-bit list.
-- Fixed Bye Sweet Carole using 32-bit ReShade — added to 64-bit list.
+- Fixed Saints Row 2, Bye Sweet Carole using wrong ReShade bitness.
+- Fixed Assassin's Creed Unity using 32-bit ReShade.
 - Fixed ReShade not loading on NTE: Neverness To Everness — added d3d12.dll name override.
-- Added install warning for The Witcher 3: Wild Hunt — Remastered — the available RenoDX mod is for the original version, not the Remastered Edition. The warning links to the Discord thread for the Remastered mod.
+- Added install warning for The Witcher 3: Wild Hunt — Remastered (the available RenoDX mod targets the original version).
 
 ---
 
