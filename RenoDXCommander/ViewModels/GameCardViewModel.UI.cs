@@ -335,9 +335,22 @@ public partial class GameCardViewModel
     {
         get
         {
-            // Luma mode: show the Luma mod author instead of the RenoDX author
-            if (EffectiveLumaMode && LumaMod != null && !string.IsNullOrWhiteSpace(LumaMod.Author))
-                return SplitAuthors(LumaMod.Author).ToArray();
+            // Luma mod available: show Luma author.
+            // Exception: if a RenoDX named maintainer exists AND Luma is NOT installed,
+            // show the RenoDX author instead (Luma is just available, not active).
+            if (LumaMod != null && !string.IsNullOrWhiteSpace(LumaMod.Author))
+            {
+                bool lumaInstalled = LumaStatus is GameStatus.Installed or GameStatus.UpdateAvailable;
+                bool hasRenodxAuthor = !string.IsNullOrWhiteSpace(Maintainer);
+                if (!lumaInstalled && hasRenodxAuthor)
+                {
+                    // Fall through to RenoDX author below
+                }
+                else
+                {
+                    return SplitAuthors(LumaMod.Author).ToArray();
+                }
+            }
 
             // UE-Extended overrides everything — credit goes to Marat alone
             if (UseUeExtended || IsManifestUeExtended)

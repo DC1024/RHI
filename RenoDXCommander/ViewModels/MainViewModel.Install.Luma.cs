@@ -698,6 +698,7 @@ public partial class MainViewModel
                 {
                     Name = card.GameName,
                     IsGenericLuma = true,
+                    Author = "Pumbo",
                     DownloadUrl = "https://github.com/Filoppi/Luma-Framework/releases/latest/download/Luma-Unreal_Engine.zip",
                     Status = "✅",
                 };
