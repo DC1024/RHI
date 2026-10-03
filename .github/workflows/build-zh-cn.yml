@@ -1,0 +1,106 @@
+name: Build RHI zh-CN
+
+# Builds the Simplified Chinese fork of RHI (WinUI 3 / net8.0-windows) and
+# publishes a portable zip.
+#
+# Trigger:
+#   - push a tag like v2.8.1-zh-cn-1  -> build + GitHub Release
+#   - Actions tab -> Run workflow      -> build + workflow artifact only
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      PROJECT: RenoDXCommander/RenoDXCommander.csproj
+      PUBLISH_DIR: artifacts/publish/RHI-win-x64-portable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore $env:PROJECT
+
+      - name: Build (Release x64)
+        run: dotnet build $env:PROJECT -c Release -p:Platform=x64 --no-restore
+
+      - name: Localization tests
+        continue-on-error: true
+        run: dotnet test RenoDXCommander.Tests/RenoDXCommander.Tests.csproj --filter "FullyQualifiedName~Localization"
+
+      - name: Publish (portable folder)
+        run: >
+          dotnet publish $env:PROJECT -c Release -p:Platform=x64 -r win-x64
+          --self-contained false -o $env:PUBLISH_DIR
+
+      - name: Zip portable build
+        shell: pwsh
+        run: |
+          $name = "RHI-zh-CN-$($env:GITHUB_REF_NAME)-win-x64"
+          $zip  = "$name.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path "$env:PUBLISH_DIR\*" -DestinationPath $zip -CompressionLevel Optimal
+          (Get-FileHash $zip -Algorithm SHA256).Hash | Out-File -FilePath "$zip.sha256" -Encoding utf8
+          "ASSET_NAME=$name" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "ASSET_ZIP=$zip"   | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Get-Item $zip | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}} | Format-List
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_NAME }}
+          path: |
+            ${{ env.ASSET_ZIP }}
+            ${{ env.ASSET_ZIP }}.sha256
+          if-no-files-found: error
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: RHI 简体中文版 ${{ github.ref_name }}
+          files: |
+            ${{ env.ASSET_ZIP }}
+            ${{ env.ASSET_ZIP }}.sha256
+          body: |
+            ## RHI 简体中文版 ${{ github.ref_name }}
+
+            上游 [RankFTW/RHI](https://github.com/RankFTW/RHI) 的非官方中文分支，
+            唯一改动是新增简体中文界面：词条源自社区 PR [#20](https://github.com/RankFTW/RHI/pull/20)，
+            由本分支 rebase 到当前主线。遵循上游 **GPL-3.0** 许可，源码随仓库开放。
+
+            ### 安装
+
+            下载 `RHI-zh-CN-${{ github.ref_name }}-win-x64.zip`，解压后运行 `RHI.exe`
+            （**请整目录解压，不要只拷贝 exe**）。
+
+            ### 切换中文
+
+            启动 → Settings → Language → 简体中文，即时生效。
+
+            ### 已知仍为英文
+
+            上游 2026-05 之后新增的模块（Extras / NeuralRendering / NvidiaProfile / DofFix）尚未翻译，
+            详见仓库内 `ZH-CN-BUILD.md`。
+
+            SHA256 校验值见同名 `.sha256` 文件。
+          draft: false
+          prerelease: true
+          generate_release_notes: true
