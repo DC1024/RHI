@@ -4,9 +4,9 @@
 - **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder — neither will remove it while the other still needs it. The ⚙ cog lets you pick which version to use, useful for games that work better with an older build.
 - **Control Ultimate Edition — OptiScaler FG** — the install dialog has two new options: "Install OptiScaler FG" sets up OptiScaler Nightly for Frame Generation in one click (Streamline deployed, DLLs renamed, INI settings all written), and "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset.
 - **GitHub API** — new section in Settings. Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour, improving reliability of update checks, manifest fetches, and DLSS version lookups. Token is stored in settings and applied automatically on next launch.
+- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you don't want RHI checking for updates unless you ask it to.
 
 ### Changes
-- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you don't want RHI checking for updates unless you ask it to.
 - **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions at a glance.
 - **DLSS / Streamline collapsed summary** now shows the active preset letter and render scale when non-default.
 - **Shader pack update log** now shows real version numbers for packs that have GitHub releases (Lilium HDR Shaders, PumboAutoHDR, UltrawideSideGlass).
