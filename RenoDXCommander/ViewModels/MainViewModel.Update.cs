@@ -1114,8 +1114,14 @@ public partial class MainViewModel
         // forceCheck = true when user clicks Refresh/Update All, so Nexus always runs on explicit action.
         bool nexusEnabled = forceCheck || _settingsViewModel.BackgroundUpdateChecks == "On";
 
-        // Patch RS record channels to reflect the current per-game override before the update check.
-        // The update service uses card.RsRecord.Channel (not auxRecords) for the pinned-channel guard.
+        // "Minimal" background checks: skip all component update checks unless user explicitly triggered.
+        // Manifests, PCGW, DLSS manifest, and shader packs still run (they're in RunBackgroundScanAndMergeAsync).
+        if (!forceCheck && _settingsViewModel.BackgroundUpdateChecks == "Minimal")
+        {
+            _crashReporter.Log("[MainViewModel.CheckForUpdatesAsync] BackgroundUpdateChecks=Minimal — skipping all component update checks (user-initiated only)");
+            return;
+        }
+
         // If the user changed the channel to Custom after the last install, the record's Channel
         // is stale — patch it here so CheckReShadeUpdateLocal correctly skips custom/legacy channels.
         foreach (var card in cards)

@@ -1180,8 +1180,8 @@
                                         <ToolTipService.ToolTip>
                                             <ToolTip>
                                                 <TextBlock TextWrapping="Wrap" MaxWidth="280">
-                                                    <Run Text="On: all update checks run automatically on startup and every 4 hours, including Nexus Mods."/><LineBreak/>
-                                                    <Run Text="Minimal: only manifest fetches run automatically — Nexus Mods checks only fire when you click Refresh or Update All."/>
+                                                    <Run Text="On: all update checks run automatically on startup and every 4 hours, including ReShade, RenoDX, OptiScaler, Nexus Mods, and all other components."/><LineBreak/>
+                                                    <Run Text="Minimal: only manifests, PCGW data, and DLSS versions update automatically. Component update checks only run when you click Refresh or Update All."/>
                                                 </TextBlock>
                                             </ToolTip>
                                         </ToolTipService.ToolTip>

@@ -11,7 +11,7 @@
 - **Streamline deployment now includes nvngx_dlssg.dll** — copied into the OptiScaler/Streamline/ subfolder on every Streamline deploy for FG support.
 - **OptiScaler Nightly FG cog** — three new Frame Generation settings: FG Enabled (on/off master switch), Force Reflex, and Use Games Reflex Markers. Changes write to OptiScaler.ini immediately.
 - **Neural Rendering remove button** is now a ✕ red icon with the ⚙ cog always shown beside it, matching the Extras section style.
-- **Background Update Checks** — new setting in the Updates section of Settings. "On" (default) keeps the current behaviour: full update checks on startup and every 4 hours, including Nexus Mods. "Minimal" restricts automatic background checks to manifest fetches only — Nexus Mods queries only fire when you explicitly click Refresh or Update All.
+- **Background Update Checks** — new setting in the Updates section of Settings. "On" (default) keeps the current behaviour: all component update checks run on startup and every 4 hours. "Minimal" skips all background component checks entirely — only manifests, PCGW data, and DLSS versions update automatically. Update checks for ReShade, RenoDX, OptiScaler, Nexus Mods, and everything else only run when you explicitly click Refresh or Update All.
 
 ### Bug Fixes
 
