@@ -181,7 +181,7 @@ public partial class MainViewModel
                 _forceUpdateCheck = true; // bypass cooldown since we ARE the cooldown
                 var records = _installer.LoadAll();
                 var auxRecords = _auxInstaller.LoadAll();
-                await CheckForUpdatesAsync(_allCards, records, auxRecords);
+                await CheckForUpdatesAsync(_allCards, records, auxRecords, userInitiated: false);
 
                 // Check for custom ReShade DLL changes and redeploy
                 try
@@ -1090,7 +1090,7 @@ public partial class MainViewModel
 
     // ── Update checking ───────────────────────────────────────────────────────────
 
-    private async Task CheckForUpdatesAsync(List<GameCardViewModel> cards, List<InstalledModRecord> records, List<AuxInstalledRecord> auxRecords)
+    private async Task CheckForUpdatesAsync(List<GameCardViewModel> cards, List<InstalledModRecord> records, List<AuxInstalledRecord> auxRecords, bool userInitiated = false)
     {
         // ── Cooldown: skip update checks if last check was recent ──────────────
         const int CooldownHours = 4;
@@ -1112,11 +1112,11 @@ public partial class MainViewModel
         // Nexus GraphQL calls are gated by the "Background Update Checks" setting.
         // "On" (default): full checks including Nexus. "Minimal": Nexus only on explicit user action.
         // forceCheck = true when user clicks Refresh/Update All, so Nexus always runs on explicit action.
-        bool nexusEnabled = forceCheck || _settingsViewModel.BackgroundUpdateChecks == "On";
+        bool nexusEnabled = userInitiated || _settingsViewModel.BackgroundUpdateChecks == "On";
 
         // "Minimal" background checks: skip all component update checks unless user explicitly triggered.
         // Manifests, PCGW, DLSS manifest, and shader packs still run (they're in RunBackgroundScanAndMergeAsync).
-        if (!forceCheck && _settingsViewModel.BackgroundUpdateChecks == "Minimal")
+        if (!userInitiated && _settingsViewModel.BackgroundUpdateChecks == "Minimal")
         {
             _crashReporter.Log("[MainViewModel.CheckForUpdatesAsync] BackgroundUpdateChecks=Minimal — skipping all component update checks (user-initiated only)");
             return;

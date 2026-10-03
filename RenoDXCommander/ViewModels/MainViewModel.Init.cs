@@ -728,7 +728,7 @@ public partial class MainViewModel
             {
                 try
                 {
-                    await CheckForUpdatesAsync(_allCards, records, auxRecords);
+                    await CheckForUpdatesAsync(_allCards, records, auxRecords, userInitiated: _forceUpdateCheck);
                 }
                 catch (Exception ex)
                 {
