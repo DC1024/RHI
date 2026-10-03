@@ -212,9 +212,17 @@ public partial class DetailPanelBuilder
         // Determine label: RenoDX addon filename + Luma mod name when both are present
         string? fileLabel = null;
         bool lumaInstalled = card.LumaStatus is GameStatus.Installed or GameStatus.UpdateAvailable;
-        string? lumaLabel = lumaInstalled && card.LumaMod != null
-            ? (card.LumaMod.IsGenericLuma ? "Luma" : card.LumaMod.Name)
-            : null;
+        string? lumaLabel = null;
+        if (lumaInstalled && card.LumaMod != null)
+        {
+            // Prefer the actual installed addon filename (e.g. "Luma-Prey.addon") like RenoDX does
+            var addonFile = card.LumaRecord?.InstalledFiles
+                .Select(f => Path.GetFileName(f))
+                .FirstOrDefault(f => f.EndsWith(".addon", StringComparison.OrdinalIgnoreCase)
+                                  || f.EndsWith(".addon64", StringComparison.OrdinalIgnoreCase)
+                                  || f.EndsWith(".addon32", StringComparison.OrdinalIgnoreCase));
+            lumaLabel = addonFile ?? (card.LumaMod.IsGenericLuma ? "Luma" : card.LumaMod.Name);
+        }
 
         if (!string.IsNullOrEmpty(card.InstalledAddonFileName) && lumaLabel != null)
             fileLabel = $"{card.InstalledAddonFileName}  ·  {lumaLabel}";
