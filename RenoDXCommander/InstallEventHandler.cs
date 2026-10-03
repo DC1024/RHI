@@ -515,7 +515,7 @@ public class InstallEventHandler
 
         // Directly update the badge text based on the new state
         string newLabel = card.UseUeExtended ? "UE Extended" : "Generic UE";
-        _window.DetailGenericText.Text = newLabel;
+        LocalizationService.SetText(_window.DetailGenericText, newLabel);
 
         // Update the UE button styling
         if (card.UseUeExtended)
@@ -532,7 +532,7 @@ public class InstallEventHandler
         }
 
         // Update tooltip
-        ToolTipService.SetToolTip(_window.DetailUeExtendedBtn,
+        LocalizationService.SetToolTip(_window.DetailUeExtendedBtn,
             card.UseUeExtended ? "Disable UE Extended" : "Enable UE Extended");
 
         // Show inline message or warning dialog

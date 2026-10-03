@@ -225,14 +225,14 @@ public class MassDlssDeployDialog
         ComboBox srPresetCombo, ComboBox rrPresetCombo, ComboBox fgPresetCombo,
         bool autoCreateProfiles)
     {
-        var dlssVersion  = dlssCombo.SelectedItem  as string;
-        var dlssdVersion = dlssdCombo.SelectedItem as string;
-        var dlssgVersion = dlssgCombo.SelectedItem as string;
-        var slVersion    = slCombo.SelectedItem    as string;
+        var dlssVersion = GetSelectedValue(dlssCombo);
+        var dlssdVersion = GetSelectedValue(dlssdCombo);
+        var dlssgVersion = GetSelectedValue(dlssgCombo);
+        var slVersion = GetSelectedValue(slCombo);
 
-        var srPresetSelection = srPresetCombo.SelectedItem as string;
-        var rrPresetSelection = rrPresetCombo.SelectedItem as string;
-        var fgPresetSelection = fgPresetCombo.SelectedItem as string;
+        var srPresetSelection = GetSelectedValue(srPresetCombo);
+        var rrPresetSelection = GetSelectedValue(rrPresetCombo);
+        var fgPresetSelection = GetSelectedValue(fgPresetCombo);
 
         // "NVIDIA Override" in the version combo means: write the driver DLL override, skip file swap
         bool srDriverEnable = dlssVersion  == NvidiaOverrideOption;
@@ -555,7 +555,7 @@ public class MassDlssDeployDialog
             var detection = card.DlssDetection;
             if (detection == null) continue;
 
-            progressText.Text = $"Restoring {card.GameName}...";
+            LocalizationService.SetText(progressText, $"Restoring {card.GameName}...");
             await Task.Delay(1);
 
             // Restore DLL backups
@@ -633,26 +633,38 @@ public class MassDlssDeployDialog
             if (idx >= 0) selectedIdx = idx;
         }
 
-        return new ComboBox
+        var combo = new ComboBox
         {
-            ItemsSource = items,
-            SelectedIndex = selectedIdx,
+            SelectedIndex = 0,
             FontSize = 12,
             CornerRadius = new CornerRadius(6),
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
+
+        foreach (var item in items)
+        {
+            var comboItem = new ComboBoxItem
+            {
+                Tag = item,
+            };
+            LocalizationService.SetContent(comboItem, item);
+            combo.Items.Add(comboItem);
+        }
+
+        return combo;
     }
 
     private static StackPanel BuildDropdownSection(string label, ComboBox combo)
     {
         var panel = new StackPanel { Spacing = 4 };
-        panel.Children.Add(new TextBlock
+        var labelBlock = new TextBlock
         {
-            Text = label,
             FontSize = 12,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 200, 210, 230)),
-        });
+        };
+        LocalizationService.SetText(labelBlock, label);
+        panel.Children.Add(labelBlock);
         panel.Children.Add(combo);
         return panel;
     }
@@ -663,20 +675,34 @@ public class MassDlssDeployDialog
         foreach (var (name, _) in presets)
             items.Add(name);
 
-        int selectedIdx = 0; // Default to "None"
-        if (savedDefault != 0)
+        var combo = new ComboBox
         {
-            var presetIdx = Array.FindIndex(presets, p => p.Value == savedDefault);
-            if (presetIdx >= 0) selectedIdx = presetIdx + 1; // +1 for "None" at index 0
-        }
-
-        return new ComboBox
-        {
-            ItemsSource = items,
-            SelectedIndex = selectedIdx,
+            SelectedIndex = 0,
             FontSize = 12,
             CornerRadius = new CornerRadius(6),
             HorizontalAlignment = HorizontalAlignment.Stretch,
+        };
+
+        foreach (var item in items)
+        {
+            var comboItem = new ComboBoxItem
+            {
+                Tag = item,
+            };
+            LocalizationService.SetContent(comboItem, item);
+            combo.Items.Add(comboItem);
+        }
+
+        return combo;
+    }
+
+    private static string GetSelectedValue(ComboBox combo)
+    {
+        return combo.SelectedItem switch
+        {
+            ComboBoxItem { Tag: string tag } => tag,
+            string value => value,
+            _ => NoneOption,
         };
     }
 

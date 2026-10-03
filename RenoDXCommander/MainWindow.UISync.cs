@@ -16,6 +16,57 @@ public sealed partial class MainWindow
 {
     // ── ViewModel → UI sync ───────────────────────────────────────────────────────
 
+    private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
+        => DispatcherQueue.TryEnqueue(ApplyLocalization);
+
+    private void ApplyLocalization()
+    {
+        if (Content is DependencyObject root)
+            LocalizationService.ApplyTo(root);
+
+        ViewModel.NotifyLocalizationChanged();
+        SyncStatusText();
+        SyncCountText();
+        _settingsHandler.RefreshGlobalUpdateSummary();
+        RebuildCustomFilterChips();
+
+        if (ViewModel.CurrentViewLayout == ViewLayout.Grid)
+            RebuildCardGrid();
+
+        if (ViewModel.SelectedGame is { } selected)
+        {
+            selected.NotifyAll();
+            if (ViewModel.CurrentViewLayout == ViewLayout.Detail)
+            {
+                PopulateDetailPanel(selected);
+                BuildOverridesPanel(selected);
+            }
+            else if (ViewModel.CurrentViewLayout == ViewLayout.Compact)
+            {
+                _compactViewBuilder?.RebuildCurrentPage(selected, ViewModel.CompactPageIndex);
+            }
+        }
+    }
+
+    private void SyncStatusText()
+    {
+        var statusText = LocalizationService.Text(ViewModel.StatusText);
+        var subStatusText = LocalizationService.Text(ViewModel.SubStatusText);
+        LoadingTitle.Text = statusText;
+        LoadingSubtitle.Text = subStatusText;
+        StatusBarText.Text = statusText
+            + (string.IsNullOrEmpty(subStatusText) ? "" : $"  —  {subStatusText}");
+    }
+
+    private void SyncCountText()
+    {
+        InstalledCountText.Text = LocalizationService.Format("{0} installed", ViewModel.InstalledCount);
+        GameCountText.Text = LocalizationService.Format("{0} shown", ViewModel.TotalGames);
+        HiddenCountText.Text = ViewModel.HiddenCount > 0
+            ? LocalizationService.Format("· {0} hidden", ViewModel.HiddenCount)
+            : "";
+    }
+
     private void OnViewModelChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         DispatcherQueue.TryEnqueue(() =>
@@ -75,20 +126,16 @@ public sealed partial class MainWindow
                     break;
                 case nameof(ViewModel.StatusText):
                 case nameof(ViewModel.SubStatusText):
-                    LoadingTitle.Text    = ViewModel.StatusText;
-                    LoadingSubtitle.Text = ViewModel.SubStatusText;
-                    StatusBarText.Text   = ViewModel.StatusText
-                        + (string.IsNullOrEmpty(ViewModel.SubStatusText) ? "" : $"  —  {ViewModel.SubStatusText}");
+                    SyncStatusText();
                     break;
                 case nameof(ViewModel.InstalledCount):
-                    InstalledCountText.Text = $"{ViewModel.InstalledCount} ReShade";
+                    SyncCountText();
                     break;
                 case nameof(ViewModel.TotalGames):
-                    GameCountText.Text = $"{ViewModel.TotalGames} shown";
+                    SyncCountText();
                     break;
                 case nameof(ViewModel.HiddenCount):
-                    HiddenCountText.Text = ViewModel.HiddenCount > 0
-                        ? $"· {ViewModel.HiddenCount} hidden" : "";
+                    SyncCountText();
                     break;
                 case nameof(ViewModel.FilterMode):
                     RefreshFilterButtonStyles();
@@ -198,6 +245,7 @@ public sealed partial class MainWindow
     {
         ViewModel.SetLastUiAction($"PopulateDetailPanel({card.GameName})");
         _detailPanelBuilder.PopulateDetailPanel(card);
+        LocalizationService.ApplyTo(DetailPanel);
     }
 
     private void UpdateDetailComponentRows(GameCardViewModel card) => _detailPanelBuilder.UpdateDetailComponentRows(card);
@@ -208,11 +256,12 @@ public sealed partial class MainWindow
     {
         ViewModel.SetLastUiAction($"BuildOverridesPanel({card.GameName})");
         _detailPanelBuilder.BuildOverridesPanel(card);
-    }
+        LocalizationService.ApplyTo(OverridesPanel);
+        LocalizationService.ApplyTo(ManagementPanel);
 
     internal void UpdateLumaToggleStyle(bool isLumaMode)
     {
-        DetailLumaToggleText.Text = isLumaMode ? "Luma ON" : "Luma OFF";
+        LocalizationService.SetText(DetailLumaToggleText, isLumaMode ? "Luma ON" : "Luma OFF");
         if (isLumaMode)
         {
             DetailLumaToggle.Background = Brush(ResourceKeys.AccentGreenBgBrush);

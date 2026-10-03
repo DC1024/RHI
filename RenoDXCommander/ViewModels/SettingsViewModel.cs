@@ -140,6 +140,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _defaultRrDriverOverride = false;
     /// <summary>When true, Quick Apply / Batch Deploy will enable the NVIDIA driver DLL override for DLSS FG.</summary>
     [ObservableProperty] private bool _defaultFgDriverOverride = false;
+    [ObservableProperty] private string _language = LocalizationService.AutoLanguage;
 
     /// <summary>
     /// Optional callback invoked after any settings-specific property changes,
@@ -158,6 +159,13 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnVerboseLoggingChanged(bool value)
     {
         CrashReporter.VerboseLogging = value;
+    }
+
+    partial void OnLanguageChanged(string value)
+    {
+        Language = LocalizationService.NormalizePreference(value);
+        LocalizationService.SetLanguagePreference(Language);
+        SettingsChanged?.Invoke();
     }
 
     // ── Settings file I/O ─────────────────────────────────────────────────────────
@@ -452,6 +460,10 @@ public partial class SettingsViewModel : ObservableObject
             }
             catch { DetailSectionOrder = new(DefaultSectionOrder); }
         }
+        Language = s.TryGetValue("Language", out var langVal)
+            ? LocalizationService.NormalizePreference(langVal)
+            : LocalizationService.AutoLanguage;
+        LocalizationService.SetLanguagePreference(Language);
     }
 
     /// <summary>
@@ -569,6 +581,7 @@ public partial class SettingsViewModel : ObservableObject
             s["DetailSectionOrder"] = System.Text.Json.JsonSerializer.Serialize(DetailSectionOrder);
         else
             s.Remove("DetailSectionOrder");
+        s["Language"] = LocalizationService.NormalizePreference(Language);
     }
 
     public void LoadThemeAndDensity()
