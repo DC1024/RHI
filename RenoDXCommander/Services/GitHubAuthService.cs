@@ -31,7 +31,7 @@ public sealed class GitHubAuthService
     /// GitHub App Client ID.  This is NOT a secret — device flow only uses it to identify the app.
     /// Replace with the actual Client ID from the GitHub App settings page once the app is created.
     /// </summary>
-    public const string ClientId = "YOUR_GITHUB_APP_CLIENT_ID";
+    public const string ClientId = "Iv23lijkKOAsRqnn4m17";
 
     private const string DeviceCodeUrl    = "https://github.com/login/device/code";
     private const string AccessTokenUrl   = "https://github.com/login/oauth/access_token";
