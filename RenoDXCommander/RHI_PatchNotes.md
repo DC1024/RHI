@@ -2,6 +2,17 @@
 
 To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. Takes about 30 seconds.
 
+## v2.8.2
+
+### Bug Fixes
+- Fixed OptiScaler Nightly install silently deploying Streamline and DLSS Enabler to the game folder without actually installing OptiScaler when staging was unavailable (e.g. GitHub rate limited). The failed install now exits cleanly.
+- Fixed ultrawide fix links (Lyall) failing to load on startup with a 401 error when a GitHub token was configured. The shared HTTP client was sending the GitHub Bearer token to Codeberg, which rejected it.
+
+### Changes
+- dgVoodoo2 now appears in the Extras collapsed summary when installed.
+
+---
+
 ## v2.8.1
 
 ### New

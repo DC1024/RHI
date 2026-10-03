@@ -256,6 +256,7 @@ public partial class MainViewModel
             var sections = new List<string>();
             var currentSection = new List<string>();
             bool inSection = false;
+            var preamble = new List<string>();
 
             foreach (var line in lines)
             {
@@ -285,15 +286,25 @@ public partial class MainViewModel
                         currentSection.Add(line);
                     }
                 }
+                else
+                {
+                    preamble.Add(line);
+                }
             }
 
             // Capture final section if still in progress
             if (inSection && currentSection.Count > 0 && sections.Count < count)
                 sections.Add(string.Join("\n", currentSection));
 
-            return sections.Count > 0
+            var body = sections.Count > 0
                 ? string.Join("\n\n---\n\n", sections)
                 : "No patch notes available.";
+
+            // Prepend preamble (e.g. the GitHub API warning banner) if present
+            var preambleText = string.Join("\n", preamble).Trim();
+            return string.IsNullOrEmpty(preambleText)
+                ? body
+                : preambleText + "\n\n---\n\n" + body;
         }
         catch (Exception ex)
         {

@@ -356,7 +356,22 @@ public partial class UltrawideFixService : IUltrawideFixService
         // Fetch from network
         try
         {
-            var content = await _http.GetStringAsync(url).ConfigureAwait(false);
+            // Use a manual request so we can strip the global Authorization header for
+            // non-GitHub hosts (e.g. Codeberg). The shared HttpClient may carry a
+            // "Bearer ghp_..." default header that Codeberg rejects with 401.
+            string content;
+            using (var req = new HttpRequestMessage(HttpMethod.Get, url))
+            {
+                var uri = new Uri(url);
+                if (!uri.Host.EndsWith("github.com", StringComparison.OrdinalIgnoreCase) &&
+                    !uri.Host.EndsWith("githubusercontent.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    req.Headers.Remove("Authorization");
+                }
+                using var resp = await _http.SendAsync(req).ConfigureAwait(false);
+                resp.EnsureSuccessStatusCode();
+                content = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
             CrashReporter.Log($"[UltrawideFixService] {label} fetched from network");
 
             // Persist to cache
