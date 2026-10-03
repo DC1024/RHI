@@ -1,5 +1,22 @@
 # RHI — ReShade HDR Installer
 
+> ## 🇨🇳 Fork 说明 / Fork notice
+>
+> 本仓库是 [RankFTW/RHI](https://github.com/RankFTW/RHI) 的非官方分支，**唯一改动是增加简体中文界面**，
+> 其余代码保持与上游同步。上游原作者不参与本分支，官方暂未提供中文支持（见 upstream issue #5 / #25 / #68，
+> 以及尚未合并的社区 PR #20、#53）。
+>
+> English: this is an **unofficial fork** of RankFTW/RHI whose only functional change is an added
+> Simplified Chinese UI. Upstream is untouched otherwise.
+>
+> - 默认分支：`zh-cn`（基于 upstream `1f8b36d`，v2.8.1 Beta 3）
+> - 切换语言：Settings → Language → 简体中文
+> - 中文的实现细节、已知仍为英文的区域、重建命令见 **[ZH-CN-BUILD.md](ZH-CN-BUILD.md)**
+> - 翻译词条源自社区 PR [#20](https://github.com/RankFTW/RHI/pull/20)（HexBen123），本分支将其 rebase 到新主线
+> - 本项目遵循上游许可证 **GPL-3.0**，源码与所有修改均开放
+>
+> 需要官方原版请到上游下载：<https://github.com/RankFTW/RHI>
+
 **One tool. Every game. Full HDR, DLSS, and NVIDIA driver management from a single window.**
 
 RHI detects your entire game library across every major store and handles ReShade, HDR mods, frame limiters, DLSS management, OptiScaler, shader packs, and NVIDIA driver profiles — all in one click.

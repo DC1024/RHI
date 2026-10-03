@@ -1,0 +1,75 @@
+# RHI 简体中文自建版 · 使用与维护说明
+
+本目录是把社区 PR [RankFTW/RHI#20](https://github.com/RankFTW/RHI/pull/20)（作者 HexBen123）的简体中文方案，
+rebase 到 `RankFTW/RHI` main 分支 v2.8.1 Beta 3 之后的本地构建。官方仓库至今没有合并任何中文 PR。
+
+- 分支：`zh-cn`（本地仓库 `C:\Users\15657.DC-PC\WorkBuddy\2026-10-03-23-22-31\RHI`）
+- 基准提交：`1f8b36d`（Patch notes: add NVAPI session lock freeze fix）
+- 产物：`artifacts/publish/RHI-win-x64-portable/RHI.exe`（202 个文件，不要单独拷 exe）
+
+## 怎么切中文
+
+启动后 → **Settings（设置）** → 第一张卡片 **Language（语言）**：
+
+| 选项 | 行为 |
+| --- | --- |
+| Automatic (system language) | 跟随 Windows 显示语言，非 zh-CN 回退英文 |
+| English | 强制英文 |
+| 简体中文 | 强制中文 |
+
+切换即时生效（会触发 `LocalizationService.LanguageChanged` → 重新遍历整棵可视树），偏好写入 `%LOCALAPPDATA%\RHI\settings.json` 的 `Language` 键。
+
+## 汉化实现
+
+`RenoDXCommander/Services/LocalizationService.cs`：
+
+- **581 条静态词条**的英→中词典，另有 ~73 条正则规则处理运行时动态文案（如 "Downloading X..."、"Updated N file(s)."）。
+- 用 `VisualTreeHelper` 递归遍历可视树，按**英文原文**做键匹配，翻译 TextBlock / Run / TextBox 占位符 / ComboBox Header / ToggleSwitch 的 On-Off 文案 / ToolTip / MenuFlyoutItem。
+  → XAML 里写的 UI 不需要逐个加 `x:Uid`，后续新增界面大概率自动就有中文。
+- 技术名词刻意保留原文：Unreal / Unity / Streamline / RenoDX / ReShade / DXVK / OptiScaler / Lilium HDR。
+
+改动面：`SettingsViewModel`（持久化）、`SettingsHandler`（下拉同步）、`MainWindow.xaml`（语言卡片）、
+`MainWindow.UISync`（刷新入口）、以及各 ViewModel 的 `L()` 包装。
+
+## 还没翻的地方（已知缺口）
+
+| 位置 | 原因 |
+| --- | --- |
+| DetailPanelBuilder 的 Extras / NeuralRendering / NvidiaProfile / DofFix 等模块 | 2026-05 之后上游新增，PR 没碰；新的英文串不在 581 条词典里 |
+| 部分组合文案（如 UE-Extended 的更新按钮） | 已补到词典，但类似组合串可能还有漏网的 |
+| 安装引导界面 | 走的是 Inno Setup；要做中文安装界面需参考 PR #53 的 `Installer/Languages/ChineseSimplified.isl` |
+
+补翻译只需往 `SimplifiedChinese` 词典加一行 `["英文原文"] = "中文"`，重编译即可。
+
+## 重新构建
+
+本机 .NET 8 SDK 装在用户目录（非全局），构建前先注入环境：
+
+```bash
+export PATH="/c/Users/15657.DC-PC/.dotnet:$PATH"
+export DOTNET_ROOT="C:\\Users\\15657.DC-PC\\.dotnet"
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+```
+
+```bash
+dotnet restore RenoDXCommander/RenoDXCommander.csproj
+dotnet build RenoDXCommander/RenoDXCommander.csproj -c Release -p:Platform=x64 --no-restore
+dotnet test  RenoDXCommander.Tests/RenoDXCommander.Tests.csproj --filter "FullyQualifiedName~Localization"
+dotnet publish RenoDXCommander/RenoDXCommander.csproj -c Release -p:Platform=x64 -r win-x64 \
+    --self-contained false -o artifacts/publish/RHI-win-x64-portable
+```
+
+验证状态：`build 0 error`，`test 10/10 passed`，进程可正常启动。
+
+> 注意：不要用 `PublishSingleFile=true`。实测单文件发布不会把 `ReShade.ini` / `FEATURES.txt` 等
+> `ExcludeFromSingleFile=true` 的内容文件复制到输出目录，只能跑便携版（整个目录）。
+
+## 跟进上游
+
+```bash
+git checkout zh-cn
+git fetch upstream main          # upstream = https://github.com/RankFTW/RHI.git
+git merge upstream/main         # 冲突多半落在 LocalizationService 周边，按"保留上游逻辑 + 补翻译调用"处理
+```
+
+上游若有大重构，优先保留他们的新结构，翻译可以事后用遍历机制自动覆盖。

@@ -20,6 +20,7 @@ public partial class GameCardViewModel
             // No mod available and nothing manually installed
             if (Mod?.SnapshotUrl == null && !IsExternalOnly && string.IsNullOrEmpty(InstalledAddonFileName))
                 return L("No RenoDX mod available");
+            var name = UseUeExtended ? "UE-Extended" : "RenoDX";
             return Status == GameStatus.UpdateAvailable ? L($"⬆  Update {name}")
                  : Status == GameStatus.Installed       ? L($"↺  Reinstall {name}")
                  : L($"⬇  Install {name}");

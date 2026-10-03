@@ -30,21 +30,14 @@ public sealed partial class MainWindow
         _settingsHandler.RefreshGlobalUpdateSummary();
         RebuildCustomFilterChips();
 
-        if (ViewModel.CurrentViewLayout == ViewLayout.Grid)
-            RebuildCardGrid();
+        // Grid layout was removed upstream (Detail + Compact only), so there is
+        // nothing to rebuild after a language change.
 
         if (ViewModel.SelectedGame is { } selected)
         {
             selected.NotifyAll();
-            if (ViewModel.CurrentViewLayout == ViewLayout.Detail)
-            {
-                PopulateDetailPanel(selected);
-                BuildOverridesPanel(selected);
-            }
-            else if (ViewModel.CurrentViewLayout == ViewLayout.Compact)
-            {
-                _compactViewBuilder?.RebuildCurrentPage(selected, ViewModel.CompactPageIndex);
-            }
+            PopulateDetailPanel(selected);
+            BuildOverridesPanel(selected);
         }
     }
 
@@ -258,6 +251,7 @@ public sealed partial class MainWindow
         _detailPanelBuilder.BuildOverridesPanel(card);
         LocalizationService.ApplyTo(OverridesPanel);
         LocalizationService.ApplyTo(ManagementPanel);
+    }
 
     internal void UpdateLumaToggleStyle(bool isLumaMode)
     {

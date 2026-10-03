@@ -10,12 +10,7 @@ namespace RenoDXCommander;
 
 public partial class DetailPanelBuilder
 {
-    internal static readonly string[] DcDllOverrideNames =
-    [
-        "dxgi.dll", "d3d9.dll", "d3d11.dll", "d3d12.dll", "ddraw.dll",
-        "hid.dll", "version.dll", "opengl32.dll", "dbghelp.dll",
-        "vulkan-1.dll", "winmm.dll",
-    ];
+    // (DcDllOverrideNames now lives in DetailPanelBuilder.Overrides.Dxvk.cs upstream.)
 
     private sealed class LocalizedComboOption(string value)
     {
@@ -56,6 +51,8 @@ public partial class DetailPanelBuilder
 
         if (match != null)
             comboBox.SelectedItem = match;
+    }
+
     private sealed class OverridesPanelCtx
     {
         public required GameCardViewModel Card;

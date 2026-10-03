@@ -135,14 +135,9 @@ public partial class MainViewModel : ObservableObject
     public Visibility DetailOrCompactVisibility => Visibility.Visible;
     public string LayoutToggleLabel => CurrentViewLayout switch
     {
-        ViewLayout.Detail => LocalizationService.Text("Detail View"),
-        ViewLayout.Grid => LocalizationService.Text("Grid View"),
         ViewLayout.Compact => LocalizationService.Text("Compact View"),
         _ => LocalizationService.Text("Detail View"),
     };
-
-    // Backward-compatible property for code that still checks grid mode
-    public bool IsGridLayout => CurrentViewLayout == ViewLayout.Grid;
 
     partial void OnCurrentViewLayoutChanged(ViewLayout value)
     {

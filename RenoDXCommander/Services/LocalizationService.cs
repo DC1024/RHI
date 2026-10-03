@@ -1057,6 +1057,11 @@ public static class LocalizationService
         ["⬆ Update RenoDX"] = "⬆  更新 RenoDX",
         ["↺ Reinstall RenoDX"] = "↺  重装 RenoDX",
         ["⬇ Install RenoDX"] = "⬇  安装 RenoDX",
+        // Rendered by GameCardViewModel.InstallActionLabel when UE-Extended is selected
+        ["⬆ Update UE-Extended"] = "⬆  更新 UE-Extended",
+        ["↺ Reinstall UE-Extended"] = "↺  重装 UE-Extended",
+        ["⬇ Install UE-Extended"] = "⬇  安装 UE-Extended",
+        ["Configure RTX HDR"] = "配置 RTX HDR",
         ["⬆ Update ReShade"] = "⬆  更新 ReShade",
         ["↺ Reinstall ReShade"] = "↺  重装 ReShade",
         ["⬇ Install ReShade"] = "⬇  安装 ReShade",
