@@ -156,7 +156,6 @@ public partial class DetailPanelBuilder
 
         // Wiki status badge — hidden from main UI, shown inside Info button dialog instead
         _window.DetailWikiBadge.Visibility = Visibility.Collapsed;
-        _window.DetailSepPlatformStatus.Visibility = Visibility.Collapsed;
 
         // Author badges
         _window.DetailAuthorBadgePanel.Children.Clear();
