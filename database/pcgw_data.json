@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "game_count": 55360,
-  "generated": "2026-10-03T04:42:36Z",
+  "game_count": 55365,
+  "generated": "2026-10-03T14:33:56Z",
   "name_overrides": {
     "ACE COMBAT 8: WINGS OF THEVE": "Ace Combat 8: Wings of Theve",
     "AFOP": "Avatar: Frontiers of Pandora",
@@ -15299,7 +15299,7 @@
     "Balls! Virtual Reality Cricket": {
       "steam_appid": 517220
     },
-    "Balls!🤬🍆": {
+    "Balls!\uD83E\uDD2C\uD83C\uDF46": {
       "steam_appid": 1156670
     },
     "BallsBlasterVR": {
@@ -15605,6 +15605,7 @@
     "Barbie as Rapunzel: A Creative Adventure": {
       "engine": "Director"
     },
+    "Barbie as Sleeping Beauty": {},
     "Barbie as the Island Princess": {
       "dx9": true
     },
@@ -17221,7 +17222,7 @@
     "Bears in Tanks": {
       "steam_appid": 1033360
     },
-    "BEARS, VODKA, BALALAIKA! 🐻": {
+    "BEARS, VODKA, BALALAIKA! \uD83D\uDC3B": {
       "steam_appid": 1129220
     },
     "Bearslayer": {
@@ -18588,7 +18589,7 @@
     "Bient├┤t l'├®t├®": {
       "steam_appid": 229600,
       "dx9": true,
-      "config_path": "HKEY_CURRENT_USER\\Software\\Tale of Tales\\Biento├îÔÇÜt l'e├îte├î\\",
+      "config_path": "HKEY_CURRENT_USER\\Software\\Tale of Tales\\Biento├îÔÇÜt l'e├î\u0081te├î\u0081\\",
       "engine": "Unity"
     },
     "Bierzerkers": {
@@ -19510,7 +19511,8 @@
       "steam_appid": 810470
     },
     "Black Forest": {
-      "steam_appid": 523070
+      "steam_appid": 523070,
+      "engine": "Unity"
     },
     "Black Friday: The Game": {
       "steam_appid": 712700
@@ -25480,13 +25482,13 @@
       "config_path": "%USERPROFILE%\\AppData\\LocalLow\\Kodll\\Bzzzt\\",
       "engine": "Unity"
     },
+    "Bþö╗Õ░æÞ»┤": {
+      "steam_appid": 1007870
+    },
     "B┼ì: Path of the Teal Lotus": {
       "steam_appid": 1614440,
       "config_path": "HKEY_CURRENT_USER\\Software\\Squid Shock Studios\\Bo",
       "engine": "Unity"
-    },
-    "Bþö╗Õ░æÞ»┤": {
-      "steam_appid": 1007870
     },
     "C": {
       "steam_appid": 779790
@@ -51130,9 +51132,6 @@
     "Dystoria": {
       "steam_appid": 516580
     },
-    "D├ñmmerlicht": {
-      "steam_appid": 589410
-    },
     "D├®j├á Vu": {
       "steam_appid": 843710
     },
@@ -51149,6 +51148,9 @@
     "D├®sir├®": {
       "steam_appid": 805760,
       "engine": "Unity"
+    },
+    "D├ñmmerlicht": {
+      "steam_appid": 589410
     },
     "D┼ìky┼½sei: Bangin' Summer": {
       "steam_appid": 1689910
@@ -60782,6 +60784,7 @@
       "config_path": "<path-to-game>\\Data\\Config"
     },
     "Fire Department 3": {
+      "dx9": true,
       "config_path": "<path-to-game>\\Data\\Config"
     },
     "Fire Farm VR": {
@@ -61375,7 +61378,7 @@
     "Fjord Battle Racing": {
       "steam_appid": 667590
     },
-    "Flag couple🚩": {
+    "Flag couple\uD83D\uDEA9": {
       "steam_appid": 960430
     },
     "Flag N Frag": {
@@ -65083,7 +65086,7 @@
       "steam_appid": 1909320,
       "engine": "Unity"
     },
-    "Furry Futanari: 3 in 1 ÔÜº🏳´©ÅÔÇì🌈": {
+    "Furry Futanari: 3 in 1 ÔÜº\uD83C\uDFF3´©ÅÔÇì\uD83C\uDF08": {
       "steam_appid": 1871000
     },
     "Furry Girl": {
@@ -65096,7 +65099,7 @@
     "Furry Hitler": {
       "steam_appid": 1992370
     },
-    "Furry Ladies 🐾": {
+    "Furry Ladies \uD83D\uDC3E": {
       "steam_appid": 1204310
     },
     "Furry Love": {
@@ -65197,7 +65200,7 @@
       "config_path": "<path-to-game>\\options.sav",
       "engine": "GameMaker"
     },
-    "Futanari girlfriends ÔÜº👧🍆": {
+    "Futanari girlfriends ÔÜº\uD83D\uDC67\uD83C\uDF46": {
       "steam_appid": 2579470
     },
     "Futanari Jigsaw Puzzle": {
@@ -80569,8 +80572,8 @@
     "Hytale": {
       "config_path": "<path-to-game>\\UserData\\Settings.json"
     },
-    "H├ñr kommer Pippi L├Ñngstrump": {},
     "H├Âllenjob": {},
+    "H├ñr kommer Pippi L├Ñngstrump": {},
     "I (Don't) Hate Hentai Puzzles": {
       "steam_appid": 1158660
     },
@@ -90590,12 +90593,12 @@
     "Kyurinaga's Revenge": {
       "steam_appid": 529580
     },
-    "K├│terGame": {
-      "steam_appid": 975700
-    },
     "K─üdomon: Hyper Auto Battlers": {
       "steam_appid": 2125540,
       "engine": "Unity"
+    },
+    "K├│terGame": {
+      "steam_appid": 975700
     },
     "K┼ìmori Fruit Rush": {
       "steam_appid": 1179340
@@ -91469,6 +91472,10 @@
       "steam_appid": 812350
     },
     "Last Half of Darkness": {},
+    "Last Half of Darkness (2025)": {
+      "steam_appid": 3096000,
+      "engine": "Unreal Engine 5"
+    },
     "Last Half of Darkness - Society of the Serpent Moon": {
       "steam_appid": 384910
     },
@@ -108202,7 +108209,7 @@
       "config_path": "%USERPROFILE%\\AppData\\LocalLow\\John Szymanski\\My Friendly Neighborhood\\",
       "engine": "Unity"
     },
-    "My Futa Girlfriend 🔞": {
+    "My Futa Girlfriend \uD83D\uDD1E": {
       "steam_appid": 2842870
     },
     "My Futanari Stepmom Impregnated Me": {
@@ -109160,22 +109167,22 @@
     "MyWorld": {
       "steam_appid": 492150
     },
-    "M├ñrchen Forest: Mylne and the Forest Gift": {
-      "steam_appid": 842810,
-      "config_path": "HKEY_CURRENT_USER\\Software\\PrimaryOrbit\\merufore_steam",
-      "engine": "Unity"
-    },
     "M├àRD": {
       "steam_appid": 928070,
       "engine": "Unity"
-    },
-    "M├▓ The Frog": {
-      "steam_appid": 967290
     },
     "M├Âbius Front '83": {
       "steam_appid": 971160,
       "dx11": true,
       "config_path": "%USERPROFILE%\\Documents\\My Games\\M├Âbius Front '83\\<user-id>\\config.cfg"
+    },
+    "M├ñrchen Forest: Mylne and the Forest Gift": {
+      "steam_appid": 842810,
+      "config_path": "HKEY_CURRENT_USER\\Software\\PrimaryOrbit\\merufore_steam",
+      "engine": "Unity"
+    },
+    "M├▓ The Frog": {
+      "steam_appid": 967290
     },
     "N": {
       "engine": "Flash"
@@ -114644,7 +114651,7 @@
     "Octopath Traveler II": {
       "steam_appid": 1971650,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Octopath_Traveler2\\Saved\\Config\\WindowsNoEditor\\",
+      "config_path": "%LOCALAPPDATA%\\Octopath_Traveler2\\Saved\\Config\\WindowsNoEditor\\*.ini, %USERPROFILE%\\Documents\\My Games\\Octopath_Traveler2\\Steam\\0\\SaveGames\\SystemData.sav",
       "engine": "Unreal Engine 4"
     },
     "Octopticom": {
@@ -142324,7 +142331,7 @@
     "Sexy Comedy: It Was a Mistake": {
       "steam_appid": 943860
     },
-    "Sexy Futa: Mecha Battles of Islands🍓": {
+    "Sexy Futa: Mecha Battles of Islands\uD83C\uDF53": {
       "steam_appid": 2975250
     },
     "Sexy Girls": {
@@ -160216,9 +160223,6 @@
     "Szybowcowa '87": {
       "steam_appid": 2246650
     },
-    "S├åLIG": {
-      "steam_appid": 612720
-    },
     "S├®bastien Loeb Rally EVO": {
       "steam_appid": 355060,
       "dx11": true,
@@ -160230,6 +160234,9 @@
     },
     "S├Âldner: Secret Wars Remastered": {
       "steam_appid": 847720
+    },
+    "S├åLIG": {
+      "steam_appid": 612720
     },
     "T Simulator": {
       "steam_appid": 1080290
@@ -162128,7 +162135,7 @@
       "steam_appid": 1486920,
       "dx11": true,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Tempest\\Saved\\Config\\Windows\\",
+      "config_path": "%LOCALAPPDATA%\\Tempest\\Saved\\Config\\Windows\\GameUserSettings.ini",
       "engine": "Unreal Engine 5"
     },
     "Templar Battleforce": {
@@ -165830,6 +165837,7 @@
       "config_path": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Disney Interactive\\Emperor's New Groove\\1.0\\",
       "engine": "Blazing Renderer"
     },
+    "The Emperor's New Groove: Groove Center": {},
     "The Emperor's Own": {
       "steam_appid": 1364800,
       "engine": "Unreal Engine 4"
@@ -168916,6 +168924,11 @@
     },
     "The Lewd Knight": {
       "steam_appid": 1129520
+    },
+    "The Liar Princess and the Blind Prince": {
+      "steam_appid": 3901910,
+      "dx11": true,
+      "config_path": "%APPDATA%\\Nippon Ichi Software, Inc\\PrincessAndPrince\\Setting.ini"
     },
     "The Life and Suffering of Prince Jerian": {
       "steam_appid": 2936290,
@@ -177484,13 +177497,13 @@
     "Touhou Hero of Ice Fairy": {
       "steam_appid": 1955830,
       "dx11": true,
-      "config_path": "%USERPROFILE%\\AppData\\LocalLow\\GAMEPULSE\\Touhou Hero of Ice Fairy\\, HKEY_CURRENT_USER\\Software\\GAMEPULSE\\Touhou Hero of Ice Fairy\\",
+      "config_path": "%USERPROFILE%\\AppData\\LocalLow\\GAMEPULSE\\Touhou\u00A0Hero\u00A0of\u00A0Ice\u00A0Fairy\\, HKEY_CURRENT_USER\\Software\\GAMEPULSE\\Touhou\u00A0Hero\u00A0of\u00A0Ice\u00A0Fairy\\",
       "engine": "Unity"
     },
     "Touhou Hero of Ice Fairy: Prologue": {
       "steam_appid": 1715460,
       "dx11": true,
-      "config_path": "<path-to-game>\\Touhou Hero of Ice Fairy Prologue_Data\\StreamingAssets\\, %USERPROFILE%\\AppData\\LocalLow\\GAMEPULSE µ©©µêÅÞäëÕå▓\\Touhou Hero of Ice Fairy_ Prologue\\, HKEY_CURRENT_USER\\Software\\GAMEPULSE µ©©µêÅÞäëÕå▓\\Touhou Hero of Ice Fairy: Prologue\\",
+      "config_path": "<path-to-game>\\Touhou\u00A0Hero\u00A0of\u00A0Ice\u00A0Fairy Prologue_Data\\StreamingAssets\\, %USERPROFILE%\\AppData\\LocalLow\\GAMEPULSE µ©©µêÅÞäëÕå▓\\Touhou\u00A0Hero\u00A0of\u00A0Ice\u00A0Fairy_ Prologue\\, HKEY_CURRENT_USER\\Software\\GAMEPULSE µ©©µêÅÞäëÕå▓\\Touhou\u00A0Hero\u00A0of\u00A0Ice\u00A0Fairy: Prologue\\",
       "engine": "Unity"
     },
     "Touhou Hisoutensoku": {
@@ -178038,6 +178051,7 @@
     "Toy Story": {
       "config_path": "<path-to-game>\\TOYSTORY.CFG"
     },
+    "Toy Story 2 Activity Center": {},
     "Toy Story 2: Buzz Lightyear to the Rescue": {
       "config_path": "<path-to-game>\\"
     },
@@ -186723,11 +186737,11 @@
     "VRZ Torment": {
       "steam_appid": 484350
     },
-    "VRÒüºÒé¿ÒâƒÒâ¬ÒéóÒü¿þò░õ©ûþòîþöƒµ┤╗-ÞåØµ×ò&µÀ╗Õ»ØþÀ¿": {
-      "steam_appid": 806560
-    },
     "VRÒüºÒâ¼ÒâáÒü¿þò░õ©ûþòîþöƒµ┤╗-ÞåØµ×ò&µÀ╗Õ»ØþÀ¿": {
       "steam_appid": 804780
+    },
+    "VRÒüºÒé¿ÒâƒÒâ¬ÒéóÒü¿þò░õ©ûþòîþöƒµ┤╗-ÞåØµ×ò&µÀ╗Õ»ØþÀ¿": {
+      "steam_appid": 806560
     },
     "VRÕ×âÕ£¥Õêåþ▒╗ Refuse classification": {
       "steam_appid": 1139920
@@ -196328,48 +196342,27 @@
     "~necromancy~Emily's Escape": {
       "steam_appid": 975120
     },
-    "┬íZombies! : Faulty Towers": {
-      "steam_appid": 451590
+    "´╝£/reality´╝×": {
+      "steam_appid": 562280,
+      "engine": "Ren'Py"
     },
-    "├ëlan Vital": {
-      "steam_appid": 1017690
+    "ð£ð½ðøð× ðúðáð×ðØðÿðø": {
+      "steam_appid": 937210
     },
-    "├ët├®": {
-      "steam_appid": 1065070
-    },
-    "├öpe": {
-      "steam_appid": 1170200
-    },
-    "├ûoo": {
-      "steam_appid": 2721890,
-      "config_path": "%LOCALAPPDATA%\\Ooo\\option.bin",
-      "engine": "GameMaker"
-    },
-    "├£berSoldier": {
-      "steam_appid": 2905090,
-      "dx9": true,
-      "config_path": "<path-to-game>\\config.ini",
-      "engine": "X-tend"
-    },
-    "├£berSoldier II": {
-      "steam_appid": 281410,
-      "config_path": "%USERPROFILE%\\Documents\\US2\\",
-      "engine": "X-tend"
-    },
-    "─îernaja Metka": {
+    "ð®ðÁð¢ð¥ð║": {
       "dx9": true
     },
-    "╬öV: Rings of Saturn": {
-      "steam_appid": 846030,
-      "opengl": true,
-      "config_path": "%APPDATA%\\dV\\settings.cfg",
-      "engine": "Godot"
+    "ð¿ðÑðö: ðùðÿð£ðÉ / IT'S WINTER": {
+      "steam_appid": 1003360
     },
-    "ðæÐâÐàð¥ð╣ ðæð░ÐéÐÅ / Drunk Dad": {
-      "steam_appid": 964260
+    "ð¿ðƒ": {
+      "steam_appid": 727640
     },
-    "ðÆ ð┐ð¥ð©Ðüð║ð░Ðà ðÉÐéð╗ð░ð¢Ðéð©ð┤Ðï": {
-      "steam_appid": 925640
+    "ðáð¥ÐüÐüð©ÐÅ 2019": {
+      "steam_appid": 1045010
+    },
+    "ðáð¥ð╝ð░ð¢ ðóÐÇð░ÐàÐéðÁð¢ð▒ðÁÐÇð│: ðÆ ð┐ð¥ð©Ðüð║ð░Ðà ð©ð┤ðÁð░ð╗Ðîð¢ð¥ð│ð¥ ð░ð¢ðÁð║ð┤ð¥Ðéð░": {
+      "engine": "VZEngine"
     },
     "ðÆ ÐéÐïð╗Ðâ ð▓ÐÇð░ð│ð░: ðöð©ð▓ðÁÐÇÐüð░ð¢ÐéÐï 2": {
       "config_path": "<path-to-game>\\profiles\\<user-id>\\settings",
@@ -196379,82 +196372,76 @@
       "config_path": "<path-to-game>\\profiles\\<user-id>\\settings",
       "engine": "GEM"
     },
-    "ðÆðùðøð×ð£ ðûð×ðƒð½": {
-      "steam_appid": 1206700
+    "ðÆ ð┐ð¥ð©Ðüð║ð░Ðà ðÉÐéð╗ð░ð¢Ðéð©ð┤Ðï": {
+      "steam_appid": 925640
     },
     "ðÆð¥ð©ð¢ ðÑð©ð¢ð¥ÐÇð░": {
       "steam_appid": 1031770
     },
-    "ðöð×ðÜðÉ 2! - ðÜðáð×ðÆð¼, ðÜðÿð¿ðÜðÿ, ðôð×ðøð½ðò ðíðÿðíð¼ðÜðÿ": {
-      "steam_appid": 980060
+    "ðæÐâÐàð¥ð╣ ðæð░ÐéÐÅ / Drunk Dad": {
+      "steam_appid": 964260
     },
-    "ðòðíðóð¼ ðöðÆðÉ ðíðóðúðøðÉ": {
-      "steam_appid": 873190
-    },
-    "ðÜðÉðØðöðÿðöðÉðó": {
-      "steam_appid": 1031810
-    },
-    "ð£ð½ðøð× ðúðáð×ðØðÿðø": {
-      "steam_appid": 937210
-    },
-    "ðØðÁ ð┐ð░ð┤ð░ð╣!": {
-      "steam_appid": 1056010
-    },
-    "ðáð¥ð╝ð░ð¢ ðóÐÇð░ÐàÐéðÁð¢ð▒ðÁÐÇð│: ðÆ ð┐ð¥ð©Ðüð║ð░Ðà ð©ð┤ðÁð░ð╗Ðîð¢ð¥ð│ð¥ ð░ð¢ðÁð║ð┤ð¥Ðéð░": {
-      "engine": "VZEngine"
-    },
-    "ðáð¥ÐüÐüð©ÐÅ 2019": {
-      "steam_appid": 1045010
-    },
-    "ðíð░ð╝ð¥ðÀð▓ð░ð¢ðÁÐå": {
-      "steam_appid": 1123510
+    "ðÆðùðøð×ð£ ðûð×ðƒð½": {
+      "steam_appid": 1206700
     },
     "ðíð©ð╝Ðâð╗ÐÅÐéð¥ÐÇ ðíð©ð┤ðÁð¢ð©ÐÅ Ðâ ðƒð¥ð┤ÐèðÁðÀð┤ð░": {
       "steam_appid": 1031920
     },
-    "ðíð║ÐâÐä ð¢ð░ ÐÇÐïð▒ð░ð╗ð║ðÁ": {
-      "steam_appid": 3149840
-    },
     "ðíðøðÉðÆðÉ ðúðÜðáðÉðçðØðå": {
       "steam_appid": 1099720
+    },
+    "ðíð║ÐâÐä ð¢ð░ ÐÇÐïð▒ð░ð╗ð║ðÁ": {
+      "steam_appid": 3149840
     },
     "ðíð╝ðÁÐêð░ÐÇð©ð║ð©: ðƒð░ÐÇð░ð╗ð╗ðÁð╗Ðîð¢ÐïðÁ ð╝ð©ÐÇÐï": {
       "dx9": true,
       "config_path": "<path-to-game>\\config.info",
       "engine": "Tanita2"
     },
+    "ðíð░ð╝ð¥ðÀð▓ð░ð¢ðÁÐå": {
+      "steam_appid": 1123510
+    },
+    "ðòðíðóð¼ ðöðÆðÉ ðíðóðúðøðÉ": {
+      "steam_appid": 873190
+    },
     "ðóÐÇð©ð┤ðÁð▓ÐÅÐéÐïðÁ ðÀðÁð╝ð╗ð©(ðíð▓ðÁÐé ð©ð╗ð© ÐéÐîð╝ð░)": {
       "steam_appid": 847100
     },
-    "ð¿ðƒ": {
-      "steam_appid": 727640
+    "ðöð×ðÜðÉ 2! - ðÜðáð×ðÆð¼, ðÜðÿð¿ðÜðÿ, ðôð×ðøð½ðò ðíðÿðíð¼ðÜðÿ": {
+      "steam_appid": 980060
     },
-    "ð¿ðÑðö: ðùðÿð£ðÉ / IT'S WINTER": {
-      "steam_appid": 1003360
+    "ðØðÁ ð┐ð░ð┤ð░ð╣!": {
+      "steam_appid": 1056010
     },
-    "ð®ðÁð¢ð¥ð║": {
-      "dx9": true
+    "ðÜðÉðØðöðÿðöðÉðó": {
+      "steam_appid": 1031810
     },
-    "Ôé¼100": {
-      "steam_appid": 1036910
+    "ÒâåÒâ╝Òâ×ÒâæÒâ╝Òé»Òü«ÞÖ½": {
+      "steam_appid": 1036270
     },
-    "ÔêÇkashicforce": {
-      "steam_appid": 857460
+    "ÒâæÒâêÒâ½Òü«Þ╗ìõ║ïÕìÜþë®Úñ¿´╝ô ÞÂàþÁÂþäíµòÁþ®ÂµÑÁÕàÁÕÖ¿": {
+      "steam_appid": 1212840
     },
-    "ÔÿàFallalypse Ôÿà Disconnect ÔØä": {
-      "steam_appid": 978610
+    "ÒâÉÒéñÒâ│ÒâëÒéÆÞºúÚÖñÒüÖÒéï(unbind)": {
+      "steam_appid": 977590
     },
-    "ÔÖ× The Tactics of War ÔÖ×": {
-      "steam_appid": 937780
+    "ÒâÉÒé░ÒâÇÒé╣ - ÒâçÒâÉÒââÒé¼Òâ╝µñ£Õ«Ü -": {
+      "steam_appid": 1002360
     },
-    "Ô£î Johnny Rocket": {
-      "steam_appid": 942300
+    "ÒâØÒé¿Òâïµêªõ║ë Õ£░õ©¡µÁÀÒü«þ¿▓Õª╗": {
+      "steam_appid": 1136900
     },
     "ÒÇèÚ¼╝þò£µêÿÞ«░´╝ÜÚçæÕØÀÕ×âõ╝áÞ»┤ÒÇï": {
       "steam_appid": 1087960
     },
     "ÒÇÉSCPÒÇæÕÖ¿ÚûóÒâÄÕ¢ÀÕ¥¿ -The will of a single Tale- þ¼¼´╝æÚâ¿": {
       "steam_appid": 1018930
+    },
+    "ÒéÀÒâïÒéÁÒé«": {
+      "steam_appid": 1113580
+    },
+    "Òü¥Òü£ÒüúÒüôÒé┐Òâ»Òâ╝": {
+      "steam_appid": 745280
     },
     "ÒüèÒéÅÒüïÒéîÒü«Òü╗Òüù": {
       "steam_appid": 1052580
@@ -196465,71 +196452,66 @@
     "Òü░ÒéïÒü░ÒéìÒüúÒüò! ´¢×ÒüÖÒüÖÒéü? ÞÁñÞ╗ìÕ░æÕÑ│µùàÕøú": {
       "steam_appid": 793080
     },
-    "Òü¥Òü£ÒüúÒüôÒé┐Òâ»Òâ╝": {
-      "steam_appid": 745280
+    "Ô£î Johnny Rocket": {
+      "steam_appid": 942300
     },
-    "ÒéÀÒâïÒéÁÒé«": {
-      "steam_appid": 1113580
+    "Ôé¼100": {
+      "steam_appid": 1036910
     },
-    "ÒâåÒâ╝Òâ×ÒâæÒâ╝Òé»Òü«ÞÖ½": {
-      "steam_appid": 1036270
+    "ÔêÇkashicforce": {
+      "steam_appid": 857460
     },
-    "ÒâÉÒéñÒâ│ÒâëÒéÆÞºúÚÖñÒüÖÒéï(unbind)": {
-      "steam_appid": 977590
+    "ÔÖ× The Tactics of War ÔÖ×": {
+      "steam_appid": 937780
     },
-    "ÒâÉÒé░ÒâÇÒé╣ - ÒâçÒâÉÒââÒé¼Òâ╝µñ£Õ«Ü -": {
-      "steam_appid": 1002360
+    "ÔÿàFallalypse Ôÿà Disconnect ÔØä": {
+      "steam_appid": 978610
     },
-    "ÒâæÒâêÒâ½Òü«Þ╗ìõ║ïÕìÜþë®Úñ¿´╝ô ÞÂàþÁÂþäíµòÁþ®ÂµÑÁÕàÁÕÖ¿": {
-      "steam_appid": 1212840
+    "Õ¢ÀÕ¥¿õ╣ïÞíù The Street of Adrift": {
+      "steam_appid": 1672670,
+      "engine": "Unity"
     },
-    "ÒâØÒé¿Òâïµêªõ║ë Õ£░õ©¡µÁÀÒü«þ¿▓Õª╗": {
-      "steam_appid": 1136900
+    "õ¢úÕàÁÕ£░õ©ïÕƒÄ/Hell Warriors": {
+      "steam_appid": 1195080
     },
-    "õ©ÇÕ¡ùõ©ìÞÉ¢": {
-      "steam_appid": 1139800
+    "õ¢úÕàÁµêÿµ¡î": {
+      "steam_appid": 1196620
     },
-    "õ©Çµû╣þüÁþö░": {
-      "steam_appid": 1201230
+    "Õ£¿þ║┐µòÖÞé▓Õ╝ÇÕÅæÕ«×õ╣áþöƒ Elearning Development Intern": {
+      "steam_appid": 1012180
     },
-    "õ©âÕñ£µÇ¬Þ░ê - Úâ¢Õ©éµáíÕø¡þªüÚöóõ╝áÞ»┤": {
-      "steam_appid": 932070
+    "Õ£¿µ£½µùÑÕëìÕñòþ¡ëÕ¥àµö¥µÖ┤": {
+      "steam_appid": 1020930
     },
-    "õ©ëÕÆîÕñºþÑ×": {
-      "steam_appid": 974450
+    "Õ£êÕ£êÕÀÑÕØè OO.Inc": {
+      "steam_appid": 993860
     },
-    "õ©ëÕø¢õ╣▒õ╝áThree Kingdoms Fantasy": {
-      "steam_appid": 1217410
+    "Õ£úÕ▒▒ShenShan": {
+      "steam_appid": 1044900
     },
-    "õ©ëÕø¢õ¢úÕàÁõ╝áÕÑç": {
-      "steam_appid": 1011970
+    "Õ£░ÕƒÄÞöÀÞûç": {
+      "steam_appid": 1073600
     },
-    "õ©ëÕø¢µùÂõ╗ú2": {
-      "steam_appid": 1154470
+    "Õ£░Úôü´╝ÜµüÉµÇûµ£½þÅ¡Þ¢ª": {
+      "steam_appid": 1062240
     },
-    "õ©ëÕø¢µ©©õ¥áÕ┐ù": {
-      "steam_appid": 781590
+    "õ¥ìÚüôÕñûõ╝Ø KATANAKAMI": {
+      "steam_appid": 1062340
     },
-    "õ©ïõ©ÇÕ▒éþÜäÕ░üÚ¡öÕíö Forever War": {
-      "steam_appid": 1089810
+    "Õ¥íÕëæ Yu Jian": {
+      "steam_appid": 1144860
     },
-    "õ©ìÕÅ»µÇØÞ««õ¢úÕàÁÕøó": {
-      "steam_appid": 1135380
+    "Õ¥íÚ¥ÖÕ£¿Õñ®-Õ╣│ÞííÕø¢µêÿþëê": {
+      "steam_appid": 1052500
     },
-    "õ©ìÞÉ¢ÕƒÄ-Unconquered Castle": {
-      "steam_appid": 873490
+    "Õ¥îÞùñõ©ÇÕ«ÂÒü«Õ¡ñÕ│Âµ«║õ║║õ║ïõ╗Â": {
+      "steam_appid": 1074530
     },
-    "õ©ûþòîÕ░¢Õñ┤þÜäÞöÀÞûçÞè▒Õø¡": {
-      "steam_appid": 1098680
+    "õ©¡ÕìÄõ©ëÕø¢Õ┐ù": {
+      "steam_appid": 1029500
     },
     "õ©£Õæ¿µïƒµêÿ": {
       "steam_appid": 1162080
-    },
-    "õ©£µû╣µóªµ£êÞ░ê~Lunatic Dreaming": {
-      "steam_appid": 1134550
-    },
-    "õ©£µû╣µóªÚøÂÚ¡é -TouHou Nil Soul-": {
-      "steam_appid": 941300
     },
     "õ©£µû╣þÖ¥Úù«-TouHouAsked": {
       "steam_appid": 930840
@@ -196541,359 +196523,56 @@
       "config_path": "<path-to-game>\\userdata\\*.json",
       "engine": "LuaSTG"
     },
-    "õ©¡ÕìÄõ©ëÕø¢Õ┐ù": {
-      "steam_appid": 1029500
+    "õ©£µû╣µóªÚøÂÚ¡é -TouHou Nil Soul-": {
+      "steam_appid": 941300
+    },
+    "õ©£µû╣µóªµ£êÞ░ê~Lunatic Dreaming": {
+      "steam_appid": 1134550
+    },
+    "õ©âÕñ£µÇ¬Þ░ê - Úâ¢Õ©éµáíÕø¡þªüÚöóõ╝áÞ»┤": {
+      "steam_appid": 932070
+    },
+    "õ©ÇÕ¡ùõ©ìÞÉ¢": {
+      "steam_appid": 1139800
+    },
+    "õ©Çµû╣þüÁþö░": {
+      "steam_appid": 1201230
+    },
+    "õ©ëÕÆîÕñºþÑ×": {
+      "steam_appid": 974450
+    },
+    "õ©ëÕø¢õ¢úÕàÁõ╝áÕÑç": {
+      "steam_appid": 1011970
+    },
+    "õ©ëÕø¢õ╣▒õ╝áThree Kingdoms Fantasy": {
+      "steam_appid": 1217410
+    },
+    "õ©ëÕø¢µ©©õ¥áÕ┐ù": {
+      "steam_appid": 781590
+    },
+    "õ©ëÕø¢µùÂõ╗ú2": {
+      "steam_appid": 1154470
+    },
+    "õ©ìÕÅ»µÇØÞ««õ¢úÕàÁÕøó": {
+      "steam_appid": 1135380
+    },
+    "õ©ìÞÉ¢ÕƒÄ-Unconquered Castle": {
+      "steam_appid": 873490
+    },
+    "Õ©îµ£øõ╣ïµÿƒ": {
+      "steam_appid": 932050
+    },
+    "õ©ïõ©ÇÕ▒éþÜäÕ░üÚ¡öÕíö Forever War": {
+      "steam_appid": 1089810
+    },
+    "Õ©ØÕø¢õ©ÄµûçµÿÄ": {
+      "steam_appid": 1041710
+    },
+    "õ©ûþòîÕ░¢Õñ┤þÜäÞöÀÞûçÞè▒Õø¡": {
+      "steam_appid": 1098680
     },
     "õ©░ÚÑÂõ╣ïÞºÆ õ©ìÕÅ»µÇØÞ««õ╣ïþë®Õ▒àõ¢ÅþÜäÕ░ÅÚòç": {
       "steam_appid": 816600
-    },
-    "õ╣îÚ©ª": {
-      "steam_appid": 870100,
-      "engine": "Unity"
-    },
-    "õ╣ØÕè½µø▓:Þ»àÕÆÆõ╣ïÕ£░ NineTrials Test Server": {
-      "steam_appid": 1012730
-    },
-    "õ╣ØÕè½µø▓´╝ÜÞ»àÕÆÆõ╣ïÕ£░": {
-      "steam_appid": 976800
-    },
-    "õ╣ØÕÀ×õ╗ÖþÄë Kyushu jade": {
-      "steam_appid": 1203900
-    },
-    "õ╣ØÚ£äþ╝│þÑ×Þ«░ Jiu Xiao": {
-      "steam_appid": 1096300
-    },
-    "õ╣ªõ╣ïµùàõ║║ Story Walker": {
-      "steam_appid": 2101220,
-      "engine": "Unreal Engine 4"
-    },
-    "õ║öµùÑÕñºÚÇâõ║í": {
-      "steam_appid": 994290
-    },
-    "õ║║ÕÀÑþü¡þ╗Ø": {
-      "steam_appid": 1197930
-    },
-    "õ║║µ░öÕè¿µ╝½Õñºõ╣▒µûù": {
-      "steam_appid": 1000310
-    },
-    "õ║║Úù┤ The Lost We Lost": {
-      "steam_appid": 1057680
-    },
-    "õ║║Úù┤õ╣ïÕ▒æ-Þë║µ£»õ╣ïÕÉì´╝êI am the dirt-for art´╝ë": {
-      "steam_appid": 1116910
-    },
-    "õ║║Ú¡öÕóâÕà▒þöƒÞ¡Ü": {
-      "steam_appid": 1179910
-    },
-    "õ╗ÄÕëìµ£ëõ©¬õ╗ÖÕä┐ Taoist immortal": {
-      "steam_appid": 1011220
-    },
-    "õ╗ÖÞ░ò": {
-      "steam_appid": 973400
-    },
-    "õ╝èÕïóÕ┐ùµæ®ÒâƒÒé╣ÒâåÒâ¬Òâ╝µíêÕåà Õü¢ÒéèÒü«Ú╗Æþ£ƒþÅá": {
-      "steam_appid": 1100030
-    },
-    "õ╝ÅÚ¥Ö Õñ®Õàâþ½×µôé": {
-      "steam_appid": 1165390
-    },
-    "õ╝áÕÑçõ©ûþòî": {
-      "steam_appid": 1222860
-    },
-    "õ¢úÕàÁÕ£░õ©ïÕƒÄ/Hell Warriors": {
-      "steam_appid": 1195080
-    },
-    "õ¢úÕàÁµêÿµ¡î": {
-      "steam_appid": 1196620
-    },
-    "õ¥ìÚüôÕñûõ╝Ø KATANAKAMI": {
-      "steam_appid": 1062340
-    },
-    "Õé▓þÜçÕ┐åÕëæÞ»Ç": {
-      "steam_appid": 997270
-    },
-    "Õàâþ┤áµêÿõ║ë Elemental war": {
-      "steam_appid": 1063970
-    },
-    "ÕàëµÿÄÕå│ DUEX": {
-      "steam_appid": 1045750
-    },
-    "ÕàëÞêçµÜùõ╣ïµêÇµø▓": {
-      "steam_appid": 1128450
-    },
-    "ÕàïÞïÅÚ▓üÕ╝éÚù╗Õ¢ò": {
-      "steam_appid": 977500,
-      "engine": "Unity"
-    },
-    "ÕàöÞÇ│ÕåÆÚÜ¬Þ¡Ü": {
-      "steam_appid": 1024440
-    },
-    "Õà¿µëÿµòÖÕ©ê": {
-      "steam_appid": 1785750,
-      "engine": "Unity"
-    },
-    "Õà¿µ░æþÄïÞÇà": {
-      "steam_appid": 742360
-    },
-    "Õà¡þòîÚú×õ╗Ö": {
-      "steam_appid": 1176450
-    },
-    "Õà¡ÚÿÂÞ░£Úóÿ six-step mystery": {
-      "steam_appid": 1164000
-    },
-    "Õà▒õ║ºõ©╗õ╣ëÕÑ│Õ¡® ~ Ôÿ¡ Communism´╝ê´┐úÒâ╝´┐ú´╝ë": {
-      "steam_appid": 962770
-    },
-    "Õà¢ÞÇ│µö╗þòÑ - TFK Faculty": {
-      "steam_appid": 1096330
-    },
-    "ÕåøÕøóµêÿµúï Legion War": {
-      "steam_appid": 975270
-    },
-    "ÕåÀµ£êµ©àÞ¥ëþàºÕñ®µÂ»(KUNG FU LEGEND)": {
-      "steam_appid": 957150,
-      "engine": "RPG Maker"
-    },
-    "Õçíõ║║Úú×õ╗Ö": {
-      "steam_appid": 1143670
-    },
-    "Õç»µùïÕ▓ø": {
-      "steam_appid": 1038680
-    },
-    "Õç║Úù¿": {
-      "steam_appid": 1175240
-    },
-    "ÕêÇÕëæÕñ®õ©ï": {
-      "steam_appid": 1155150
-    },
-    "ÕêÇÚöïþ¬üÞó¡": {
-      "steam_appid": 1184110
-    },
-    "Õêøõ©û-õ┐«þ£ƒÕ¢ò": {
-      "steam_appid": 723420
-    },
-    "ÕêøÚÇáõ©Äµîæµêÿ": {
-      "steam_appid": 913550
-    },
-    "ÕêØÕ╝ÇÕ£¿Õ╣│Õ«ëÕñ£õ╣ïÞè▒ -The Flower on Christmas Eve-": {
-      "steam_appid": 1127140
-    },
-    "Õê½õ╗Ñõ©║õ¢áµÿ»Õ╝ÇÕÅæÞÇàµêæÕ░▒õ©ìµòóµëôõ¢á": {
-      "steam_appid": 1110650
-    },
-    "ÕëæÚ¡ä": {
-      "steam_appid": 1091460
-    },
-    "Õë¬ÕêÇþƒ│Õñ┤Õ©â": {
-      "steam_appid": 977140
-    },
-    "Õë»õ¢£þö¿õ╣ïþ×│ (Tlicolity Eyes)": {
-      "steam_appid": 1195830
-    },
-    "ÕïçÕú½HERO": {
-      "steam_appid": 1169400
-    },
-    "ÕïçÞÇàµ£ëþé╣Õñ¬ÕÜúÕ╝áÒÇéG(No Hero Allowed: No Puzzle Either!)": {
-      "steam_appid": 1046600
-    },
-    "Õï┐Õ┐ÿµ¡ñÚô¡": {
-      "steam_appid": 943100
-    },
-    "Õî┐ÕÉìõ┐í´╝ÜÕñ▒Õ┐âÞÇà": {
-      "steam_appid": 1025980
-    },
-    "ÕìüÕñ®þÜäµ║½Õ║ª": {
-      "steam_appid": 1203970,
-      "config_path": "<path-to-game>\\savedata\\krenvprf.kep"
-    },
-    "ÕìüµùÑ": {
-      "steam_appid": 1055660
-    },
-    "ÕìâÚØó Melancholy Love": {
-      "steam_appid": 1168470
-    },
-    "ÕìêÚñÉ13": {
-      "steam_appid": 702790
-    },
-    "ÕìòÞ║½þïùþÜäµ£ÇÕÉÄµ£║õ╝Ü": {
-      "steam_appid": 1194560
-    },
-    "ÕìáµÿƒÕ©êAstrologer": {
-      "steam_appid": 1194800
-    },
-    "ÕìíÕôçõ╝èÕÑ│Õ¡® ~ Kawaii Girls (ÒüÑ´¢íÔùòÔÇ┐ÔÇ┐Ôùò´¢í)ÒüÑ": {
-      "steam_appid": 966230
-    },
-    "ÕìíþëçÕ£░õ©ïÕƒÄCard Monsters: Dungeon": {
-      "steam_appid": 1077440
-    },
-    "ÕÄƒõ¢ô": {
-      "steam_appid": 1095540
-    },
-    "ÕÄƒÕºïÚâ¿ÞÉ¢": {
-      "steam_appid": 812510
-    },
-    "ÕÅìþÄ░Õ«×þùçÕÇÖþ¥ñ╬│ - Counterrealstic Syndrome ╬│": {
-      "steam_appid": 1186860
-    },
-    "ÕÅÿÚçÅ": {
-      "steam_appid": 1054800
-    },
-    "ÕÅÖõ║ïµø▓2´╝Üµÿƒþ®║õ©ïþÜäÞ»║Þ¿Ç / Ballade2: the Celestial Promise": {
-      "steam_appid": 1080990
-    },
-    "ÕÅÖõ║ïµø▓´╝ÜÚÜ¥Õ┐ÿþÜäÕø×Õ┐å / Ballade: with Memories": {
-      "steam_appid": 1091720
-    },
-    "ÕÅ½µêæÚô©ÚÇáÕ©ê": {
-      "steam_appid": 1131280
-    },
-    "ÕÉîÕ▒àµîçÕìù": {
-      "steam_appid": 985740
-    },
-    "ÕÉìÕ¬øÕÑ│ÕÅï-Girlfriend invites": {
-      "steam_appid": 1178330
-    },
-    "ÕÉÄÚüùþùç´╝ÅSequela": {
-      "steam_appid": 1071900
-    },
-    "ÕÉ×ÚúƒÕñ®Õ£░ 2019": {
-      "steam_appid": 1205670
-    },
-    "ÕÉ¥Õàëþ¼öÞ«░Holimas Z Notebook": {
-      "steam_appid": 1150130,
-      "engine": "Unity"
-    },
-    "Õæèµ¡╗Õñ®õ¢┐õ╣ïÞ¿Ç - Death angel": {
-      "steam_appid": 1124090
-    },
-    "Õæ¢Þ┐Éµêÿµ¡î": {
-      "steam_appid": 2015770
-    },
-    "ÕÆöÕÅ¢µÄóÚÖ®Úÿƒ Kaki Raid": {
-      "steam_appid": 1137180
-    },
-    "ÕûÁÕÅ»ÞÄëþÜäÕàöþÄ®ÕüÂ": {
-      "steam_appid": 1162070
-    },
-    "ÕÖ¼Õàâõ╣ïõ©╗": {
-      "steam_appid": 868320
-    },
-    "ÕøÜÒéÅÒéîÒü«Úñ¿": {
-      "steam_appid": 986860
-    },
-    "Õøøõ╣ïþƒ│": {
-      "steam_appid": 1058400
-    },
-    "ÕøøÕ£úõ╝áÞ»┤1": {
-      "steam_appid": 1063910
-    },
-    "ÕøøÕ¡ú The Four Seasons": {
-      "steam_appid": 1152760
-    },
-    "Õø×Úù¿ Way Back Home": {
-      "steam_appid": 1218170
-    },
-    "Õ£êÕ£êÕÀÑÕØè OO.Inc": {
-      "steam_appid": 993860
-    },
-    "Õ£úÕ▒▒ShenShan": {
-      "steam_appid": 1044900
-    },
-    "Õ£¿µ£½µùÑÕëìÕñòþ¡ëÕ¥àµö¥µÖ┤": {
-      "steam_appid": 1020930
-    },
-    "Õ£¿þ║┐µòÖÞé▓Õ╝ÇÕÅæÕ«×õ╣áþöƒ Elearning Development Intern": {
-      "steam_appid": 1012180
-    },
-    "Õ£░ÕƒÄÞöÀÞûç": {
-      "steam_appid": 1073600
-    },
-    "Õ£░Úôü´╝ÜµüÉµÇûµ£½þÅ¡Þ¢ª": {
-      "steam_appid": 1062240
-    },
-    "ÕØªÕàïÕñºµêÿ´╝ÜÕà▒ÕÆîÕø¢õ╣ïÞ¥ë": {
-      "steam_appid": 1002930
-    },
-    "ÕØªþÄçþÜäÕ░Åþ║óÕ©¢ÕÆîþê▒Þ»┤Þ░ÄþÜäþï╝": {
-      "steam_appid": 1216080
-    },
-    "ÕƒÄÕáíõ╝áÞ»┤´╝ÜÚ¡öþÄïÞºëÚåÆ": {
-      "steam_appid": 1042560
-    },
-    "Õá┤Õñûõ║║þöƒ": {
-      "steam_appid": 1120370
-    },
-    "ÕíöÕíöÕ©ØÕø¢": {
-      "steam_appid": 1875590
-    },
-    "Õóâþòî Dice&Fighter": {
-      "steam_appid": 1191680
-    },
-    "Õó¿Þë▓õ©ëÕø¢Õ┐ù": {
-      "steam_appid": 1099980
-    },
-    "ÕñÅõ╣ïµëë´╝Üµ£ÇÕÉÄþÜäÕ£úÚ¬æÕú½": {
-      "steam_appid": 813110
-    },
-    "Õñ£õ╣ïÕ¢ÆÚÇö Night Homing": {
-      "steam_appid": 964240
-    },
-    "Õñ£Õ¡ñÕƒÄ ┬À õ¢òõ©║õ¥áõ╣ë": {
-      "steam_appid": 1158680
-    },
-    "Õñ£Úø¬Õå░Õ¿ç": {
-      "steam_appid": 801600
-    },
-    "Õñóþë®Þ¬×ORIGIN": {
-      "steam_appid": 908940
-    },
-    "ÕñóÚÖÉÒâÄÕñ£": {
-      "steam_appid": 1141660
-    },
-    "ÕñºÕ£úÕ¢ÆµØÑ": {
-      "steam_appid": 946980
-    },
-    "ÕñºµùÂõ╗ú´╝Üõ©ëÕø¢þ½ïÕ┐ù": {
-      "steam_appid": 1062200,
-      "engine": "Unity"
-    },
-    "ÕñºÞÇüþêÀ": {
-      "steam_appid": 1005950
-    },
-    "Õñ®õ©ïÕ¥Çõ║ï Journey of the world": {
-      "steam_appid": 1094020,
-      "engine": "RPG Maker"
-    },
-    "Õñ®õ╗Öµ£ê-GMþòàþÄ®þëê": {
-      "steam_appid": 1983940
-    },
-    "Õñ®þü½(TianHuo)": {
-      "steam_appid": 996710
-    },
-    "Õñ®þ®║Õé│Þ¬¼": {
-      "steam_appid": 1017380
-    },
-    "Õñ®þ¢íµÿƒÕ«┐µÁÀ The sea of TianGang XinSu": {
-      "steam_appid": 962290
-    },
-    "Õñ▒ÞÉ¢þÜäÕ£░õ©ïÕƒÄ Lost Dungeon": {
-      "steam_appid": 1069120
-    },
-    "Õñ▒ÞÉ¢þÜäþÄïÕ║ºTCG": {
-      "steam_appid": 1188420
-    },
-    "ÕÑçÞ┐╣õ©ÇÕê╗ Surmount": {
-      "steam_appid": 1089630
-    },
-    "ÕÑ│ÕÅïõ©ÄµêæþÜäµüïþê▒µùÑÕ©©": {
-      "steam_appid": 989800
-    },
-    "ÕÑ│þÑ×Ú®¥Õê░(Happy together)": {
-      "steam_appid": 905940
-    },
-    "ÕÑ│ÞúàÕª╣Õª╣õ╗Äµ▓íÕ░æÞ┐çÚ║╗þâª": {
-      "steam_appid": 820770
     },
     "Õªéµ×£õ©ÇþöƒÕÅ¬µ£ëõ©ëÕìüÕ▓üBefore Thirty": {
       "steam_appid": 1128360
@@ -196904,11 +196583,14 @@
     "ÕªêÕªê´╝îÕê½ÞÁ░": {
       "steam_appid": 1175180
     },
+    "ÕªûÞ»ù-Yaokai's Poetry-": {
+      "steam_appid": 1082880
+    },
     "ÕªûµÇ¬õ┐▒õ╣ÉÚâ¿ Demon Club": {
       "steam_appid": 992620
     },
-    "ÕªûÞ»ù-Yaokai's Poetry-": {
-      "steam_appid": 1082880
+    "Õ«ÂÕø¡VR": {
+      "steam_appid": 1160770
     },
     "Õ«êµèñõ╝áÞ»┤ Guardian Legend": {
       "steam_appid": 1145550
@@ -196918,9 +196600,6 @@
     },
     "Õ«úÕñ£": {
       "steam_appid": 958280
-    },
-    "Õ«ÂÕø¡VR": {
-      "steam_appid": 1160770
     },
     "Õ«╣Þ║½õ╣ïÕ£░Úôü": {
       "steam_appid": 1067270,
@@ -196932,72 +196611,381 @@
     "Õ»äþ╗ÖµÿÄµùÑþÜäÕ©îµ£ø": {
       "steam_appid": 1033650
     },
-    "Õ»╣Õå│õ╣ïÕóâ": {
-      "steam_appid": 1179040
-    },
     "Õ»╗Þ┐╣ -A story of a song-": {
       "steam_appid": 962940
     },
-    "Õ░üþÑ×þ¡û": {
-      "steam_appid": 1213470
-    },
-    "Õ░üþÑ×þ║¬": {
-      "steam_appid": 1210680
-    },
-    "Õ░äÕ░▒Õ«îõ║ïÕä┐õ║åµÂêþü¡Þö¼ÞÅ£": {
-      "steam_appid": 1177180
-    },
-    "Õ░Åµ×ùµ¡úÚø¬Õñìõ╗çõ╣ïÕ»åÕ«ñÚçìÕêÂþëê": {
-      "steam_appid": 899160
-    },
-    "Õ░ÅþÖ¢þÜäµû░Þíú / Snower's New Clothes": {
-      "steam_appid": 1058850,
-      "engine": "RPG Maker"
-    },
-    "Õ░æÕ╣┤Õ░üþÑ×": {
-      "steam_appid": 1154500
-    },
-    "Õ░ÿõ©ÄÕ£ƒþÜäÞ¥╣þ╝ÿ": {
-      "steam_appid": 873820
-    },
-    "Õ░©Õªéµ¢«µ░┤": {
-      "steam_appid": 953740
-    },
-    "Õ░║Õ¡ÉÕÆîµ®íþÜ«": {
-      "steam_appid": 809640
-    },
-    "Õ▒ÇÕñûõ║║ L'Etranger": {
-      "steam_appid": 1078970
-    },
-    "Õ▒×µÇºõ©Äþöƒµ┤╗": {
-      "steam_appid": 822470
-    },
-    "ÕÀàÕ│░Ú¬æÕú½Õøó": {
-      "steam_appid": 1132730
-    },
-    "ÕÀ¿Ú¥ÖÕÅ¼Õöñ": {
-      "steam_appid": 1101420
-    },
-    "ÕÀ½Õ©êÞÂàÕçíÞÇà Legend of the wizard": {
-      "steam_appid": 1106690
+    "Õ»╣Õå│õ╣ïÕóâ": {
+      "steam_appid": 1179040
     },
     "ÕÀ¡Õ¡¼Õ½æµ»û": {
       "steam_appid": 905670
     },
-    "Õ©îµ£øõ╣ïµÿƒ": {
-      "steam_appid": 932050
+    "Õà¡ÚÿÂÞ░£Úóÿ six-step mystery": {
+      "steam_appid": 1164000
     },
-    "Õ©ØÕø¢õ©ÄµûçµÿÄ": {
-      "steam_appid": 1041710
+    "Õà¡þòîÚú×õ╗Ö": {
+      "steam_appid": 1176450
     },
-    "Õ╣▓µö»Òé╗ÒâêÒâ® ÚÖ░ÒâÄÕìÀ´¢£Õ╣▓µö»etc. ÚÖ░õ╣ïÕìÀ": {
-      "steam_appid": 995330
+    "Õà¢ÞÇ│µö╗þòÑ - TFK Faculty": {
+      "steam_appid": 1096330
     },
-    "Õ╣▓µö»Òé╗ÒâêÒâ® ÚÖ¢ÒâÄÕìÀ´¢£Õ╣▓µö»etc. ÚÖ¢õ╣ïÕìÀ": {
-      "steam_appid": 1000100
+    "ÕÀ½Õ©êÞÂàÕçíÞÇà Legend of the wizard": {
+      "steam_appid": 1106690
+    },
+    "ÕÀ¿Ú¥ÖÕÅ¼Õöñ": {
+      "steam_appid": 1101420
+    },
+    "Õà¿µëÿµòÖÕ©ê": {
+      "steam_appid": 1785750,
+      "engine": "Unity"
+    },
+    "Õà¿µ░æþÄïÞÇà": {
+      "steam_appid": 742360
+    },
+    "ÕÀàÕ│░Ú¬æÕú½Õøó": {
+      "steam_appid": 1132730
+    },
+    "Õàâþ┤áµêÿõ║ë Elemental war": {
+      "steam_appid": 1063970
+    },
+    "ÕàëÞêçµÜùõ╣ïµêÇµø▓": {
+      "steam_appid": 1128450
+    },
+    "ÕàëµÿÄÕå│ DUEX": {
+      "steam_appid": 1045750
+    },
+    "ÕàïÞïÅÚ▓üÕ╝éÚù╗Õ¢ò": {
+      "steam_appid": 977500,
+      "engine": "Unity"
+    },
+    "ÕàöÞÇ│ÕåÆÚÜ¬Þ¡Ü": {
+      "steam_appid": 1024440
+    },
+    "Õà▒õ║ºõ©╗õ╣ëÕÑ│Õ¡® ~ Ôÿ¡ Communism´╝ê´┐úÒâ╝´┐ú´╝ë": {
+      "steam_appid": 962770
+    },
+    "Õá┤Õñûõ║║þöƒ": {
+      "steam_appid": 1120370
+    },
+    "ÕÄƒõ¢ô": {
+      "steam_appid": 1095540
+    },
+    "ÕÄƒÕºïÚâ¿ÞÉ¢": {
+      "steam_appid": 812510
+    },
+    "ÕÅ½µêæÚô©ÚÇáÕ©ê": {
+      "steam_appid": 1131280
+    },
+    "ÕåÀµ£êµ©àÞ¥ëþàºÕñ®µÂ»(KUNG FU LEGEND)": {
+      "steam_appid": 957150,
+      "engine": "RPG Maker"
+    },
+    "ÕÅìþÄ░Õ«×þùçÕÇÖþ¥ñ╬│ - Counterrealstic Syndrome ╬│": {
+      "steam_appid": 1186860
+    },
+    "ÕÅÖõ║ïµø▓2´╝Üµÿƒþ®║õ©ïþÜäÞ»║Þ¿Ç / Ballade2: the Celestial Promise": {
+      "steam_appid": 1080990
+    },
+    "ÕÅÖõ║ïµø▓´╝ÜÚÜ¥Õ┐ÿþÜäÕø×Õ┐å / Ballade: with Memories": {
+      "steam_appid": 1091720
+    },
+    "ÕåøÕøóµêÿµúï Legion War": {
+      "steam_appid": 975270
+    },
+    "ÕÅÿÚçÅ": {
+      "steam_appid": 1054800
+    },
+    "Õæ¢Þ┐Éµêÿµ¡î": {
+      "steam_appid": 2015770
+    },
+    "Õæèµ¡╗Õñ®õ¢┐õ╣ïÞ¿Ç - Death angel": {
+      "steam_appid": 1124090
+    },
+    "ÕÆöÕÅ¢µÄóÚÖ®Úÿƒ Kaki Raid": {
+      "steam_appid": 1137180
+    },
+    "Õç»µùïÕ▓ø": {
+      "steam_appid": 1038680
+    },
+    "Õçíõ║║Úú×õ╗Ö": {
+      "steam_appid": 1143670
+    },
+    "Õç║Úù¿": {
+      "steam_appid": 1175240
+    },
+    "ÕÉ¥Õàëþ¼öÞ«░Holimas Z Notebook": {
+      "steam_appid": 1150130,
+      "engine": "Unity"
+    },
+    "ÕÉÄÚüùþùç´╝ÅSequela": {
+      "steam_appid": 1071900
+    },
+    "ÕÉìÕ¬øÕÑ│ÕÅï-Girlfriend invites": {
+      "steam_appid": 1178330
+    },
+    "ÕÉîÕ▒àµîçÕìù": {
+      "steam_appid": 985740
+    },
+    "ÕÉ×ÚúƒÕñ®Õ£░ 2019": {
+      "steam_appid": 1205670
+    },
+    "Õé▓þÜçÕ┐åÕëæÞ»Ç": {
+      "steam_appid": 997270
+    },
+    "Õê½õ╗Ñõ©║õ¢áµÿ»Õ╝ÇÕÅæÞÇàµêæÕ░▒õ©ìµòóµëôõ¢á": {
+      "steam_appid": 1110650
+    },
+    "ÕêÇÕëæÕñ®õ©ï": {
+      "steam_appid": 1155150
+    },
+    "ÕêÇÚöïþ¬üÞó¡": {
+      "steam_appid": 1184110
+    },
+    "Õêøõ©û-õ┐«þ£ƒÕ¢ò": {
+      "steam_appid": 723420
+    },
+    "ÕêØÕ╝ÇÕ£¿Õ╣│Õ«ëÕñ£õ╣ïÞè▒ -The Flower on Christmas Eve-": {
+      "steam_appid": 1127140
+    },
+    "ÕêøÚÇáõ©Äµîæµêÿ": {
+      "steam_appid": 913550
+    },
+    "Õë¬ÕêÇþƒ│Õñ┤Õ©â": {
+      "steam_appid": 977140
+    },
+    "Õë»õ¢£þö¿õ╣ïþ×│ (Tlicolity Eyes)": {
+      "steam_appid": 1195830
+    },
+    "ÕëæÚ¡ä": {
+      "steam_appid": 1091460
+    },
+    "ÕìáµÿƒÕ©êAstrologer": {
+      "steam_appid": 1194800
+    },
+    "ÕìâÚØó Melancholy Love": {
+      "steam_appid": 1168470
+    },
+    "ÕìêÚñÉ13": {
+      "steam_appid": 702790
+    },
+    "ÕìíÕôçõ╝èÕÑ│Õ¡® ~ Kawaii Girls (ÒüÑ´¢íÔùòÔÇ┐ÔÇ┐Ôùò´¢í)ÒüÑ": {
+      "steam_appid": 966230
+    },
+    "ÕìíþëçÕ£░õ©ïÕƒÄCard Monsters: Dungeon": {
+      "steam_appid": 1077440
+    },
+    "ÕìòÞ║½þïùþÜäµ£ÇÕÉÄµ£║õ╝Ü": {
+      "steam_appid": 1194560
+    },
+    "ÕìüÕñ®þÜäµ║½Õ║ª": {
+      "steam_appid": 1203970,
+      "config_path": "<path-to-game>\\savedata\\krenvprf.kep"
+    },
+    "ÕìüµùÑ": {
+      "steam_appid": 1055660
+    },
+    "ÕíöÕíöÕ©ØÕø¢": {
+      "steam_appid": 1875590
+    },
+    "Õî┐ÕÉìõ┐í´╝ÜÕñ▒Õ┐âÞÇà": {
+      "steam_appid": 1025980
+    },
+    "ÕïçÕú½HERO": {
+      "steam_appid": 1169400
+    },
+    "ÕïçÞÇàµ£ëþé╣Õñ¬ÕÜúÕ╝áÒÇéG(No Hero Allowed: No Puzzle Either!)": {
+      "steam_appid": 1046600
+    },
+    "Õï┐Õ┐ÿµ¡ñÚô¡": {
+      "steam_appid": 943100
+    },
+    "Õñ£Õ¡ñÕƒÄ ┬À õ¢òõ©║õ¥áõ╣ë": {
+      "steam_appid": 1158680
+    },
+    "Õñ£õ╣ïÕ¢ÆÚÇö Night Homing": {
+      "steam_appid": 964240
+    },
+    "Õñ£Úø¬Õå░Õ¿ç": {
+      "steam_appid": 801600
+    },
+    "Õñ®õ©ïÕ¥Çõ║ï Journey of the world": {
+      "steam_appid": 1094020,
+      "engine": "RPG Maker"
+    },
+    "Õñ®õ╗Öµ£ê-GMþòàþÄ®þëê": {
+      "steam_appid": 1983940
+    },
+    "Õñ®þ¢íµÿƒÕ«┐µÁÀ The sea of TianGang XinSu": {
+      "steam_appid": 962290
+    },
+    "Õñ®þ®║Õé│Þ¬¼": {
+      "steam_appid": 1017380
+    },
+    "Õñ®þü½(TianHuo)": {
+      "steam_appid": 996710
+    },
+    "ÕñºÕ£úÕ¢ÆµØÑ": {
+      "steam_appid": 946980
+    },
+    "ÕñºÞÇüþêÀ": {
+      "steam_appid": 1005950
+    },
+    "ÕñºµùÂõ╗ú´╝Üõ©ëÕø¢þ½ïÕ┐ù": {
+      "steam_appid": 1062200,
+      "engine": "Unity"
+    },
+    "ÕñÅõ╣ïµëë´╝Üµ£ÇÕÉÄþÜäÕ£úÚ¬æÕú½": {
+      "steam_appid": 813110
+    },
+    "ÕÑçÞ┐╣õ©ÇÕê╗ Surmount": {
+      "steam_appid": 1089630
+    },
+    "ÕñóÚÖÉÒâÄÕñ£": {
+      "steam_appid": 1141660
+    },
+    "Õñóþë®Þ¬×ORIGIN": {
+      "steam_appid": 908940
+    },
+    "ÕÑ│ÕÅïõ©ÄµêæþÜäµüïþê▒µùÑÕ©©": {
+      "steam_appid": 989800
+    },
+    "ÕÑ│þÑ×Ú®¥Õê░(Happy together)": {
+      "steam_appid": 905940
+    },
+    "ÕÑ│ÞúàÕª╣Õª╣õ╗Äµ▓íÕ░æÞ┐çÚ║╗þâª": {
+      "steam_appid": 820770
+    },
+    "Õñ▒ÞÉ¢þÜäÕ£░õ©ïÕƒÄ Lost Dungeon": {
+      "steam_appid": 1069120
+    },
+    "Õñ▒ÞÉ¢þÜäþÄïÕ║ºTCG": {
+      "steam_appid": 1188420
+    },
+    "Õó¿Þë▓õ©ëÕø¢Õ┐ù": {
+      "steam_appid": 1099980
+    },
+    "Õóâþòî Dice&Fighter": {
+      "steam_appid": 1191680
+    },
+    "ÕÖ¼Õàâõ╣ïõ©╗": {
+      "steam_appid": 868320
+    },
+    "ÕØªÕàïÕñºµêÿ´╝ÜÕà▒ÕÆîÕø¢õ╣ïÞ¥ë": {
+      "steam_appid": 1002930
+    },
+    "ÕØªþÄçþÜäÕ░Åþ║óÕ©¢ÕÆîþê▒Þ»┤Þ░ÄþÜäþï╝": {
+      "steam_appid": 1216080
+    },
+    "Õø×Úù¿ Way Back Home": {
+      "steam_appid": 1218170
+    },
+    "ÕøøÕ¡ú The Four Seasons": {
+      "steam_appid": 1152760
+    },
+    "ÕøøÕ£úõ╝áÞ»┤1": {
+      "steam_appid": 1063910
+    },
+    "Õøøõ╣ïþƒ│": {
+      "steam_appid": 1058400
+    },
+    "ÕøÜÒéÅÒéîÒü«Úñ¿": {
+      "steam_appid": 986860
+    },
+    "ÕûÁÕÅ»ÞÄëþÜäÕàöþÄ®ÕüÂ": {
+      "steam_appid": 1162070
+    },
+    "ÕƒÄÕáíõ╝áÞ»┤´╝ÜÚ¡öþÄïÞºëÚåÆ": {
+      "steam_appid": 1042560
+    },
+    "Õ┐½õ╣ÉÕ░ÅÚ©í": {
+      "steam_appid": 1223240
+    },
+    "Õ┐âÒü«ÚùçÒü«ÕàêÒü½ Trial VersionÔàí": {
+      "steam_appid": 661700
+    },
+    "Õ┐âõ╣ïµ¬╗": {
+      "steam_appid": 951130
+    },
+    "Õ┐åµüï-Reverse Momories-": {
+      "steam_appid": 1036690
+    },
+    "õ║öµùÑÕñºÚÇâõ║í": {
+      "steam_appid": 994290
+    },
+    "õ║║ÕÀÑþü¡þ╗Ø": {
+      "steam_appid": 1197930
+    },
+    "õ║║Ú¡öÕóâÕà▒þöƒÞ¡Ü": {
+      "steam_appid": 1179910
+    },
+    "õ║║Úù┤ The Lost We Lost": {
+      "steam_appid": 1057680
+    },
+    "õ║║Úù┤õ╣ïÕ▒æ-Þë║µ£»õ╣ïÕÉì´╝êI am the dirt-for art´╝ë": {
+      "steam_appid": 1116910
+    },
+    "õ║║µ░öÕè¿µ╝½Õñºõ╣▒µûù": {
+      "steam_appid": 1000310
+    },
+    "õ╗ÄÕëìµ£ëõ©¬õ╗ÖÕä┐ Taoist immortal": {
+      "steam_appid": 1011220
+    },
+    "õ╗ÖÞ░ò": {
+      "steam_appid": 973400
+    },
+    "Õ╗║þ¡æÕñºÕåÆÚÖ®": {
+      "steam_appid": 907920
+    },
+    "õ╝áÕÑçõ©ûþòî": {
+      "steam_appid": 1222860
+    },
+    "õ╝ÅÚ¥Ö Õñ®Õàâþ½×µôé": {
+      "steam_appid": 1165390
+    },
+    "õ╝èÕïóÕ┐ùµæ®ÒâƒÒé╣ÒâåÒâ¬Òâ╝µíêÕåà Õü¢ÒéèÒü«Ú╗Æþ£ƒþÅá": {
+      "steam_appid": 1100030
+    },
+    "Õ╝éõ©ûµ▒ƒµ╣ûÕ¢ò(JiangHu Record Of Another World)": {
+      "steam_appid": 1103510
+    },
+    "Õ╝éÕîûõ╣ïµüÂÒÇçAbnormal Treatment": {
+      "steam_appid": 1122750,
+      "engine": "RPG Maker"
+    },
+    "Õ╝éþºìµêÿõ║ëÕ░æÕÑ│": {
+      "steam_appid": 964300
+    },
+    "Õ╝║Õåø": {
+      "steam_appid": 825380
+    },
+    "Õ╝╣Õ╣òÚéúõ©¬µüÂõ║║": {
+      "steam_appid": 1043470
+    },
+    "Õ╝╣þé©õ║║2222": {
+      "steam_appid": 767400
     },
     "Õ╣©Õ¡ÿÞÇà / The Survivor": {
       "steam_appid": 1139000
+    },
+    "õ╣ªõ╣ïµùàõ║║ Story Walker": {
+      "steam_appid": 2101220,
+      "engine": "Unreal Engine 4"
+    },
+    "õ╣îÚ©ª": {
+      "steam_appid": 870100,
+      "engine": "Unity"
+    },
+    "õ╣ØÕÀ×õ╗ÖþÄë Kyushu jade": {
+      "steam_appid": 1203900
+    },
+    "õ╣ØÕè½µø▓:Þ»àÕÆÆõ╣ïÕ£░ NineTrials Test Server": {
+      "steam_appid": 1012730
+    },
+    "õ╣ØÕè½µø▓´╝ÜÞ»àÕÆÆõ╣ïÕ£░": {
+      "steam_appid": 976800
+    },
+    "õ╣ØÚ£äþ╝│þÑ×Þ«░ Jiu Xiao": {
+      "steam_appid": 1096300
     },
     "Õ╣╗õ©ûµâàþ╝ÿ": {
       "steam_appid": 869660,
@@ -197015,52 +197003,673 @@
     "Õ╣╗µâ│Þï▒Úøäõ╝á ÕìíþëçÕ»╣Õå│": {
       "steam_appid": 815300
     },
-    "Õ╗║þ¡æÕñºÕåÆÚÖ®": {
-      "steam_appid": 907920
+    "Õ╣▓µö»Òé╗ÒâêÒâ® ÚÖ¢ÒâÄÕìÀ´¢£Õ╣▓µö»etc. ÚÖ¢õ╣ïÕìÀ": {
+      "steam_appid": 1000100
     },
-    "Õ╝éõ©ûµ▒ƒµ╣ûÕ¢ò(JiangHu Record Of Another World)": {
-      "steam_appid": 1103510
+    "Õ╣▓µö»Òé╗ÒâêÒâ® ÚÖ░ÒâÄÕìÀ´¢£Õ╣▓µö»etc. ÚÖ░õ╣ïÕìÀ": {
+      "steam_appid": 995330
     },
-    "Õ╝éÕîûõ╣ïµüÂÒÇçAbnormal Treatment": {
-      "steam_appid": 1122750,
+    "Õ░©Õªéµ¢«µ░┤": {
+      "steam_appid": 953740
+    },
+    "Õ░äÕ░▒Õ«îõ║ïÕä┐õ║åµÂêþü¡Þö¼ÞÅ£": {
+      "steam_appid": 1177180
+    },
+    "Õ░ÅþÖ¢þÜäµû░Þíú / Snower's New Clothes": {
+      "steam_appid": 1058850,
       "engine": "RPG Maker"
     },
-    "Õ╝éþºìµêÿõ║ëÕ░æÕÑ│": {
-      "steam_appid": 964300
+    "Õ░Åµ×ùµ¡úÚø¬Õñìõ╗çõ╣ïÕ»åÕ«ñÚçìÕêÂþëê": {
+      "steam_appid": 899160
     },
-    "Õ╝╣Õ╣òÚéúõ©¬µüÂõ║║": {
-      "steam_appid": 1043470
+    "Õ░æÕ╣┤Õ░üþÑ×": {
+      "steam_appid": 1154500
     },
-    "Õ╝╣þé©õ║║2222": {
-      "steam_appid": 767400
+    "Õ░üþÑ×þ¡û": {
+      "steam_appid": 1213470
     },
-    "Õ╝║Õåø": {
-      "steam_appid": 825380
+    "Õ░üþÑ×þ║¬": {
+      "steam_appid": 1210680
     },
-    "Õ¢ÀÕ¥¿õ╣ïÞíù The Street of Adrift": {
-      "steam_appid": 1672670,
+    "Õ░ÿõ©ÄÕ£ƒþÜäÞ¥╣þ╝ÿ": {
+      "steam_appid": 873820
+    },
+    "Õ░║Õ¡ÉÕÆîµ®íþÜ«": {
+      "steam_appid": 809640
+    },
+    "Õ▒ÇÕñûõ║║ L'Etranger": {
+      "steam_appid": 1078970
+    },
+    "Õ▒×µÇºõ©Äþöƒµ┤╗": {
+      "steam_appid": 822470
+    },
+    "Ù¼┤ýù░": {
+      "steam_appid": 1077560
+    },
+    "ÙêäÛ░Ç ÛÀ©ÙàÇÙÑ╝ ýú¢ýÿÇÙéÿ": {
+      "steam_appid": 1054520
+    },
+    "Ú¡öÕíö2018": {
+      "steam_appid": 948770
+    },
+    "Ú¡öþë®Õ¿ÿþë®Þ»¡": {
+      "steam_appid": 835530
+    },
+    "Ú¡öþë®Þ«¿õ╝ÉÕøó": {
+      "steam_appid": 905690,
+      "engine": "GameMaker"
+    },
+    "Ú¡öÞúàÞíôÕ©½ÒéóÒé½Òâì": {
+      "steam_appid": 880320
+    },
+    "Ú£ÄµùÂµÖ┤Þì½": {
+      "steam_appid": 883870
+    },
+    "Ú©┐Úù¿õ©ÇÕ«┤(Malicious Dinner) õ©¡Þï▒": {
+      "steam_appid": 1091520
+    },
+    "ÚªÖÕ▒▒31ÕÅÀ": {
+      "steam_appid": 1110230
+    },
+    "ÚªÖµ▒ƒõ╣ïÚ¥Ö´╝îDragon of Hongkong": {
+      "steam_appid": 1126430
+    },
+    "Ú¬æÕú½õ©ÄÚ¡öµ│òµêÿõ║ë": {
+      "steam_appid": 965180
+    },
+    "Ú¬░Õ¡ÉÕïçÕú½ Dice Warrior": {
+      "steam_appid": 924710
+    },
+    "Ú¼╝Õ▒▒": {
+      "steam_appid": 682490,
       "engine": "Unity"
     },
-    "Õ¥îÞùñõ©ÇÕ«ÂÒü«Õ¡ñÕ│Âµ«║õ║║õ║ïõ╗Â": {
-      "steam_appid": 1074530
+    "Ú¼╝þò£ÕñºÕåÆÚÖ® Gui Chu Da Mao Xian": {
+      "steam_appid": 668680
     },
-    "Õ¥íÕëæ Yu Jian": {
-      "steam_appid": 1144860
+    "Ú½ÿÞâ¢Õ░ÅÚÿƒ Superpower Squad": {
+      "steam_appid": 1179730
     },
-    "Õ¥íÚ¥ÖÕ£¿Õñ®-Õ╣│ÞííÕø¢µêÿþëê": {
-      "steam_appid": 1052500
+    "Ú½ÿÞÇâÕÀÑÕÄéµ¿íµïƒ(Crazy School Simulator)": {
+      "steam_appid": 1011230
     },
-    "Õ┐âÒü«ÚùçÒü«ÕàêÒü½ Trial VersionÔàí": {
-      "steam_appid": 661700
+    "ÚàÆÕ║ù": {
+      "steam_appid": 934810
     },
-    "Õ┐âõ╣ïµ¬╗": {
-      "steam_appid": 951130
+    "ÚàÆÕ║ùõ║î The Hotel 2": {
+      "steam_appid": 1077540
     },
-    "Õ┐åµüï-Reverse Momories-": {
-      "steam_appid": 1036690
+    "ÚàöÒüäÒü®ÒéîÒé»ÒéñÒé║show µ¿ÖÚìø": {
+      "steam_appid": 1037270
     },
-    "Õ┐½õ╣ÉÕ░ÅÚ©í": {
-      "steam_appid": 1223240
+    "Úâ¢Õ©éµüÉµÇûµòàõ║ï": {
+      "steam_appid": 1048320
+    },
+    "Úâ¿ÞÉ¢õ©ÄÕ╝»ÕêÇ": {
+      "steam_appid": 1094520
+    },
+    "ÚÇâÚøóÕ£░þìäÚéèþÀú - Escape from the cursed convent": {
+      "steam_appid": 1142740
+    },
+    "ÚÇÇÕ╗âµÇØÞÇâ": {
+      "steam_appid": 1205160
+    },
+    "ÚÇÇõ╝æµ¿íµïƒÕÖ¿": {
+      "steam_appid": 1220840
+    },
+    "ÚÇìÚüÑõ┐«þ£ƒ": {
+      "steam_appid": 1983840
+    },
+    "ÚÇìÚüÑµ©©": {
+      "steam_appid": 2004780
+    },
+    "ÚçìþöƒÞ¢«Õø×/Reborn Not Again": {
+      "steam_appid": 1068190
+    },
+    "ÚÇØÕÄ╗þÜäÕø×Õ┐å3´╝ÜÕøøÕÅÂÞìëõ╣ïµóª": {
+      "steam_appid": 1109130
+    },
+    "Úéúþ¥ÄÕàïµÿƒõ║║": {
+      "steam_appid": 1214210
+    },
+    "Úé╗Õ▒àÕñºÕÅö/UncleNeighbor:uncle Dating Simulator": {
+      "steam_appid": 1177420
+    },
+    "ÚíÂÚà▒": {
+      "steam_appid": 1117210
+    },
+    "Úò┐Õñ® Long Sky": {
+      "steam_appid": 1043030
+    },
+    "Úò┐µ¡îÞíî": {
+      "steam_appid": 1223850
+    },
+    "ÚÖåÕñºÞ┐╣þÑ×Ôàí": {
+      "steam_appid": 1220880
+    },
+    "Úø¬Ú╣░Úóåõ©╗": {
+      "steam_appid": 1114050
+    },
+    "Úø¬þ¡ûÞ¥╣Õóâ": {
+      "steam_appid": 979500
+    },
+    "Úø¬┬Àþûæ": {
+      "steam_appid": 1001010
+    },
+    "ÚøÂõ©ïÞ«░Õ┐å": {
+      "steam_appid": 1166050
+    },
+    "ÚøÂþòîµêÿþ║┐": {
+      "steam_appid": 1195870
+    },
+    "ÚøÂµÇ¿ The curse of the deab": {
+      "steam_appid": 1221420
+    },
+    "ÚØÆÕ▓ÜÞíÇµ×½": {
+      "steam_appid": 1103620
+    },
+    "ÚØÆÞøÖÞÀ│µ¿íµïƒÕÖ¿": {
+      "steam_appid": 1013890
+    },
+    "ÚøÇÕº¼": {
+      "steam_appid": 1084520
+    },
+    "ÚØ×õ©ÇÞê¼ÞüîÕ£║": {
+      "steam_appid": 1163140
+    },
+    "ÚúÄµÁüÕêÇÕ«ó": {
+      "steam_appid": 1209000
+    },
+    "ÚúÄµÜ┤Õ▓ø": {
+      "steam_appid": 769720
+    },
+    "ÚûâÚø╗Õ░ìµ▒║Lightning Wings II": {
+      "steam_appid": 1124850
+    },
+    "ÚüáÕÅñÕñºÚÖ©ÕñûÕé│-ÕÅñÚüôþÜäþøíÚá¡": {
+      "steam_appid": 1169460
+    },
+    "ÚÜÉ-Stealth": {
+      "steam_appid": 800170
+    },
+    "ÚÜÉþºÿþÜäÞºÆÞÉ¢": {
+      "steam_appid": 2071200
+    },
+    "Úÿ┐Þ¥¥õ©ëÕø¢Õ┐ù2018": {
+      "steam_appid": 910320
+    },
+    "Úÿ┐µ»öµû»þÜäÕ«ØÞùÅTreasure of abyss": {
+      "steam_appid": 932570
+    },
+    "Úÿ┐µ┤Ñ": {
+      "steam_appid": 1036960
+    },
+    "Ú║╗þÑ×µÂêµÂêõ╣É": {
+      "steam_appid": 1063330
+    },
+    "Ú╗ÄµÿÄÚ£×Õàë": {
+      "steam_appid": 1130900
+    },
+    "Ú╗æµÜùµûÖþÉå?!": {
+      "steam_appid": 970530
+    },
+    "ýòöýáä:Blackout": {
+      "steam_appid": 871810
+    },
+    "þ¡öÚóÿÞï▒Úøä--þ╗åÞâ×þöƒþë®Õ¡ª": {
+      "steam_appid": 1011860
+    },
+    "þ¢¬þÜäþ¼¼õ©âþ½á": {
+      "steam_appid": 1200200
+    },
+    "Þ¢╗µóªÞ░¡ - þô«õ╣ïþ»ç -": {
+      "steam_appid": 1214720
+    },
+    "þ£ïõ©ìÞºüþÜäþê▒": {
+      "steam_appid": 1121980
+    },
+    "þ£ƒÚ¥Öõ©╗Õ«░": {
+      "steam_appid": 1201920
+    },
+    "þ¥Äõ©¢µû░õ©ûþòîi Brave New World i": {
+      "steam_appid": 895920
+    },
+    "þ¥ÄÕ░æÕÑ│ÕñÅµùÑµ¼óõ╣É!": {
+      "steam_appid": 835040
+    },
+    "þ¥ÄÕ░æÕÑ│Ú║╗Õ░åµÄÑÚ¥Ö": {
+      "steam_appid": 908350
+    },
+    "Þ¥úµØíµØéÞ┤ºÕ║ù:Õø×Õê░1997´╝îµêæÕ¢ôÕ░ÅÕòåÞ┤®": {
+      "steam_appid": 687650,
+      "engine": "Unity"
+    },
+    "Þªçþ£îÒéÆµÅíÒéî ´¢×47Úâ¢ÚüôÕ║£þ£îÕñºµêª´¢×": {
+      "steam_appid": 928690
+    },
+    "Þ«░Õ┐åÚçìþÄ░/Rememory": {
+      "steam_appid": 1158840
+    },
+    "Þ«░Õ┐åÚçìµ×ä/Memories": {
+      "steam_appid": 1015020
+    },
+    "ÞºàÚò┐þöƒ": {
+      "steam_appid": 1189490
+    },
+    "þ»«þÉâÞ«íÕêÆ Project Dunk": {
+      "steam_appid": 1110830
+    },
+    "Þ»Àþ╗Öµêæõ¢áþÜäÞâûµ¼í´╝îÞ«®µêæµï»µòæõ©ûþòî": {
+      "steam_appid": 1049620
+    },
+    "Þ»øþÑ×õ╣¥ÕØñ": {
+      "steam_appid": 1146040
+    },
+    "þ¼ªµûçÕÑ│Õ¡®/Rune Girl": {
+      "steam_appid": 1083210,
+      "engine": "Unity"
+    },
+    "þ¼¼Õøøþ®║Úù┤Fourth Space": {
+      "steam_appid": 1065250
+    },
+    "Þà¥ÞÁÀõ╣ïÞøç": {
+      "steam_appid": 1155730
+    },
+    "ÞÀ│ÞÀ│ÕñºÕÆû": {
+      "steam_appid": 1000110,
+      "engine": "Unity"
+    },
+    "ÞÁ½þéÄþÜäÕì░ÕèáÞ»║Õàï Fullvoice ReBORN": {
+      "steam_appid": 982400
+    },
+    "þá┤þóÄµ│òµ£»": {
+      "steam_appid": 1124740
+    },
+    "þâ¡ÞíÇµ▓ÖÕƒÄ": {
+      "steam_appid": 1147420
+    },
+    "þâ¢þü½Õñºþºª": {
+      "steam_appid": 1157330
+    },
+    "Þâ£Õê®Õì│µ¡úõ╣ë! / Victory is justice´╝ü": {
+      "steam_appid": 1058910,
+      "engine": "Unity"
+    },
+    "ÞÂàÚƒ│þÑ×µ¿éÒÇèõ©âÚƒ│Õ£ûÚ¿░þ»çÒÇï- UltraKagura -": {
+      "steam_appid": 925120
+    },
+    "ÞÂàþ║ºµ£║þö▓µêÿõ║ëOL": {
+      "steam_appid": 1138620
+    },
+    "þâêþä░µêÿþ║¬": {
+      "steam_appid": 835500
+    },
+    "ÞÄ½µ»öõ╣îµû»õ╣ïþÄ»-õ©ìÕ▒×õ║Äõ╗╗õ¢òõ║║þÜäõ║ñÕôìµé▓µ¡î-MOBIUS & ELEGY BELONGS TO NOBODY": {
+      "steam_appid": 1094320
+    },
+    "þÄäÕ░ÿõ╗ÖÚÇö": {
+      "steam_appid": 1169790
+    },
+    "þÄïÕø¢Õç║Õç╗": {
+      "steam_appid": 698920
+    },
+    "þÄïÕø¢Õ╣╗Õóâ fantastic kingdom": {
+      "steam_appid": 1097550
+    },
+    "þÄïÞÇàÞï▒Úøä The Great Hero": {
+      "steam_appid": 930330
+    },
+    "þÄïÞÇàµêÿÞ¢ª": {
+      "steam_appid": 987980
+    },
+    "þÄïþëîÞê░Úò┐": {
+      "steam_appid": 681010
+    },
+    "ÞÇüÞÖÄµ©©µêÅ": {
+      "steam_appid": 887740
+    },
+    "ÞÇüµØ┐µö╗þòÑ": {
+      "steam_appid": 1115020
+    },
+    "ÞÉ¢ÕìÄÕ▒à": {
+      "steam_appid": 1133610
+    },
+    "ÞÉ¢Õ░ÿõ╣ïÕƒƒ": {
+      "steam_appid": 985820
+    },
+    "þéÄÚ╗äµêÿþ║¬õ╣ïõ©ëÕø¢þâ¢þâƒ": {
+      "steam_appid": 590910
+    },
+    "ÞÉîÕ¿ÿµêÿÞ«░": {
+      "steam_appid": 1052430
+    },
+    "ÞéÑÕò¥ÕñºÕåÆÚÖ®": {
+      "steam_appid": 1175940
+    },
+    "ÞéÑÞéÑÕñºõ¢£µêÿ fat battle": {
+      "steam_appid": 994250
+    },
+    "þé╝ÕªûÞ«░": {
+      "steam_appid": 1147900
+    },
+    "Þë¥µü®µ┤øõ║Ü´╝Üþé╝ÚçæÞÁÀµ║Éõ╣ïþ½á": {
+      "steam_appid": 1220670
+    },
+    "ÞìÆÕ▓øµ▒éþöƒ": {
+      "steam_appid": 1152250
+    },
+    "ÞìÆÚçÄÕ»╗Þ©¬": {
+      "steam_appid": 855670
+    },
+    "ÞìÆÚçÄÕñºÞø«þÑ×": {
+      "steam_appid": 998150
+    },
+    "ÞìÆµ╝áµ▒éþöƒ": {
+      "steam_appid": 880620
+    },
+    "ÞíÇÞàÑõ╣ïµùÑ228-Vampire Martina-Bloody Day 2.28": {
+      "steam_appid": 1060360
+    },
+    "Þíîþòî´╝ÜÚüù WENT:OneAlive": {
+      "steam_appid": 1005560
+    },
+    "ÞíùÕñ┤Þï▒Úøä": {
+      "steam_appid": 924500
+    },
+    "Þíùµ£║õ╣ïõ©ëÕø¢µê░Þ¿ÿ": {
+      "steam_appid": 2086830
+    },
+    "þîÄÚ¡öÞÇàµêÿþ║¬": {
+      "steam_appid": 1066290
+    },
+    "ÞîëÞÄëõ╣ïÕñÅ Jasmine Summer": {
+      "steam_appid": 913160
+    },
+    "þîÑþÉÉÕÉº´╝üÕÉÄÕ«½õ¢úÕàÁÕøó": {
+      "steam_appid": 657320
+    },
+    "þïÉÒü«µùàÞÀ»": {
+      "steam_appid": 1178050
+    },
+    "ÞïìÕñ£": {
+      "steam_appid": 923400
+    },
+    "þï╝õ║║µØÇÕìòµ£║þëê": {
+      "steam_appid": 1065960
+    },
+    "Þï▒Úøäþ¥ñõ¥áõ╝á": {
+      "steam_appid": 1102980
+    },
+    "Þï▒Úøäþ¥ñõ¥áõ╝áII": {
+      "steam_appid": 1115640
+    },
+    "Þï▒Þ»¡µØÇ": {
+      "steam_appid": 934710
+    },
+    "þÑ¡ÕúçÒü«Þè▒/Saidan no Hana": {
+      "steam_appid": 1128150
+    },
+    "þñ¥þ¿Àþ╗êõ║ÄÕ╣╗µâ│ ~ A Finality with Sheji": {
+      "steam_appid": 992750
+    },
+    "þñÄÒü«µÑ» -AEGIS-": {
+      "steam_appid": 1039550
+    },
+    "þÑêÚó¿ Inorikaze": {
+      "steam_appid": 992740
+    },
+    "þÑ×Õø¢´╝ÜÕêøÚÇá": {
+      "steam_appid": 1185600
+    },
+    "þÑ×õ╗ÖÕÉìÕìò": {
+      "steam_appid": 1180390
+    },
+    "þÑ×Ú®¼µ▒ƒµ╣û": {
+      "steam_appid": 1012130
+    },
+    "þÑ×Þ░ï": {
+      "steam_appid": 1093900
+    },
+    "þÑ×µêÆ": {
+      "steam_appid": 1219930
+    },
+    "þÑ×µ×¬Õ░æÕÑ│": {
+      "steam_appid": 1181450
+    },
+    "þÑ×µÿÄÕ£¿õ©è": {
+      "steam_appid": 1000080
+    },
+    "þÑøÚ¡à┬ÀÕàÑþü¡´╝êþÑøÚ¡à2´╝ë - Disenchantment Nirvana": {
+      "steam_appid": 972200
+    },
+    "þÑøÚ¡à┬ÀµòÖÕîû´╝êþÑøÚ¡à1´╝ë": {
+      "steam_appid": 850820
+    },
+    "þóºÞÉ¢õ╝áÞ»┤": {
+      "steam_appid": 973560
+    },
+    "Þó½ÞÖ½Õ¿ÿÕà╗Þé▓þØÇþ╣üµ«ûÕÉÄõ╗ú": {
+      "steam_appid": 1020060
+    },
+    "ÞôØÕ«Øþƒ│Þê¼þÜäÞó½Õ«│Õªäµâ│Õ░æÕÑ│": {
+      "steam_appid": 970510
+    },
+    "þÖ¢þƒ│µ┤▓Õ¥Çõ║ï": {
+      "steam_appid": 1101980
+    },
+    "þÖ¥Þè▒õ©ëÕø¢Õ┐ù(Banner of the THREE KINGDOMS)": {
+      "steam_appid": 1137160
+    },
+    "þöÁþ¡Æõ¥á": {
+      "steam_appid": 1126230
+    },
+    "ÞöÜÞôØµ£êõ©ï": {
+      "steam_appid": 964970
+    },
+    "þöƒþë®ÕñºÕåÆÚÖ®": {
+      "steam_appid": 1211270
+    },
+    "þöƒþë®þƒÑÞ»åµá╝µûùÕñºÞÁø": {
+      "steam_appid": 1193350
+    },
+    "þö╗µ▒ƒµ╣ûõ╣ïµØ»ÞÄ½Õü£": {
+      "steam_appid": 1345730
+    },
+    "þ×│´╝ÜþÑêµä┐ VR / Pupil: Wandering VR": {
+      "steam_appid": 773460,
+      "engine": "Unreal Engine 4"
+    },
+    "þøøõ©ûõ╝áÕÑç": {
+      "steam_appid": 1180460
+    },
+    "þùàµ»ÆµüÂÕîû": {
+      "steam_appid": 1036120
+    },
+    "Þúüµ▒║ÞÇà -The White Butcher-": {
+      "steam_appid": 758270
+    },
+    "þû»þïéþÜäÕØªÕàï": {
+      "steam_appid": 1143560
+    },
+    "þûæþè»Õ»╗Þ©¬ In Pursuit": {
+      "steam_appid": 1036190
+    },
+    "þü¡þÑ×": {
+      "steam_appid": 1153340
+    },
+    "þü½µƒ┤õ║║Þüöþøƒ2": {
+      "steam_appid": 1094010
+    },
+    "þüÁÕ╣╗Õàêþöƒ : Þç┤µò¼õ©Çõ╗úÕâÁÕ░©ÚüôÚò┐´╝ü": {
+      "steam_appid": 1063340
+    },
+    "þüÁþòî Sprites´╝êµÁïÞ»òþëê´╝ë": {
+      "steam_appid": 1043140
+    },
+    "þüÁµûçÞÑ┐µ©©": {
+      "steam_appid": 832520
+    },
+    "þÜôµ£êþ®║ÕìÄ": {
+      "steam_appid": 974200
+    },
+    "ÞüûÕëúÒâ¼ÒéñÒâ┤Òâ®Òâ│ÒéÀÒâ½þë®Þ¬×": {
+      "steam_appid": 729610,
+      "engine": "RPG Maker"
+    },
+    "þ│ûµ×£Õ║ùþë®Þ»¡": {
+      "steam_appid": 780970
+    },
+    "Þ┐ÀÕ«½µêÿõ║ë(Maze Wars)": {
+      "steam_appid": 1037950
+    },
+    "Þ┐ÀÚø¥ The Mist": {
+      "steam_appid": 1048470
+    },
+    "þ┐öþÜäÕáòÞÉ¢õ║║þöƒ": {
+      "steam_appid": 1030280
+    },
+    "Þ┤ÑÕ«Âõ╗ö Last Wish": {
+      "steam_appid": 952850
+    },
+    "Þ┤ñÞÇàµî¢µ¡îõ╣ïÚ®¼þòÑÕìíÕìÅÕÑÅµø▓": {
+      "steam_appid": 745820
+    },
+    "þ║©õ║║´╝Üþ¼¼õ©Çþ½á Paper Dolls Original": {
+      "steam_appid": 1051310
+    },
+    "þ║©þëçõ║║3D": {
+      "steam_appid": 831600
+    },
+    "þ║ªõ╝Üõ©ûþòî~The dating world": {
+      "steam_appid": 989000
+    },
+    "þ║ªµïìÕÑ│þÑ× Private Model": {
+      "steam_appid": 1064860
+    },
+    "þ║óÚ¡öõ║ïõ╗Âþ░┐ The Note of Red Evil": {
+      "steam_appid": 1211350,
+      "engine": "RPG Maker"
+    },
+    "þ╗«þ¢ùÕøøµùÂÞ░¡": {
+      "steam_appid": 1172980
+    },
+    "þ╗åÞâ×µêÿõ║ë": {
+      "steam_appid": 1000040,
+      "engine": "Unity"
+    },
+    "þ╗Øµ£øþøæþëó / þÁÂµ£øÒâùÒâ¬Òé║Òâ│": {
+      "steam_appid": 1167790
+    },
+    "µ¡ªÕäÆþ╗ÿÕìÀ - ÕÉ»þñ║Õ¢ò": {
+      "steam_appid": 1204490,
+      "engine": "Unity"
+    },
+    "µ¡ªÕäÆþ╗ÿÕìÀ - õ╣Øõ║öÞç│Õ░è": {
+      "steam_appid": 983060
+    },
+    "µ¡ªÚüôÕ░åÚ¡é": {
+      "steam_appid": 2068950
+    },
+    "µ¡ªÚüôµê░Õº¼ - ÕÑ│Õâò(µ¡ªÚüôµêªÕº½ - ÒâíÒéñÒâë / Budo Girl War - Maid)": {
+      "steam_appid": 1117040
+    },
+    "µ£½µ│òõ╗ÖÞÀ»": {
+      "steam_appid": 1062260
+    },
+    "µ£êþÉâÕØáÞÉ¢µùÂ Moon Fall": {
+      "steam_appid": 1092400
+    },
+    "µ£êþëÖµÑ╝ÚúÄõ║æ": {
+      "steam_appid": 1177480
+    },
+    "µ£║ÚÇÇµÇ¬Õà¢": {
+      "steam_appid": 1021670,
+      "engine": "Unity"
+    },
+    "µ£║Þâ¢ÕÑ│Õ¡®-Energy Girl": {
+      "steam_appid": 962490
+    },
+    "µ£║þö▓ÚøäÕ┐â´╝ÜÕÀíÕñ®ÞÇà": {
+      "steam_appid": 1142860
+    },
+    "µ£║µó░µÿƒµ▓│": {
+      "steam_appid": 1036080
+    },
+    "µ©©þª╗ÕñºÚÖå - Uniland": {
+      "steam_appid": 935970
+    },
+    "µ©©þë®Þ»¡ Travel story": {
+      "steam_appid": 1081900
+    },
+    "µ®ÖÕñ®Òü«ÚèÇþ┐╝ ´¢×Òé╣Òé½ÒéñÒâ®Òâ│ÒâëÒü«Ú¡öÕÑ│Òü¿ÕÀ½ÕÑ│´¢×": {
+      "steam_appid": 793410
+    },
+    "µ¼óõ╣ÉÚÇùþùàµ»ÆTD": {
+      "steam_appid": 1219310
+    },
+    "µ¿¬µë½Õñ®õ©ïõ╣ïõ©çÕ╣┤Õ╝║ÞÇà": {
+      "steam_appid": 1219920
+    },
+    "µ¿íµïƒÕ«ÂÞúàõ┐«": {
+      "steam_appid": 1065030
+    },
+    "µÀÀõ╣▒õ¢┐ÞÇà(Chaos Maker)": {
+      "steam_appid": 981140
+    },
+    "µÀ▒µÁÀ DEEPSEA": {
+      "steam_appid": 1061010
+    },
+    "µÁ«õ©ûõ©çÕìâõ╣ïÕëìõ©ûõ╗èþöƒ": {
+      "steam_appid": 1217190
+    },
+    "µÁÀÕ║òÕ»╗Õ«Ø": {
+      "steam_appid": 936060
+    },
+    "µÁüµ░ôÞ»╗ÕñºÕ¡ª liumang dudaxue": {
+      "steam_appid": 992630
+    },
+    "µÁ┤ÞíÇµêÿÚ¡é": {
+      "steam_appid": 1211280
+    },
+    "µá╝µûùõ╣ïÕƒÄ": {
+      "steam_appid": 1993230,
+      "engine": "Unity"
+    },
+    "µÂàµºâõ╣ïÞÀ»": {
+      "steam_appid": 1043760
+    },
+    "µâèÚÖ®µ×üÚÇƒ": {
+      "steam_appid": 1777280,
+      "engine": "Unity"
+    },
+    "µÂêþü¡Ú¡öþÄïÕåø Destroy the demon army": {
+      "steam_appid": 1006170
+    },
+    "µÄîµÄºÞÇà": {
+      "steam_appid": 832380
+    },
+    "µÄÑÕñ┤ / Contact Point": {
+      "steam_appid": 1109070,
+      "engine": "Unity"
+    },
+    "µÄóÚÖ®õ©ÄÚ¡öµ│ò": {
+      "steam_appid": 1184330
+    },
+    "µÄóþüÁþ¼öÞ«░-1v5(Notes of Ghost)": {
+      "steam_appid": 991780
+    },
+    "µäøþÑ×ÚñÉÚñ¿2": {
+      "steam_appid": 769680
+    },
+    "µäÜÞÇàÕ£░þëó-UPõ©╗þÜäµÂêÕñ▒": {
+      "steam_appid": 1099110
+    },
+    "µÆ×Õç╗Õà¼õ©╗ ! / Princess Hit !": {
+      "steam_appid": 1062380,
+      "engine": "Unity"
+    },
+    "µÇ¬ÕÑçÕ╣╗µâ│Õñóþë®Þ¬× µÇ¬þìúþÂ║Þ¡Ü Þ¬ÿÕ«ÁÕ£░þìä": {
+      "steam_appid": 1179350
     },
     "µÇ¬ÕÑçÕ╣╗µâ│Õñóþë®Þ¬× µÇ¬þìúþÂ║Þ¡Ü µ£ºÕìüÕñ£": {
       "steam_appid": 931870
@@ -197068,58 +197677,23 @@
     "µÇ¬ÕÑçÕ╣╗µâ│Õñóþë®Þ¬× µÇ¬þìúþÂ║Þ¡Ü µí£Þøçõ╝Ø": {
       "steam_appid": 936150
     },
-    "µÇ¬ÕÑçÕ╣╗µâ│Õñóþë®Þ¬× µÇ¬þìúþÂ║Þ¡Ü Þ¬ÿÕ«ÁÕ£░þìä": {
-      "steam_appid": 1179350
-    },
     "µÇ¬þìúþÂ║Þ¡Ü µ£ºÕìüÕñ£ þ®║þïÉõ©çÞÅ»ÚÅí": {
       "steam_appid": 1018380
-    },
-    "µüï õ©Çõ║øÕ░Åµ©àµû░þÜäþîÄÕÑçµòàõ║ï": {
-      "steam_appid": 1203980
-    },
-    "µüïþê▒Õà¼Õ»ô´╝êMy Girl´╝ÜLove Story´╝ë": {
-      "steam_appid": 1044930
-    },
-    "µüïþê▒µÇ╗Õè¿Õæÿ/Love Date": {
-      "steam_appid": 1095790,
-      "engine": "RPG Maker"
-    },
-    "µüÉÚ¥ÖÕñºÕåÆÚÖ®": {
-      "steam_appid": 1019180
-    },
-    "µé¬µóªer-mo": {
-      "steam_appid": 909900
-    },
-    "µâèÚÖ®µ×üÚÇƒ": {
-      "steam_appid": 1777280,
-      "engine": "Unity"
-    },
-    "µäÜÞÇàÕ£░þëó-UPõ©╗þÜäµÂêÕñ▒": {
-      "steam_appid": 1099110
-    },
-    "µäøþÑ×ÚñÉÚñ¿2": {
-      "steam_appid": 769680
     },
     "µçÆõ║║õ┐«õ╗Öõ╝á": {
       "steam_appid": 892420
     },
-    "µêæõ╗¼þÜäÕø¢": {
-      "steam_appid": 1156970
+    "µé¬µóªer-mo": {
+      "steam_appid": 909900
     },
     "µêæõ╗¼þÜäÕñºÕ¡ª": {
       "steam_appid": 1104400
     },
+    "µêæõ╗¼þÜäÕø¢": {
+      "steam_appid": 1156970
+    },
     "µêæõ╗¼þÜäµê┐Õ▒ï OUR HOUSE": {
       "steam_appid": 1098810
-    },
-    "µêæµÿ»µ©úþöÀ-Dishonest": {
-      "steam_appid": 965890
-    },
-    "µêæµÿ»Úö«þøÿõ¥á": {
-      "steam_appid": 1159000
-    },
-    "µêæµÿ»ÚÖóÚò┐ - µ¿íµïƒþ╗ÅÞÉÑÕî╗ÚÖóµ©©µêÅ": {
-      "steam_appid": 1163100
     },
     "µêæþÜäÕà¢ÞÇ│ÕÉÄÕ«½": {
       "steam_appid": 1158000
@@ -197127,50 +197701,42 @@
     "µêæþÜäþ║©þëçõ║║ÕÑ│ÕÅï/Make butter together!": {
       "steam_appid": 1070020
     },
+    "µêæµÿ»Úö«þøÿõ¥á": {
+      "steam_appid": 1159000
+    },
+    "µêæµÿ»ÚÖóÚò┐ - µ¿íµïƒþ╗ÅÞÉÑÕî╗ÚÖóµ©©µêÅ": {
+      "steam_appid": 1163100
+    },
+    "µêæµÿ»µ©úþöÀ-Dishonest": {
+      "steam_appid": 965890
+    },
     "µêÿµ£»þïéµâ│3-µ×¬µêÿÞÂ│þÉâ(Chimera of Tactics 3-Gun and Soccer)": {
       "steam_appid": 944030
     },
+    "µëºÞíîõ║║ Executor": {
+      "steam_appid": 962950
+    },
     "µëÇÞ░ôõ¥áÕ«ó So-called Hero": {
       "steam_appid": 1116080
-    },
-    "µëôÕç╗ÞÇàµëôÕ¡ùµ©©µêÅÚøå´╝êStriker A Type Game Pack´╝ë": {
-      "steam_appid": 1059860
     },
     "µëôÕÀÑÕÉº´╝üÕñ®õ¢┐Úà▒ ~Õñ®õ¢┐Õ£¿Ú¡öþòîþÜäÕè│µö╣þöƒµ┤╗~": {
       "steam_appid": 1984350,
       "engine": "RPG Maker"
     },
-    "µëºÞíîõ║║ Executor": {
-      "steam_appid": 962950
-    },
-    "µïûµïëµ£║": {
-      "steam_appid": 975860
-    },
-    "µï»µòæÕñºÚ¡öþÄï2:ÚÇåµÁü Falsemen2:Upstream": {
-      "steam_appid": 1038820
-    },
-    "µï╝Þ»ìµ©©µêÅ 2017": {
-      "steam_appid": 745840
+    "µëôÕç╗ÞÇàµëôÕ¡ùµ©©µêÅÚøå´╝êStriker A Type Game Pack´╝ë": {
+      "steam_appid": 1059860
     },
     "µìòÚ▒╝ÕïçÞÇàÞüöþøƒ": {
       "steam_appid": 1179670
     },
-    "µÄîµÄºÞÇà": {
-      "steam_appid": 832380
+    "µï»µòæÕñºÚ¡öþÄï2:ÚÇåµÁü Falsemen2:Upstream": {
+      "steam_appid": 1038820
     },
-    "µÄóþüÁþ¼öÞ«░-1v5(Notes of Ghost)": {
-      "steam_appid": 991780
+    "µïûµïëµ£║": {
+      "steam_appid": 975860
     },
-    "µÄóÚÖ®õ©ÄÚ¡öµ│ò": {
-      "steam_appid": 1184330
-    },
-    "µÄÑÕñ┤ / Contact Point": {
-      "steam_appid": 1109070,
-      "engine": "Unity"
-    },
-    "µÆ×Õç╗Õà¼õ©╗ ! / Princess Hit !": {
-      "steam_appid": 1062380,
-      "engine": "Unity"
+    "µï╝Þ»ìµ©©µêÅ 2017": {
+      "steam_appid": 745840
     },
     "µòàÚâÀÒéÆÒüòÒüîÒüÖõ©ëÕºëÕª╣": {
       "steam_appid": 1094190
@@ -197181,32 +197747,43 @@
     "µòúµ¡®ÒüÖÒéïÒé¡Òâ╝Òâ£Òâ╝Òâëõ¢┐Òüä": {
       "steam_appid": 1183740
     },
-    "µûçÕ¡ùþìä": {
-      "steam_appid": 1035750
+    "µóªõ©ëÞï▒Úøäõ╝á": {
+      "steam_appid": 907320
     },
-    "µûùõ©ëÕø¢": {
-      "steam_appid": 1976720
+    "µóªÕ╣╗þ│ûµ×£": {
+      "steam_appid": 1182080
     },
-    "µûùÕ£░õ©╗VR": {
-      "steam_appid": 800160
+    "µóªµ£¼µùáÕ┐º": {
+      "steam_appid": 909020
     },
-    "µû®ÕªûRaksasi": {
-      "steam_appid": 1016600
+    "µóªµÂ»": {
+      "steam_appid": 1075120
     },
-    "µû░õ©ûÕïçÞÇàõ╝á": {
-      "steam_appid": 957140
+    "µóªµ║¬þö╗ÕØè / DreamGallery": {
+      "steam_appid": 1041310
     },
-    "µû░ÕÇ¥Õø¢õ╣ïµÇÆ": {
-      "steam_appid": 1685470
+    "µóàÕíöþë╣ÚÜå Metatron": {
+      "steam_appid": 993980
     },
-    "µû░ÕÀ¿Õòå": {
-      "steam_appid": 1042590
+    "µ×òÞ¥╣Õ░æÕÑ│ MOE Hypnotist - share dreams with you": {
+      "steam_appid": 942930
     },
-    "µû╣ÕØùÞüöþøƒ": {
-      "steam_appid": 998300
+    "µ×Øµ▒ƒþ¼¼õ©ÇÞê×µûùõ╝Ü": {
+      "steam_appid": 1864590,
+      "engine": "Unity"
     },
-    "µû╣ÞºúÕñóþò░Þü× ´¢× Avant-Garde Discerning Paralleler (µØ▒µû╣õ║îµ¼íÕëÁõ¢£STG)": {
-      "steam_appid": 1095590
+    "µØÄµòÖµÄêþÜäþƒÑÞ»åÚù«þ¡ö": {
+      "steam_appid": 865100
+    },
+    "µØÑõ║║ LIGHTWORKERS": {
+      "steam_appid": 1997230,
+      "engine": "Unity"
+    },
+    "µØ▒µû╣þ┐áþÑ×Õ╗╗Õ╗è ÒÇ£ Faith in the Goddess of Suwa.": {
+      "steam_appid": 1010850
+    },
+    "µø▓Úÿ┐Õ░ÅÕ░å Minor Leader": {
+      "steam_appid": 1118100
     },
     "µùáõ©╗õ╣ïÕ£░:ÚôÂµ▓│ 4X-Galaxy": {
       "steam_appid": 922450
@@ -197224,11 +197801,57 @@
     "µùáÚÖÉõ╣ïÕ┐â": {
       "steam_appid": 1158870
     },
+    "µùÂõ╣ïþ╗êKlock": {
+      "steam_appid": 1186200
+    },
     "µùÂõ╣ïµëë": {
       "steam_appid": 1081810
     },
-    "µùÂõ╣ïþ╗êKlock": {
-      "steam_appid": 1186200
+    "µû®ÕªûRaksasi": {
+      "steam_appid": 1016600
+    },
+    "µûçÕ¡ùþìä": {
+      "steam_appid": 1035750
+    },
+    "µûùÕ£░õ©╗VR": {
+      "steam_appid": 800160
+    },
+    "µûùõ©ëÕø¢": {
+      "steam_appid": 1976720
+    },
+    "µû╣ÕØùÞüöþøƒ": {
+      "steam_appid": 998300
+    },
+    "µû╣ÞºúÕñóþò░Þü× ´¢× Avant-Garde Discerning Paralleler (µØ▒µû╣õ║îµ¼íÕëÁõ¢£STG)": {
+      "steam_appid": 1095590
+    },
+    "µû░õ©ûÕïçÞÇàõ╝á": {
+      "steam_appid": 957140
+    },
+    "µû░ÕÀ¿Õòå": {
+      "steam_appid": 1042590
+    },
+    "µû░ÕÇ¥Õø¢õ╣ïµÇÆ": {
+      "steam_appid": 1685470
+    },
+    "µüÉÚ¥ÖÕñºÕåÆÚÖ®": {
+      "steam_appid": 1019180
+    },
+    "µüï õ©Çõ║øÕ░Åµ©àµû░þÜäþîÄÕÑçµòàõ║ï": {
+      "steam_appid": 1203980
+    },
+    "µüïþê▒Õà¼Õ»ô´╝êMy Girl´╝ÜLove Story´╝ë": {
+      "steam_appid": 1044930
+    },
+    "µüïþê▒µÇ╗Õè¿Õæÿ/Love Date": {
+      "steam_appid": 1095790,
+      "engine": "RPG Maker"
+    },
+    "µÜùÚ╗æþá┤ÕØÅÕ▓ø/Diablo IslanD": {
+      "steam_appid": 1138060
+    },
+    "µÜ┤ÞÁ░þåèÕ¡®": {
+      "steam_appid": 683680
     },
     "µÿÄµùÑÒÇüÕêØÒéüÒüªÕ¢╝ÕÑ│Òü¿ÔØñ": {
       "steam_appid": 2077040,
@@ -197238,104 +197861,19 @@
     "µÿÄµùÑµÄóÚÖ®Õ«Â": {
       "steam_appid": 1131460
     },
-    "µÜùÚ╗æþá┤ÕØÅÕ▓ø/Diablo IslanD": {
-      "steam_appid": 1138060
-    },
-    "µÜ┤ÞÁ░þåèÕ¡®": {
-      "steam_appid": 683680
-    },
-    "µø▓Úÿ┐Õ░ÅÕ░å Minor Leader": {
-      "steam_appid": 1118100
-    },
-    "µ£êþëÖµÑ╝ÚúÄõ║æ": {
-      "steam_appid": 1177480
-    },
-    "µ£êþÉâÕØáÞÉ¢µùÂ Moon Fall": {
-      "steam_appid": 1092400
-    },
-    "µ£½µ│òõ╗ÖÞÀ»": {
-      "steam_appid": 1062260
-    },
-    "µ£║µó░µÿƒµ▓│": {
-      "steam_appid": 1036080
-    },
-    "µ£║þö▓ÚøäÕ┐â´╝ÜÕÀíÕñ®ÞÇà": {
-      "steam_appid": 1142860
-    },
-    "µ£║Þâ¢ÕÑ│Õ¡®-Energy Girl": {
-      "steam_appid": 962490
-    },
-    "µ£║ÚÇÇµÇ¬Õà¢": {
-      "steam_appid": 1021670,
-      "engine": "Unity"
-    },
-    "µØÄµòÖµÄêþÜäþƒÑÞ»åÚù«þ¡ö": {
-      "steam_appid": 865100
-    },
-    "µØÑõ║║ LIGHTWORKERS": {
-      "steam_appid": 1997230,
-      "engine": "Unity"
-    },
-    "µØ▒µû╣þ┐áþÑ×Õ╗╗Õ╗è ÒÇ£ Faith in the Goddess of Suwa.": {
-      "steam_appid": 1010850
-    },
-    "µ×òÞ¥╣Õ░æÕÑ│ MOE Hypnotist - share dreams with you": {
-      "steam_appid": 942930
-    },
-    "µ×Øµ▒ƒþ¼¼õ©ÇÞê×µûùõ╝Ü": {
-      "steam_appid": 1864590,
-      "engine": "Unity"
-    },
     "µƒÉ1þºìÚØÆµÿÑ": {
       "steam_appid": 1002290,
       "dx9": true
     },
-    "µá╝µûùõ╣ïÕƒÄ": {
-      "steam_appid": 1993230,
+    "µ┤╗õ©ïÕÄ╗": {
+      "steam_appid": 1151610
+    },
+    "µ║¬ÚúÄÞ░Àõ╣ïµêÿ(roguelike moba game)": {
+      "steam_appid": 1513250,
       "engine": "Unity"
     },
-    "µóàÕíöþë╣ÚÜå Metatron": {
-      "steam_appid": 993980
-    },
-    "µóªõ©ëÞï▒Úøäõ╝á": {
-      "steam_appid": 907320
-    },
-    "µóªÕ╣╗þ│ûµ×£": {
-      "steam_appid": 1182080
-    },
-    "µóªµ£¼µùáÕ┐º": {
-      "steam_appid": 909020
-    },
-    "µóªµÂ»": {
-      "steam_appid": 1075120
-    },
-    "µóªµ║¬þö╗ÕØè / DreamGallery": {
-      "steam_appid": 1041310
-    },
-    "µ¿íµïƒÕ«ÂÞúàõ┐«": {
-      "steam_appid": 1065030
-    },
-    "µ¿¬µë½Õñ®õ©ïõ╣ïõ©çÕ╣┤Õ╝║ÞÇà": {
-      "steam_appid": 1219920
-    },
-    "µ®ÖÕñ®Òü«ÚèÇþ┐╝ ´¢×Òé╣Òé½ÒéñÒâ®Òâ│ÒâëÒü«Ú¡öÕÑ│Òü¿ÕÀ½ÕÑ│´¢×": {
-      "steam_appid": 793410
-    },
-    "µ¼óõ╣ÉÚÇùþùàµ»ÆTD": {
-      "steam_appid": 1219310
-    },
-    "µ¡ªÕäÆþ╗ÿÕìÀ - õ╣Øõ║öÞç│Õ░è": {
-      "steam_appid": 983060
-    },
-    "µ¡ªÕäÆþ╗ÿÕìÀ - ÕÉ»þñ║Õ¢ò": {
-      "steam_appid": 1204490,
-      "engine": "Unity"
-    },
-    "µ¡ªÚüôÕ░åÚ¡é": {
-      "steam_appid": 2068950
-    },
-    "µ¡ªÚüôµê░Õº¼ - ÕÑ│Õâò(µ¡ªÚüôµêªÕº½ - ÒâíÒéñÒâë / Budo Girl War - Maid)": {
-      "steam_appid": 1117040
+    "µ╝½µ¡ÑÞÇà The Walker": {
+      "steam_appid": 1189600
     },
     "µ▒ëµ£½µ▒éþöƒ": {
       "steam_appid": 1006800
@@ -197352,12 +197890,15 @@
     "µ▒ƒµ╣ûµ▒éþöƒ Ganghood Survival": {
       "steam_appid": 965080
     },
+    "µ▓ëþØíþÜäµ│òÕêÖ": {
+      "steam_appid": 965820
+    },
     "µ▓ëµÁ«´╝êSea of Craft´╝ë": {
       "steam_appid": 990920,
       "engine": "Unity"
     },
-    "µ▓ëþØíþÜäµ│òÕêÖ": {
-      "steam_appid": 965820
+    "µ▓íþî½þùàÕêÂõ¢£õ║║ / Psychosoft Ltd.": {
+      "steam_appid": 1009070
     },
     "µ▓ÖÕÀ┤Õàïõ╝áÕÑç": {
       "steam_appid": 1153870
@@ -197365,569 +197906,42 @@
     "µ▓ÖÚøòõ╣ïÞÀ»": {
       "steam_appid": 1092590
     },
-    "µ▓íþî½þùàÕêÂõ¢£õ║║ / Psychosoft Ltd.": {
-      "steam_appid": 1009070
-    },
-    "µ┤╗õ©ïÕÄ╗": {
-      "steam_appid": 1151610
-    },
-    "µÁüµ░ôÞ»╗ÕñºÕ¡ª liumang dudaxue": {
-      "steam_appid": 992630
-    },
-    "µÁ«õ©ûõ©çÕìâõ╣ïÕëìõ©ûõ╗èþöƒ": {
-      "steam_appid": 1217190
-    },
-    "µÁ┤ÞíÇµêÿÚ¡é": {
-      "steam_appid": 1211280
-    },
-    "µÁÀÕ║òÕ»╗Õ«Ø": {
-      "steam_appid": 936060
-    },
-    "µÂàµºâõ╣ïÞÀ»": {
-      "steam_appid": 1043760
-    },
-    "µÂêþü¡Ú¡öþÄïÕåø Destroy the demon army": {
-      "steam_appid": 1006170
-    },
-    "µÀ▒µÁÀ DEEPSEA": {
-      "steam_appid": 1061010
-    },
-    "µÀÀõ╣▒õ¢┐ÞÇà(Chaos Maker)": {
-      "steam_appid": 981140
-    },
-    "µ©©þë®Þ»¡ Travel story": {
-      "steam_appid": 1081900
-    },
-    "µ©©þª╗ÕñºÚÖå - Uniland": {
-      "steam_appid": 935970
-    },
-    "µ║¬ÚúÄÞ░Àõ╣ïµêÿ(roguelike moba game)": {
-      "steam_appid": 1513250,
-      "engine": "Unity"
-    },
-    "µ╝½µ¡ÑÞÇà The Walker": {
-      "steam_appid": 1189600
-    },
-    "þü½µƒ┤õ║║Þüöþøƒ2": {
-      "steam_appid": 1094010
-    },
-    "þü¡þÑ×": {
-      "steam_appid": 1153340
-    },
-    "þüÁÕ╣╗Õàêþöƒ : Þç┤µò¼õ©Çõ╗úÕâÁÕ░©ÚüôÚò┐´╝ü": {
-      "steam_appid": 1063340
-    },
-    "þüÁµûçÞÑ┐µ©©": {
-      "steam_appid": 832520
-    },
-    "þüÁþòî Sprites´╝êµÁïÞ»òþëê´╝ë": {
-      "steam_appid": 1043140
-    },
-    "þéÄÚ╗äµêÿþ║¬õ╣ïõ©ëÕø¢þâ¢þâƒ": {
-      "steam_appid": 590910
-    },
-    "þé╝ÕªûÞ«░": {
-      "steam_appid": 1147900
-    },
-    "þâêþä░µêÿþ║¬": {
-      "steam_appid": 835500
-    },
-    "þâ¡ÞíÇµ▓ÖÕƒÄ": {
-      "steam_appid": 1147420
-    },
-    "þâ¢þü½Õñºþºª": {
-      "steam_appid": 1157330
-    },
-    "þïÉÒü«µùàÞÀ»": {
-      "steam_appid": 1178050
-    },
-    "þï╝õ║║µØÇÕìòµ£║þëê": {
-      "steam_appid": 1065960
-    },
-    "þîÄÚ¡öÞÇàµêÿþ║¬": {
-      "steam_appid": 1066290
-    },
-    "þîÑþÉÉÕÉº´╝üÕÉÄÕ«½õ¢úÕàÁÕøó": {
-      "steam_appid": 657320
-    },
-    "þÄäÕ░ÿõ╗ÖÚÇö": {
-      "steam_appid": 1169790
-    },
-    "þÄïÕø¢Õç║Õç╗": {
-      "steam_appid": 698920
-    },
-    "þÄïÕø¢Õ╣╗Õóâ fantastic kingdom": {
-      "steam_appid": 1097550
-    },
-    "þÄïþëîÞê░Úò┐": {
-      "steam_appid": 681010
-    },
-    "þÄïÞÇàµêÿÞ¢ª": {
-      "steam_appid": 987980
-    },
-    "þÄïÞÇàÞï▒Úøä The Great Hero": {
-      "steam_appid": 930330
-    },
-    "þöƒþë®ÕñºÕåÆÚÖ®": {
-      "steam_appid": 1211270
-    },
-    "þöƒþë®þƒÑÞ»åµá╝µûùÕñºÞÁø": {
-      "steam_appid": 1193350
-    },
-    "þöÁþ¡Æõ¥á": {
-      "steam_appid": 1126230
-    },
-    "þö╗µ▒ƒµ╣ûõ╣ïµØ»ÞÄ½Õü£": {
-      "steam_appid": 1345730
-    },
-    "þûæþè»Õ»╗Þ©¬ In Pursuit": {
-      "steam_appid": 1036190
-    },
-    "þû»þïéþÜäÕØªÕàï": {
-      "steam_appid": 1143560
-    },
-    "þùàµ»ÆµüÂÕîû": {
-      "steam_appid": 1036120
-    },
-    "þÖ¢þƒ│µ┤▓Õ¥Çõ║ï": {
-      "steam_appid": 1101980
-    },
-    "þÖ¥Þè▒õ©ëÕø¢Õ┐ù(Banner of the THREE KINGDOMS)": {
-      "steam_appid": 1137160
-    },
-    "þÜôµ£êþ®║ÕìÄ": {
-      "steam_appid": 974200
-    },
-    "þøøõ©ûõ╝áÕÑç": {
-      "steam_appid": 1180460
-    },
-    "þ£ïõ©ìÞºüþÜäþê▒": {
-      "steam_appid": 1121980
-    },
-    "þ£ƒÚ¥Öõ©╗Õ«░": {
-      "steam_appid": 1201920
-    },
-    "þ×│´╝ÜþÑêµä┐ VR / Pupil: Wandering VR": {
-      "steam_appid": 773460,
-      "engine": "Unreal Engine 4"
-    },
-    "þá┤þóÄµ│òµ£»": {
-      "steam_appid": 1124740
-    },
-    "þóºÞÉ¢õ╝áÞ»┤": {
-      "steam_appid": 973560
-    },
-    "þñÄÒü«µÑ» -AEGIS-": {
-      "steam_appid": 1039550
-    },
-    "þñ¥þ¿Àþ╗êõ║ÄÕ╣╗µâ│ ~ A Finality with Sheji": {
-      "steam_appid": 992750
-    },
-    "þÑêÚó¿ Inorikaze": {
-      "steam_appid": 992740
-    },
-    "þÑøÚ¡à┬ÀÕàÑþü¡´╝êþÑøÚ¡à2´╝ë - Disenchantment Nirvana": {
-      "steam_appid": 972200
-    },
-    "þÑøÚ¡à┬ÀµòÖÕîû´╝êþÑøÚ¡à1´╝ë": {
-      "steam_appid": 850820
-    },
-    "þÑ×õ╗ÖÕÉìÕìò": {
-      "steam_appid": 1180390
-    },
-    "þÑ×Õø¢´╝ÜÕêøÚÇá": {
-      "steam_appid": 1185600
-    },
-    "þÑ×µêÆ": {
-      "steam_appid": 1219930
-    },
-    "þÑ×µÿÄÕ£¿õ©è": {
-      "steam_appid": 1000080
-    },
-    "þÑ×µ×¬Õ░æÕÑ│": {
-      "steam_appid": 1181450
-    },
-    "þÑ×Þ░ï": {
-      "steam_appid": 1093900
-    },
-    "þÑ×Ú®¼µ▒ƒµ╣û": {
-      "steam_appid": 1012130
-    },
-    "þÑ¡ÕúçÒü«Þè▒/Saidan no Hana": {
-      "steam_appid": 1128150
-    },
-    "þ¼ªµûçÕÑ│Õ¡®/Rune Girl": {
-      "steam_appid": 1083210,
-      "engine": "Unity"
-    },
-    "þ¼¼Õøøþ®║Úù┤Fourth Space": {
-      "steam_appid": 1065250
-    },
-    "þ¡öÚóÿÞï▒Úøä--þ╗åÞâ×þöƒþë®Õ¡ª": {
-      "steam_appid": 1011860
-    },
-    "þ»«þÉâÞ«íÕêÆ Project Dunk": {
-      "steam_appid": 1110830
-    },
-    "þ│ûµ×£Õ║ùþë®Þ»¡": {
-      "steam_appid": 780970
-    },
-    "þ║óÚ¡öõ║ïõ╗Âþ░┐ The Note of Red Evil": {
-      "steam_appid": 1211350,
-      "engine": "RPG Maker"
-    },
-    "þ║ªõ╝Üõ©ûþòî~The dating world": {
-      "steam_appid": 989000
-    },
-    "þ║ªµïìÕÑ│þÑ× Private Model": {
-      "steam_appid": 1064860
-    },
-    "þ║©õ║║´╝Üþ¼¼õ©Çþ½á Paper Dolls Original": {
-      "steam_appid": 1051310
-    },
-    "þ║©þëçõ║║3D": {
-      "steam_appid": 831600
-    },
-    "þ╗åÞâ×µêÿõ║ë": {
-      "steam_appid": 1000040,
-      "engine": "Unity"
-    },
-    "þ╗Øµ£øþøæþëó / þÁÂµ£øÒâùÒâ¬Òé║Òâ│": {
-      "steam_appid": 1167790
-    },
-    "þ╗«þ¢ùÕøøµùÂÞ░¡": {
-      "steam_appid": 1172980
-    },
-    "þ¢¬þÜäþ¼¼õ©âþ½á": {
-      "steam_appid": 1200200
-    },
-    "þ¥Äõ©¢µû░õ©ûþòîi Brave New World i": {
-      "steam_appid": 895920
-    },
-    "þ¥ÄÕ░æÕÑ│ÕñÅµùÑµ¼óõ╣É!": {
-      "steam_appid": 835040
-    },
-    "þ¥ÄÕ░æÕÑ│Ú║╗Õ░åµÄÑÚ¥Ö": {
-      "steam_appid": 908350
-    },
-    "þ┐öþÜäÕáòÞÉ¢õ║║þöƒ": {
-      "steam_appid": 1030280
-    },
-    "ÞÇüµØ┐µö╗þòÑ": {
-      "steam_appid": 1115020
-    },
-    "ÞÇüÞÖÄµ©©µêÅ": {
-      "steam_appid": 887740
-    },
-    "ÞüûÕëúÒâ¼ÒéñÒâ┤Òâ®Òâ│ÒéÀÒâ½þë®Þ¬×": {
-      "steam_appid": 729610,
-      "engine": "RPG Maker"
-    },
-    "ÞéÑÕò¥ÕñºÕåÆÚÖ®": {
-      "steam_appid": 1175940
-    },
-    "ÞéÑÞéÑÕñºõ¢£µêÿ fat battle": {
-      "steam_appid": 994250
-    },
-    "Þâ£Õê®Õì│µ¡úõ╣ë! / Victory is justice´╝ü": {
-      "steam_appid": 1058910,
-      "engine": "Unity"
-    },
-    "Þà¥ÞÁÀõ╣ïÞøç": {
-      "steam_appid": 1155730
-    },
-    "Þë¥µü®µ┤øõ║Ü´╝Üþé╝ÚçæÞÁÀµ║Éõ╣ïþ½á": {
-      "steam_appid": 1220670
-    },
-    "ÞïìÕñ£": {
-      "steam_appid": 923400
-    },
-    "Þï▒Þ»¡µØÇ": {
-      "steam_appid": 934710
-    },
-    "Þï▒Úøäþ¥ñõ¥áõ╝á": {
-      "steam_appid": 1102980
-    },
-    "Þï▒Úøäþ¥ñõ¥áõ╝áII": {
-      "steam_appid": 1115640
-    },
-    "ÞîëÞÄëõ╣ïÕñÅ Jasmine Summer": {
-      "steam_appid": 913160
-    },
-    "ÞìÆÕ▓øµ▒éþöƒ": {
-      "steam_appid": 1152250
-    },
-    "ÞìÆµ╝áµ▒éþöƒ": {
-      "steam_appid": 880620
-    },
-    "ÞìÆÚçÄÕñºÞø«þÑ×": {
-      "steam_appid": 998150
-    },
-    "ÞìÆÚçÄÕ»╗Þ©¬": {
-      "steam_appid": 855670
-    },
-    "ÞÄ½µ»öõ╣îµû»õ╣ïþÄ»-õ©ìÕ▒×õ║Äõ╗╗õ¢òõ║║þÜäõ║ñÕôìµé▓µ¡î-MOBIUS & ELEGY BELONGS TO NOBODY": {
-      "steam_appid": 1094320
-    },
-    "ÞÉîÕ¿ÿµêÿÞ«░": {
-      "steam_appid": 1052430
-    },
-    "ÞÉ¢ÕìÄÕ▒à": {
-      "steam_appid": 1133610
-    },
-    "ÞÉ¢Õ░ÿõ╣ïÕƒƒ": {
-      "steam_appid": 985820
-    },
-    "ÞôØÕ«Øþƒ│Þê¼þÜäÞó½Õ«│Õªäµâ│Õ░æÕÑ│": {
-      "steam_appid": 970510
-    },
-    "ÞöÜÞôØµ£êõ©ï": {
-      "steam_appid": 964970
-    },
-    "ÞíÇÞàÑõ╣ïµùÑ228-Vampire Martina-Bloody Day 2.28": {
-      "steam_appid": 1060360
-    },
-    "Þíîþòî´╝ÜÚüù WENT:OneAlive": {
-      "steam_appid": 1005560
-    },
-    "ÞíùÕñ┤Þï▒Úøä": {
-      "steam_appid": 924500
-    },
-    "Þíùµ£║õ╣ïõ©ëÕø¢µê░Þ¿ÿ": {
-      "steam_appid": 2086830
-    },
-    "Þó½ÞÖ½Õ¿ÿÕà╗Þé▓þØÇþ╣üµ«ûÕÉÄõ╗ú": {
-      "steam_appid": 1020060
-    },
-    "Þúüµ▒║ÞÇà -The White Butcher-": {
-      "steam_appid": 758270
-    },
-    "Þªçþ£îÒéÆµÅíÒéî ´¢×47Úâ¢ÚüôÕ║£þ£îÕñºµêª´¢×": {
-      "steam_appid": 928690
-    },
-    "ÞºàÚò┐þöƒ": {
-      "steam_appid": 1189490
-    },
-    "Þ«░Õ┐åÚçìµ×ä/Memories": {
-      "steam_appid": 1015020
-    },
-    "Þ«░Õ┐åÚçìþÄ░/Rememory": {
-      "steam_appid": 1158840
-    },
-    "Þ»øþÑ×õ╣¥ÕØñ": {
-      "steam_appid": 1146040
-    },
-    "Þ»Àþ╗Öµêæõ¢áþÜäÞâûµ¼í´╝îÞ«®µêæµï»µòæõ©ûþòî": {
-      "steam_appid": 1049620
-    },
-    "Þ┤ñÞÇàµî¢µ¡îõ╣ïÚ®¼þòÑÕìíÕìÅÕÑÅµø▓": {
-      "steam_appid": 745820
-    },
-    "Þ┤ÑÕ«Âõ╗ö Last Wish": {
-      "steam_appid": 952850
-    },
-    "ÞÁ½þéÄþÜäÕì░ÕèáÞ»║Õàï Fullvoice ReBORN": {
-      "steam_appid": 982400
-    },
-    "ÞÂàþ║ºµ£║þö▓µêÿõ║ëOL": {
-      "steam_appid": 1138620
-    },
-    "ÞÂàÚƒ│þÑ×µ¿éÒÇèõ©âÚƒ│Õ£ûÚ¿░þ»çÒÇï- UltraKagura -": {
-      "steam_appid": 925120
-    },
-    "ÞÀ│ÞÀ│ÕñºÕÆû": {
-      "steam_appid": 1000110,
-      "engine": "Unity"
-    },
-    "Þ¢╗µóªÞ░¡ - þô«õ╣ïþ»ç -": {
-      "steam_appid": 1214720
-    },
-    "Þ¥úµØíµØéÞ┤ºÕ║ù:Õø×Õê░1997´╝îµêæÕ¢ôÕ░ÅÕòåÞ┤®": {
-      "steam_appid": 687650,
-      "engine": "Unity"
-    },
-    "Þ┐ÀÕ«½µêÿõ║ë(Maze Wars)": {
-      "steam_appid": 1037950
-    },
-    "Þ┐ÀÚø¥ The Mist": {
-      "steam_appid": 1048470
-    },
-    "ÚÇÇõ╝æµ¿íµïƒÕÖ¿": {
-      "steam_appid": 1220840
-    },
-    "ÚÇÇÕ╗âµÇØÞÇâ": {
-      "steam_appid": 1205160
-    },
-    "ÚÇâÚøóÕ£░þìäÚéèþÀú - Escape from the cursed convent": {
-      "steam_appid": 1142740
-    },
-    "ÚÇìÚüÑõ┐«þ£ƒ": {
-      "steam_appid": 1983840
-    },
-    "ÚÇìÚüÑµ©©": {
-      "steam_appid": 2004780
-    },
-    "ÚÇØÕÄ╗þÜäÕø×Õ┐å3´╝ÜÕøøÕÅÂÞìëõ╣ïµóª": {
-      "steam_appid": 1109130
-    },
-    "ÚüáÕÅñÕñºÚÖ©ÕñûÕé│-ÕÅñÚüôþÜäþøíÚá¡": {
-      "steam_appid": 1169460
-    },
-    "Úéúþ¥ÄÕàïµÿƒõ║║": {
-      "steam_appid": 1214210
-    },
-    "Úé╗Õ▒àÕñºÕÅö/UncleNeighbor:uncle Dating Simulator": {
-      "steam_appid": 1177420
-    },
-    "Úâ¿ÞÉ¢õ©ÄÕ╝»ÕêÇ": {
-      "steam_appid": 1094520
-    },
-    "Úâ¢Õ©éµüÉµÇûµòàõ║ï": {
-      "steam_appid": 1048320
-    },
-    "ÚàÆÕ║ù": {
-      "steam_appid": 934810
-    },
-    "ÚàÆÕ║ùõ║î The Hotel 2": {
-      "steam_appid": 1077540
-    },
-    "ÚàöÒüäÒü®ÒéîÒé»ÒéñÒé║show µ¿ÖÚìø": {
-      "steam_appid": 1037270
-    },
-    "ÚçìþöƒÞ¢«Õø×/Reborn Not Again": {
-      "steam_appid": 1068190
-    },
-    "Úò┐Õñ® Long Sky": {
-      "steam_appid": 1043030
-    },
-    "Úò┐µ¡îÞíî": {
-      "steam_appid": 1223850
-    },
-    "ÚûâÚø╗Õ░ìµ▒║Lightning Wings II": {
-      "steam_appid": 1124850
-    },
-    "Úÿ┐µ»öµû»þÜäÕ«ØÞùÅTreasure of abyss": {
-      "steam_appid": 932570
-    },
-    "Úÿ┐µ┤Ñ": {
-      "steam_appid": 1036960
-    },
-    "Úÿ┐Þ¥¥õ©ëÕø¢Õ┐ù2018": {
-      "steam_appid": 910320
-    },
-    "ÚÖåÕñºÞ┐╣þÑ×Ôàí": {
-      "steam_appid": 1220880
-    },
-    "ÚÜÉ-Stealth": {
-      "steam_appid": 800170
-    },
-    "ÚÜÉþºÿþÜäÞºÆÞÉ¢": {
-      "steam_appid": 2071200
-    },
-    "ÚøÇÕº¼": {
-      "steam_appid": 1084520
-    },
-    "Úø¬┬Àþûæ": {
-      "steam_appid": 1001010
-    },
-    "Úø¬þ¡ûÞ¥╣Õóâ": {
-      "steam_appid": 979500
-    },
-    "Úø¬Ú╣░Úóåõ©╗": {
-      "steam_appid": 1114050
-    },
-    "ÚøÂõ©ïÞ«░Õ┐å": {
-      "steam_appid": 1166050
-    },
-    "ÚøÂµÇ¿ The curse of the deab": {
-      "steam_appid": 1221420
-    },
-    "ÚøÂþòîµêÿþ║┐": {
-      "steam_appid": 1195870
-    },
-    "Ú£ÄµùÂµÖ┤Þì½": {
-      "steam_appid": 883870
-    },
-    "ÚØÆÕ▓ÜÞíÇµ×½": {
-      "steam_appid": 1103620
-    },
-    "ÚØÆÞøÖÞÀ│µ¿íµïƒÕÖ¿": {
-      "steam_appid": 1013890
-    },
-    "ÚØ×õ©ÇÞê¼ÞüîÕ£║": {
-      "steam_appid": 1163140
-    },
-    "ÚíÂÚà▒": {
-      "steam_appid": 1117210
-    },
-    "ÚúÄµÜ┤Õ▓ø": {
-      "steam_appid": 769720
-    },
-    "ÚúÄµÁüÕêÇÕ«ó": {
-      "steam_appid": 1209000
-    },
-    "ÚªÖÕ▒▒31ÕÅÀ": {
-      "steam_appid": 1110230
-    },
-    "ÚªÖµ▒ƒõ╣ïÚ¥Ö´╝îDragon of Hongkong": {
-      "steam_appid": 1126430
-    },
-    "Ú¬æÕú½õ©ÄÚ¡öµ│òµêÿõ║ë": {
-      "steam_appid": 965180
-    },
-    "Ú¬░Õ¡ÉÕïçÕú½ Dice Warrior": {
-      "steam_appid": 924710
-    },
-    "Ú½ÿÞÇâÕÀÑÕÄéµ¿íµïƒ(Crazy School Simulator)": {
-      "steam_appid": 1011230
-    },
-    "Ú½ÿÞâ¢Õ░ÅÚÿƒ Superpower Squad": {
-      "steam_appid": 1179730
-    },
-    "Ú¼╝Õ▒▒": {
-      "steam_appid": 682490,
-      "engine": "Unity"
-    },
-    "Ú¼╝þò£ÕñºÕåÆÚÖ® Gui Chu Da Mao Xian": {
-      "steam_appid": 668680
-    },
-    "Ú¡öÕíö2018": {
-      "steam_appid": 948770
-    },
-    "Ú¡öþë®Õ¿ÿþë®Þ»¡": {
-      "steam_appid": 835530
-    },
-    "Ú¡öþë®Þ«¿õ╝ÉÕøó": {
-      "steam_appid": 905690,
+    "─îernaja Metka": {
+      "dx9": true
+    },
+    "├£berSoldier": {
+      "steam_appid": 2905090,
+      "dx9": true,
+      "config_path": "<path-to-game>\\config.ini",
+      "engine": "X-tend"
+    },
+    "├£berSoldier II": {
+      "steam_appid": 281410,
+      "config_path": "%USERPROFILE%\\Documents\\US2\\",
+      "engine": "X-tend"
+    },
+    "├ëlan Vital": {
+      "steam_appid": 1017690
+    },
+    "├ët├®": {
+      "steam_appid": 1065070
+    },
+    "├öpe": {
+      "steam_appid": 1170200
+    },
+    "├ûoo": {
+      "steam_appid": 2721890,
+      "config_path": "%LOCALAPPDATA%\\Ooo\\option.bin",
       "engine": "GameMaker"
     },
-    "Ú¡öÞúàÞíôÕ©½ÒéóÒé½Òâì": {
-      "steam_appid": 880320
+    "┬íZombies! : Faulty Towers": {
+      "steam_appid": 451590
     },
-    "Ú©┐Úù¿õ©ÇÕ«┤(Malicious Dinner) õ©¡Þï▒": {
-      "steam_appid": 1091520
-    },
-    "Ú║╗þÑ×µÂêµÂêõ╣É": {
-      "steam_appid": 1063330
-    },
-    "Ú╗ÄµÿÄÚ£×Õàë": {
-      "steam_appid": 1130900
-    },
-    "Ú╗æµÜùµûÖþÉå?!": {
-      "steam_appid": 970530
-    },
-    "ÙêäÛ░Ç ÛÀ©ÙàÇÙÑ╝ ýú¢ýÿÇÙéÿ": {
-      "steam_appid": 1054520
-    },
-    "Ù¼┤ýù░": {
-      "steam_appid": 1077560
-    },
-    "ýòöýáä:Blackout": {
-      "steam_appid": 871810
-    },
-    "´╝£/reality´╝×": {
-      "steam_appid": 562280,
-      "engine": "Ren'Py"
+    "╬öV: Rings of Saturn": {
+      "steam_appid": 846030,
+      "opengl": true,
+      "config_path": "%APPDATA%\\dV\\settings.cfg",
+      "engine": "Godot"
     }
   }
 }
