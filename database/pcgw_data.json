@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "game_count": 55352,
-  "generated": "2026-10-01T19:25:00Z",
+  "game_count": 55360,
+  "generated": "2026-10-03T04:42:36Z",
   "name_overrides": {
     "ACE COMBAT 8: WINGS OF THEVE": "Ace Combat 8: Wings of Theve",
     "AFOP": "Avatar: Frontiers of Pandora",
@@ -3427,7 +3427,8 @@
       "engine": "Unreal Engine 5"
     },
     "Ace Combat Zero: The Belkan War": {
-      "steam_appid": 3635880
+      "steam_appid": 3635880,
+      "config_path": "<path-to-game>\\ACE COMBAT 8\\ACZero\\settings\\setting.ini"
     },
     "Ace Combat: Assault Horizon - Enhanced Edition": {
       "steam_appid": 228400,
@@ -7585,6 +7586,9 @@
     "Am I Nima": {
       "steam_appid": 3224600,
       "engine": "Unity"
+    },
+    "AMA Superbike": {
+      "config_path": "<path-to-game>\\d3d.ini, <path-to-game>\\ControlMap.ini, <path-to-game>\\CommandMap.ini, <path-to-game>\\game.ini"
     },
     "Amairo Chocolate": {
       "steam_appid": 1238680
@@ -12767,7 +12771,8 @@
     "Atelier Ryza 3: Alchemist of the End & the Secret Key DX": {
       "steam_appid": 3365050,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\KoeiTecmo\\Atelier Ryza 3 DX\\<user-id>\\"
+      "config_path": "%LOCALAPPDATA%\\KoeiTecmo\\Atelier Ryza 3 DX\\<user-id>\\",
+      "engine": "Katana Engine"
     },
     "Atelier Ryza: Ever Darkness & the Secret Hideout": {
       "steam_appid": 1121560,
@@ -15645,6 +15650,7 @@
       "engine": "Eclipse Engine"
     },
     "Barbie Sparkling Ice Show": {},
+    "Barbie Storymaker": {},
     "Barbie: Project Friendship": {
       "steam_appid": 2478330,
       "dx11": true,
@@ -32994,6 +33000,9 @@
       "config_path": "<path-to-game>\\c4.cfg",
       "engine": "Black Hawk Engine"
     },
+    "Comanche Gold": {
+      "engine": "Voxel Space 2"
+    },
     "Comanche: Maximum Overkill": {},
     "Comatose": {
       "steam_appid": 3301370,
@@ -40315,6 +40324,7 @@
       "engine": "Unreal Engine 4"
     },
     "Dawn of Magic": {
+      "steam_appid": 4938460,
       "config_path": "<path-to-game>\\tbm.ini",
       "engine": "TheEngine"
     },
@@ -40518,6 +40528,11 @@
     "Days Under Custody": {
       "steam_appid": 412730,
       "engine": "NW.js"
+    },
+    "Days Without Incident": {
+      "steam_appid": 3593490,
+      "dx11": true,
+      "engine": "Unity"
     },
     "Daytona Championship USA": {},
     "Daytona Racing": {
@@ -43840,7 +43855,8 @@
     },
     "Despicable Me: Minion Rush": {
       "dx9": true,
-      "config_path": "%LOCALAPPDATA%\\Packages\\GAMELOFTSA.DespicableMeMinionRush_0pp20fcewvvtj\\LocalState"
+      "config_path": "%LOCALAPPDATA%\\Packages\\GAMELOFTSA.DespicableMeMinionRush_0pp20fcewvvtj\\LocalState",
+      "engine": "Jet Engine"
     },
     "Despoiler": {
       "steam_appid": 635050
@@ -52999,6 +53015,10 @@
     "Elsword": {
       "steam_appid": 558230
     },
+    "Elta: Defy All Gods": {
+      "steam_appid": 2659410,
+      "engine": "Unreal Engine 5"
+    },
     "Elteria Adventures": {
       "steam_appid": 744200
     },
@@ -60931,6 +60951,8 @@
     },
     "Firmament": {
       "steam_appid": 754890,
+      "dx11": true,
+      "dx12": true,
       "config_path": "%LOCALAPPDATA%\\Firmament\\Saved\\Config\\WindowsNoEditor",
       "engine": "Unreal Engine 4"
     },
@@ -66746,7 +66768,7 @@
     "Gears of War: E-Day": {
       "steam_appid": 3010850,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\FairlightConcept\\Saved\\Config\\",
+      "config_path": "%LOCALAPPDATA%\\Microsoft\\Gears of War E-Day\\Saves\\",
       "engine": "Unreal Engine 5"
     },
     "Gears of War: Reloaded": {
@@ -73097,7 +73119,9 @@
       "config_path": "<path-to-game>\\dewrito_prefs.cfg",
       "engine": "Halo Engine"
     },
-    "Halo Recruit": {},
+    "Halo Recruit": {
+      "dx12": true
+    },
     "Halo Wars 2": {
       "dx12": true,
       "engine": "Phoenix (Ensemble Studios)"
@@ -94107,6 +94131,8 @@
     },
     "Limbus Company": {
       "steam_appid": 1973530,
+      "dx11": true,
+      "dx12": true,
       "config_path": "HKEY_CURRENT_USER\\Software\\ProjectMoon\\LimbusCompany",
       "engine": "Unity"
     },
@@ -113975,6 +114001,10 @@
     },
     "Nubla": {
       "steam_appid": 1101000
+    },
+    "Nubs! Arena": {
+      "steam_appid": 2337860,
+      "engine": "Unity"
     },
     "Nubs' Adventure": {
       "steam_appid": 401280
@@ -183737,6 +183767,10 @@
       "engine": "Unreal Engine 4"
     },
     "Valkyrie no Densetsu": {},
+    "Valkyrie Saga": {
+      "steam_appid": 2663150,
+      "engine": "Godot"
+    },
     "Valkyrius Prime": {
       "steam_appid": 493670,
       "config_path": "%USERPROFILE%\\Documents\\SavedGames\\Valkyrius Prime\\Valkyrius Prime Data\\Player*\\settings.sav",
@@ -190285,6 +190319,10 @@
     },
     "Wild Arena": {
       "steam_appid": 533280
+    },
+    "Wild Assault": {
+      "steam_appid": 2827230,
+      "engine": "Unreal Engine 5"
     },
     "Wild Blue Skies": {
       "steam_appid": 1921490,
