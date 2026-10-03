@@ -1,6 +1,11 @@
 # RHI — ReShade HDR Installer
 
+[![Build RHI zh-CN](https://github.com/DC1024/RHI/actions/workflows/build-zh-cn.yml/badge.svg)](https://github.com/DC1024/RHI/actions/workflows/build-zh-cn.yml)
+
 > ## 🇨🇳 Fork 说明 / Fork notice
+>
+> **下载中文版**：[Releases 页面](https://github.com/DC1024/RHI/releases/latest) → `RHI-zh-CN-*-win-x64.zip`
+> （解压后运行 `RHI.exe`，请整目录解压）。每次打 `v*` 标签由 GitHub Actions 自动构建发布。
 >
 > 本仓库是 [RankFTW/RHI](https://github.com/RankFTW/RHI) 的非官方分支，**唯一改动是增加简体中文界面**，
 > 其余代码保持与上游同步。上游原作者不参与本分支，官方暂未提供中文支持（见 upstream issue #5 / #25 / #68，

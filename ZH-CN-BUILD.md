@@ -1,5 +1,19 @@
 # RHI 简体中文自建版 · 使用与维护说明
 
+## 直接下载（不用自己编）
+
+<https://github.com/DC1024/RHI/releases/latest> → `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB），
+附同名 `.sha256` 校验文件。产物由 `.github/workflows/build-zh-cn.yml` 在打 `v*` 标签时自动构建发布。
+
+发新版只需：
+
+```bash
+git tag -a v2.8.1-zh-cn-2 -m "说明"
+git push <remote> v2.8.1-zh-cn-2     # CI 自动构建 + 发 Release
+```
+
+下面是手工构建的方式，CI 用的也是同一套命令。
+
 本目录是把社区 PR [RankFTW/RHI#20](https://github.com/RankFTW/RHI/pull/20)（作者 HexBen123）的简体中文方案，
 rebase 到 `RankFTW/RHI` main 分支 v2.8.1 Beta 3 之后的本地构建。官方仓库至今没有合并任何中文 PR。
 
