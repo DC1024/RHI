@@ -1694,10 +1694,7 @@
                                 Visibility="Collapsed"
                                 Background="{StaticResource SurfaceRaisedBrush}" CornerRadius="10" Padding="20,16"
                                 BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1">
-                            <StackPanel Spacing="12">
-                                <TextBlock Text="RenoDX Data Source" FontSize="15" FontWeight="Bold"
-                                           Foreground="{StaticResource TextPrimaryBrush}"/>
-                                <Grid ColumnSpacing="0" RowSpacing="0">
+                            <Grid ColumnSpacing="0" RowSpacing="0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
@@ -1787,7 +1784,6 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
-                            </StackPanel>
                         </Border>
 
                         <!-- ══════════════════════════════════════════════════════════
