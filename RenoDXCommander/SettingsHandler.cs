@@ -158,6 +158,9 @@ public class SettingsHandler
         // Initialize component auto-update combo
         _window.AutoUpdateComponentsCombo.SelectedIndex = ViewModel.Settings.AutoUpdateComponents ? 1 : 0;
 
+        // Initialize background update checks combo
+        _window.BackgroundUpdateChecksCombo.SelectedIndex = ViewModel.Settings.BackgroundUpdateChecks == "Minimal" ? 1 : 0;
+
         // Initialize HDR auto-toggle combo
         _window.HdrAutoToggleCombo.SelectedIndex = ViewModel.Settings.HdrAutoToggle ? 1 : 0;
 

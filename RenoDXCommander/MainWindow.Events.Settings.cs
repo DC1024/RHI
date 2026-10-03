@@ -1218,6 +1218,13 @@ public sealed partial class MainWindow
         ViewModel.SaveSettingsPublic();
     }
 
+    private void BackgroundUpdateChecksCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is not ComboBox combo || combo.SelectedIndex < 0) return;
+        ViewModel.Settings.BackgroundUpdateChecks = combo.SelectedIndex == 1 ? "Minimal" : "On";
+        ViewModel.SaveSettingsPublic();
+    }
+
     private void HdrAutoToggleCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ComboBox combo || combo.SelectedIndex < 0) return;

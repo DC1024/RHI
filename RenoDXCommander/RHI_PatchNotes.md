@@ -11,6 +11,7 @@
 - **Streamline deployment now includes nvngx_dlssg.dll** — copied into the OptiScaler/Streamline/ subfolder on every Streamline deploy for FG support.
 - **OptiScaler Nightly FG cog** — three new Frame Generation settings: FG Enabled (on/off master switch), Force Reflex, and Use Games Reflex Markers. Changes write to OptiScaler.ini immediately.
 - **Neural Rendering remove button** is now a ✕ red icon with the ⚙ cog always shown beside it, matching the Extras section style.
+- **Background Update Checks** — new setting in the Updates section of Settings. "On" (default) keeps the current behaviour: full update checks on startup and every 4 hours, including Nexus Mods. "Minimal" restricts automatic background checks to manifest fetches only — Nexus Mods queries only fire when you explicitly click Refresh or Update All.
 
 ### Bug Fixes
 
@@ -18,6 +19,9 @@
 - Fixed a permanent freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The NR section was using the same star-column grid layout that caused the NVIDIA panel freeze in v2.8.0. Fixed the same way — calculated fixed-pixel column widths.
 - Fixed the Extras and Neural Rendering sections overflowing their containers, pushing cog and ✕ buttons off-screen.
 - Fixed a UI deadlock that has caused the app to freeze completely on startup or after changing settings, particularly on games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR). The Settings panel initializes several NVIDIA driver combos (G-Sync indicator, G-Sync mode, VSync, etc.) and was accidentally writing those values back to the driver during initialization — before the protection flag was cleared. This write happened concurrently with the NVIDIA panel reading driver settings for the selected game, causing an unsynchronized concurrent NVAPI access that locked up the driver API and froze the UI. The protection flag now stays active until all NVIDIA combos are fully populated.
+
+**Privacy**
+- Session logs now sanitise paths before writing to disk — usernames are replaced with %USERPROFILE%, Steam user IDs in paths are masked, and Xbox package AUMIDs are truncated. Logs are local-only and never transmitted, but this keeps them clean.
 
 **DXVK**
 - Fixed the "Deploy dxvk.conf" button in the DXVK cog always deploying a generic conf. For Lilium HDR it now deploys the correct preset-specific content matching your selected preset.

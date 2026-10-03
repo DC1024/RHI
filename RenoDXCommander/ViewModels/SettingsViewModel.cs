@@ -63,6 +63,10 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>When true, silently installs component updates in the background after an update check.</summary>
     [ObservableProperty] private bool _autoUpdateComponents;
 
+    // ── Background Update Checks ──────────────────────────────────────────────
+    /// <summary>"On" = full background checks including Nexus (default). "Minimal" = manifest fetches only; Nexus calls only on explicit user action.</summary>
+    [ObservableProperty] private string _backgroundUpdateChecks = "On";
+
     // ── DLSS/Streamline Auto-Update ───────────────────────────────────────────
     [ObservableProperty] private bool _autoUpdateDlss;
     [ObservableProperty] private bool _autoUpdateStreamline;
@@ -323,6 +327,7 @@ public partial class SettingsViewModel : ObservableObject
             catch { PeakNitsPresets = new() { 1, 2, 3 }; }
         }
         if (s.TryGetValue("AutoUpdateComponents", out var aucVal)) AutoUpdateComponents = aucVal == "true";
+        if (s.TryGetValue("BackgroundUpdateChecks", out var bucVal) && !string.IsNullOrEmpty(bucVal)) BackgroundUpdateChecks = bucVal;
         if (s.TryGetValue("AutoUpdateDlss", out var audVal)) AutoUpdateDlss = audVal == "true";
         if (s.TryGetValue("AutoUpdateStreamline", out var ausVal)) AutoUpdateStreamline = ausVal == "true";
         if (s.TryGetValue("LastKnownNewestDlss", out var lkndVal)) LastKnownNewestDlss = lkndVal ?? "";
@@ -493,6 +498,7 @@ public partial class SettingsViewModel : ObservableObject
         else
             s.Remove("PeakNitsPresets"); // All 3 checked = default — remove stale non-default value
         if (AutoUpdateComponents) s["AutoUpdateComponents"] = "true"; else s.Remove("AutoUpdateComponents");
+        if (BackgroundUpdateChecks != "On") s["BackgroundUpdateChecks"] = BackgroundUpdateChecks; else s.Remove("BackgroundUpdateChecks"); // "On" is default — omit to keep file clean
         if (AutoUpdateDlss) s["AutoUpdateDlss"] = "true"; else s.Remove("AutoUpdateDlss");
         if (AutoUpdateStreamline) s["AutoUpdateStreamline"] = "true"; else s.Remove("AutoUpdateStreamline");
         if (!string.IsNullOrEmpty(LastKnownNewestDlss)) s["LastKnownNewestDlss"] = LastKnownNewestDlss;

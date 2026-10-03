@@ -136,7 +136,7 @@ public static class CrashReporter
     /// </summary>
     public static void Log(string message)
     {
-        var entry = $"[{DateTime.Now:HH:mm:ss.fff}] {message}";
+        var entry = $"[{DateTime.Now:HH:mm:ss.fff}] {SanitisePath(message)}";
         _breadcrumbs.Enqueue(entry);
 
         // Keep the buffer bounded
@@ -145,6 +145,36 @@ public static class CrashReporter
 
         // Always write to the session log file
         AppendSessionLog(entry);
+    }
+
+    /// <summary>
+    /// Removes personally identifiable information from log entries before writing to disk.
+    /// Replaces Windows usernames, Steam user IDs, and Xbox AUMIDs with safe placeholders.
+    /// </summary>
+    private static string SanitisePath(string message)
+    {
+        // Replace C:\Users\{username}\ with %USERPROFILE%\
+        message = System.Text.RegularExpressions.Regex.Replace(
+            message,
+            @"C:\\Users\\[^\\]+\\",
+            "%USERPROFILE%\\",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // Replace Steam userdata\{numericId}\ with userdata\[userid]\
+        message = System.Text.RegularExpressions.Regex.Replace(
+            message,
+            @"(userdata\\)\d+(\\)",
+            "$1[userid]$2",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // Truncate Xbox AUMIDs — keep only up to the last underscore segment (package family)
+        // e.g. Microsoft.ForteBaseGame_3.440.853.0_x64__8wekyb3d8bbwe → Microsoft.ForteBaseGame_[ver]
+        message = System.Text.RegularExpressions.Regex.Replace(
+            message,
+            @"(\\WindowsApps\\[^_]+)_[\d.]+_x64__\w+",
+            "$1_[ver]");
+
+        return message;
     }
 
     private static void AppendSessionLog(string entry)

@@ -1155,6 +1155,8 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0" Spacing="8">
                                         <TextBlock Text="Check For Updates" FontSize="13" FontWeight="SemiBold"
@@ -1169,6 +1171,16 @@
                                             CornerRadius="8" Padding="12,7" FontSize="12"
                                             HorizontalAlignment="Stretch"
                                             ToolTipService.ToolTip="Check all components and the app for available updates"/>
+                                    <TextBlock Grid.Row="2" TextWrapping="Wrap" FontSize="11"
+                                               Foreground="{StaticResource InlineDescriptionBrush}" LineHeight="18" Margin="0,8,0,0"
+                                               Text="Background Checks"/>
+                                    <ComboBox Grid.Row="3" x:Name="BackgroundUpdateChecksCombo" x:FieldModifier="internal"
+                                              FontSize="12" HorizontalAlignment="Stretch"
+                                              ToolTipService.ToolTip="On: all update checks run automatically on startup and every 4 hours, including Nexus Mods. Minimal: only manifest fetches run automatically — Nexus Mods checks only fire when you click Refresh or Update All."
+                                              SelectionChanged="BackgroundUpdateChecksCombo_SelectionChanged">
+                                        <ComboBoxItem Content="On"/>
+                                        <ComboBoxItem Content="Minimal"/>
+                                    </ComboBox>
                                 </Grid>
 
                                 <!-- Divider -->

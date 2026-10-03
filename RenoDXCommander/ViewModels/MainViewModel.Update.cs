@@ -1109,6 +1109,11 @@ public partial class MainViewModel
             }
         }
 
+        // Nexus GraphQL calls are gated by the "Background Update Checks" setting.
+        // "On" (default): full checks including Nexus. "Minimal": Nexus only on explicit user action.
+        // forceCheck = true when user clicks Refresh/Update All, so Nexus always runs on explicit action.
+        bool nexusEnabled = forceCheck || _settingsViewModel.BackgroundUpdateChecks == "On";
+
         // Patch RS record channels to reflect the current per-game override before the update check.
         // The update service uses card.RsRecord.Channel (not auxRecords) for the pinned-channel guard.
         // If the user changed the channel to Custom after the last install, the record's Channel
@@ -1144,7 +1149,8 @@ public partial class MainViewModel
         {
             _crashReporter.Log("[MainViewModel.CheckForUpdatesAsync] GitHub API rate limited — skipping remaining GitHub-based update checks");
 
-            // Still run the Nexus check (uses Nexus GraphQL API, not GitHub)
+            // Still run the Nexus check (uses Nexus GraphQL API, not GitHub) — only if background checks are enabled
+            if (nexusEnabled)
             try
             {
                 var nexusModsToCheck = cards
@@ -1186,6 +1192,7 @@ public partial class MainViewModel
             }
 
             // ── Nexus update check for Luma mods (rate-limited path) ─────────────
+            if (nexusEnabled)
             try
             {
                 var lumaModsToCheck = cards
@@ -1446,6 +1453,7 @@ public partial class MainViewModel
         }
 
         // ── Nexus Mods update check (external-only games with Nexus URLs) ─────────
+        if (nexusEnabled)
         try
         {
             // For external-only games, the Nexus URL is in ExternalUrl (set by manifest forceExternalOnly).
@@ -1491,6 +1499,7 @@ public partial class MainViewModel
         }
 
         // ── Nexus Mods update check for Luma mods ─────────────────────────────
+        if (nexusEnabled)
         try
         {
             var lumaModsToCheck = cards
