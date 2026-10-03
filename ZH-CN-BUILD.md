@@ -2,14 +2,19 @@
 
 ## 直接下载（不用自己编）
 
-<https://github.com/DC1024/RHI/releases/latest> → `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB），
-附同名 `.sha256` 校验文件。产物由 `.github/workflows/build-zh-cn.yml` 在打 `v*` 标签时自动构建发布。
+<https://github.com/DC1024/RHI/releases>（因为是 prerelease，`/releases/latest` 会 404，要点进去选最新的 `v*-zh-cn-*`）。
+每个版本两个包，都附同名 `.sha256` 校验文件：
+
+- `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB）—— 完整绿色版
+- `RHI-zh-CN-patch-<tag>.zip`（约 1.6MB）—— 中文补丁包，见下节
+
+产物由 `.github/workflows/build-zh-cn.yml` 在打 `v*` 标签时自动构建发布。
 
 发新版只需：
 
 ```bash
-git tag -a v2.8.1-zh-cn-2 -m "说明"
-git push <remote> v2.8.1-zh-cn-2     # CI 自动构建 + 发 Release
+git tag -a v2.8.1-zh-cn-3 -m "说明"
+git push <remote> v2.8.1-zh-cn-3     # CI 自动构建 + 发 Release
 ```
 
 ## 中文补丁包（给已装官方版的用户）

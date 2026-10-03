@@ -4,8 +4,12 @@
 
 > ## 🇨🇳 Fork 说明 / Fork notice
 >
-> **下载中文版**：[Releases 页面](https://github.com/DC1024/RHI/releases/latest) → `RHI-zh-CN-*-win-x64.zip`
-> （解压后运行 `RHI.exe`，请整目录解压）。每次打 `v*` 标签由 GitHub Actions 自动构建发布。
+> **下载中文版**：[Releases 页面](https://github.com/DC1024/RHI/releases)（选最新的 `v*-zh-cn-*`）。每次打 `v*` 标签由 GitHub Actions 自动构建发布，每个版本提供两个包：
+>
+> | 包 | 大小 | 适用 |
+> | --- | --- | --- |
+> | `RHI-zh-CN-<tag>-win-x64.zip` | 约 35 MB | **全新安装**：整目录解压后运行 `RHI.exe`（不要只拷 exe） |
+> | `RHI-zh-CN-patch-<tag>.zip` | 约 1.6 MB | **已装原版**：只含 `RHI.dll` + `resources.pri`，覆盖到安装目录即可变中文 |
 >
 > 本仓库是 [RankFTW/RHI](https://github.com/RankFTW/RHI) 的非官方分支，**唯一改动是增加简体中文界面**，
 > 其余代码保持与上游同步。上游原作者不参与本分支，官方暂未提供中文支持（见 upstream issue #5 / #25 / #68，
