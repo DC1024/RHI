@@ -1,12 +1,16 @@
-## v2.8.1 Beta 3
+⚠ **Sign in with GitHub — strongly recommended** — almost everything RHI downloads comes from GitHub: ReShade, RenoDX, OptiScaler, DLSS versions, shader packs, Luma mods, manifests, update checks, and more. Without a GitHub account connected, all of this shares a single limit of **60 requests per hour**. That quota runs out fast, and when it does, downloads silently fail — installs abort, update checks are skipped, and staging shows as unavailable with no obvious reason why. Signing in raises the limit to **5,000 requests per hour**.
+
+To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. Takes about 30 seconds.
+
+## v2.8.1
 
 ### New
-- **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder. The ⚙ cog lets you pick which version to deploy.
 - **Control Ultimate Edition — OptiScaler FG** — the install dialog has two new options: "Install OptiScaler FG" sets up OptiScaler Nightly for Frame Generation in one click (Streamline, DLL renames, and INI settings all handled), and "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset.
-- **GitHub API** — new section in Settings. Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour. Improves reliability of update checks, manifest fetches, and DLSS version lookups. Token is stored and applied automatically on launch.
-- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you prefer to check for updates manually.
+- **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder. The ⚙ cog lets you pick which version to deploy.
 - **Luma mod info on game card** — when Luma is installed, the installed addon filename (e.g. `Luma-Prey.addon`) now appears in the badge row alongside any RenoDX addon. Both the RenoDX and Luma mod authors are shown as separate badges (e.g. RenoDX: Marat · Luma: Pumbo). The card updates immediately after install without needing a refresh.
 - **Card layout** — store and engine badges are now right-aligned on the same row as the Launch button. Graphics API and bitness badges are right-aligned on the same row as the installed mod names.
+- **GitHub API** — new section in Settings. Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour. Improves reliability of update checks, manifest fetches, and DLSS version lookups. Token is stored and applied automatically on launch.
+- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you prefer to check for updates manually.
 
 ### Changes
 - **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions at a glance.
