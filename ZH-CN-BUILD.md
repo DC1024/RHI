@@ -6,7 +6,7 @@
 每个版本两个包，都附同名 `.sha256` 校验文件：
 
 - `RHI-zh-CN-<tag>-win-x64.zip`（约 35MB）—— 完整绿色版
-- `RHI-zh-CN-patch-<tag>.zip`（约 45MB）—— 中文补丁包，见下节
+- `RHI-zh-CN-patch-<tag>.zip`（约 34MB）—— 中文补丁包，见下节
 
 产物由 `.github/workflows/build-zh-cn.yml` 在打 `v*` 标签时自动构建发布。
 
