@@ -1255,7 +1255,10 @@
   "donationUrls": {
     "Bit Viper": "https://ko-fi.com/bitviper",
     "DristoforColumb": "https://ko-fi.com/dristoforcolumb",
+    "Ersh": "https://ko-fi.com/ershin",
     "Forge": "https://ko-fi.com/forge87682",
+    "HDR Den": "https://ko-fi.com/hdrden",
+    "Izueh": "https://ko-fi.com/izueh",
     "Jon": "https://ko-fi.com/kickfister",
     "Lilium": "https://ko-fi.com/endlesslyflowering",
     "Musa": "https://ko-fi.com/musaqh",
@@ -1265,12 +1268,18 @@
     "Ritsu": "https://ko-fi.com/ritsucecil",
     "ShortFuse": "https://ko-fi.com/shortfuse",
     "speedlemur": "https://ko-fi.com/speedlemur87816",
+    "souperman9": "https://ko-fi.com/souperman9",
+    "spiwar": "https://ko-fi.com/spiwar",
+    "vietnick": "https://ko-fi.com/vietnick",
     "Voosh": "https://ko-fi.com/notvoosh"
   },
   "authorRoles": {
     "Bit Viper": "RenoDX mods",
     "DristoforColumb": "RenoDX mods, Luma mods",
+    "Ersh": "Luma Framework, Luma mods",
     "Forge": "RenoDX mods",
+    "HDR Den": "The HDR Den",
+    "Izueh": "Luma mods",
     "Jon": "RenoDX mods, Luma mods",
     "Lilium": "Lilium HDR Shaders",
     "Musa": "RenoDX mods, Luma mods",
@@ -1280,6 +1289,9 @@
     "Ritsu": "RenoDX mods",
     "ShortFuse": "RenoDX, RenoDX mods",
     "speedlemur": "RenoDX mods",
+    "souperman9": "Switch emulator mods",
+    "spiwar": "RenoDX mods",
+    "vietnick": "RenoDX mods",
     "Voosh": "RenoDX mods"
   },
   "authorOverrides": {
