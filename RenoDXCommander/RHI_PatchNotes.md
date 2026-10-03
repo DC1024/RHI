@@ -1,4 +1,4 @@
-## v2.8.1 Beta 2
+## v2.8.1 Beta 3
 
 ### New
 - **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder — neither will remove it while the other still needs it. The ⚙ cog lets you pick which version to use, useful for games that work better with an older build.
