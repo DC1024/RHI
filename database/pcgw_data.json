@@ -539,7 +539,7 @@
     },
     "171": {
       "steam_appid": 1269370,
-      "config_path": "%LOCALAPPDATA%\\BGG\\Saved\\SaveGames\\Configuration*.sav",
+      "config_path": "%LOCALAPPDATA%\\BGG\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 5"
     },
     "1775: Rebellion": {
@@ -3943,7 +3943,7 @@
     },
     "Ad Infinitum": {
       "steam_appid": 1234430,
-      "config_path": "%LOCALAPPDATA%\\AdInfinitum\\Saved\\Config\\WindowsNoEditor\\Settings.ini",
+      "config_path": "%LOCALAPPDATA%\\AdInfinitum\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Ad movere": {
@@ -4475,7 +4475,7 @@
     },
     "Aegis Descent": {
       "steam_appid": 1251040,
-      "config_path": "%LOCALAPPDATA%\\Casper\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Casper\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Aegis of Earth: Protonovus Assault": {
@@ -7229,7 +7229,7 @@
     "Alone in the Dark (2024)": {
       "steam_appid": 1310410,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\AloneInTheDark\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\AloneInTheDark\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Alone in the Dark 2": {
@@ -10242,7 +10242,7 @@
     "Arcadegeddon": {
       "steam_appid": 1515640,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Arcade\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.sav",
+      "config_path": "%LOCALAPPDATA%\\Arcade\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Arcadia": {
@@ -11683,7 +11683,7 @@
     },
     "Asemblance": {
       "steam_appid": 452970,
-      "config_path": "%LOCALAPPDATA%\\HoloRoom9code\\Saved\\SaveGames\\GameVideoSave1.sav",
+      "config_path": "%LOCALAPPDATA%\\HoloRoom9code\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Asemblance: Oversight": {
@@ -12150,7 +12150,7 @@
     "Assetto Corsa Rally": {
       "steam_appid": 3917090,
       "dx12": true,
-      "config_path": "%USERPROFILE%\\AppData\\Local\\acr\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%USERPROFILE%\\AppData\\Local\\acr\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "ASTA": {
@@ -13954,7 +13954,7 @@
     },
     "Away: The Survival Series": {
       "steam_appid": 750200,
-      "config_path": "%LOCALAPPDATA%\\Away\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Away\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Awe": {
@@ -15963,7 +15963,7 @@
     },
     "Bassmaster Fishing 2022": {
       "steam_appid": 1449500,
-      "config_path": "C:\\Users\\<Username>\\AppData\\Local\\BassmasterFishing\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "C:\\Users\\<Username>\\AppData\\Local\\BassmasterFishing\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Bastard": {
@@ -16054,7 +16054,7 @@
     "Batman: Arkham VR": {
       "steam_appid": 502820,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\ArkhamVR\\Saved\\SaveGames\\BatmanVR_<user-id>.sav",
+      "config_path": "%LOCALAPPDATA%\\ArkhamVR\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Batman: The Caped Crusader": {},
@@ -16084,7 +16084,7 @@
       "steam_appid": 1506440,
       "dx11": true,
       "dx12": true,
-      "config_path": "%AppData%\\Local\\Batora\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%AppData%\\Local\\Batora\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "BATS: Bloodsucker Anti-Terror Squad": {
@@ -16582,7 +16582,7 @@
     "BattleCore Arena": {
       "steam_appid": 2613870,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\BattleCoreArena\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\BattleCoreArena\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 4"
     },
     "BATTLECREW Space Pirates": {
@@ -17371,7 +17371,7 @@
     "Beat Hazard 2": {
       "steam_appid": 618740,
       "opengl": true,
-      "config_path": "%USERPROFILE%\\Documents\\ColdBeamGames\\BeatHazard2\\settings2.dat",
+      "config_path": "%USERPROFILE%\\Documents\\ColdBeamGames\\BeatHazard2\\",
       "engine": "Unreal Engine 4"
     },
     "Beat Me!": {
@@ -17932,7 +17932,7 @@
     },
     "Ben and Ed": {
       "steam_appid": 395200,
-      "config_path": "<path-to-game>\\BenAndEd\\Saved\\SaveGames\\settings.sav",
+      "config_path": "<path-to-game>\\BenAndEd\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Ben and Ed - Blood Party": {
@@ -27613,7 +27613,7 @@
     },
     "Castle on the Coast": {
       "steam_appid": 1341900,
-      "config_path": "<path-to-game>\\CastleOnTheCoast\\Saved\\SaveGames\\settings.sav",
+      "config_path": "<path-to-game>\\CastleOnTheCoast\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Castle Rencounter": {
@@ -31879,7 +31879,7 @@
     "Cloudheim": {
       "steam_appid": 2070270,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\ProtoCat\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\ProtoCat\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Cloudlands 2": {
@@ -32228,7 +32228,7 @@
     "Code Vein II": {
       "steam_appid": 2362060,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\CodeVein2\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\CodeVein2\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Code World": {
@@ -33394,7 +33394,7 @@
     "Commandos: Origins": {
       "steam_appid": 1479730,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Commandos\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Commandos\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Commandos: Strike Force": {
@@ -39106,7 +39106,7 @@
     },
     "Dark and Light": {
       "steam_appid": 529180,
-      "config_path": "<path-to-game>\\DNL\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "<path-to-game>\\DNL\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Dark Angels: Masquerade of Shadows": {
@@ -40088,7 +40088,7 @@
     "Darwin's Paradox!": {
       "steam_appid": 2989180,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\DarwinParadox\\Saved\\SaveGames\\MainGame\\Steam\\DarwinsParadoxSettings.sav",
+      "config_path": "%LOCALAPPDATA%\\DarwinParadox\\Saved\\SaveGames\\MainGame\\Steam\\",
       "engine": "Unreal Engine 5"
     },
     "Darwin's Test": {
@@ -42306,13 +42306,13 @@
       "steam_appid": 548430,
       "dx11": true,
       "dx12": true,
-      "config_path": "<path-to-game>\\FSD\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "<path-to-game>\\FSD\\Saved\\Config\\WindowsNoEditor\\",
       "config_path_xbox": "<path-to-game>\\FSD\\Saved\\Config\\WinGDK\\*.ini",
       "engine": "Unreal Engine 4"
     },
     "Deep Rock Galactic: Rogue Core": {
       "steam_appid": 2605790,
-      "config_path": "<path-to-game>\\RogueCore\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "<path-to-game>\\RogueCore\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Deep Rock Galactic: Survivor": {
@@ -45161,7 +45161,7 @@
     },
     "Dinoblade": {
       "steam_appid": 3440070,
-      "config_path": "%LOCALAPPDATA%\\DinobladeGame\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\DinobladeGame\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "DinoBlaster": {
@@ -45319,7 +45319,7 @@
     "Directive 8020": {
       "steam_appid": 2255370,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%/Directive8020/Saved/SaveGames/Option*.sav",
+      "config_path": "%LOCALAPPDATA%\\Directive8020\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 5"
     },
     "Director of Football": {
@@ -45827,7 +45827,7 @@
     "Dispatcher": {
       "steam_appid": 341980,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Disp1\\Saved\\SaveGames\\GS.sav",
+      "config_path": "%LOCALAPPDATA%\\Disp1\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Dispatcher: Revoke": {
@@ -49355,13 +49355,13 @@
     "Drizzlepath: Genie": {
       "steam_appid": 438340,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Genie\\Saved\\SaveGames\\SettingsSaveFile.sav",
+      "config_path": "%LOCALAPPDATA%\\Genie\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Drizzlepath: Glass": {
       "steam_appid": 581370,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Glass\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Glass\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Drizzlepath: Picturae": {
@@ -49483,7 +49483,7 @@
     },
     "Drop Duchy": {
       "steam_appid": 2525310,
-      "config_path": "%LOCALAPPDATA%\\DropDuchy\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\DropDuchy\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Drop Hunt - Adventure Puzzle": {
@@ -53488,7 +53488,7 @@
     "Empulse": {
       "steam_appid": 4323990,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Orion\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Orion\\Saved\\Config\\WindowsClient\\",
       "engine": "Unreal Engine 5"
     },
     "Empyre: Lords of the Sea Gates": {
@@ -54057,7 +54057,7 @@
     "Enotria: The Last Song": {
       "steam_appid": 2102450,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Enotria\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Enotria\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Enshrouded": {
@@ -54353,7 +54353,7 @@
     "Epic Mickey: Rebrushed": {
       "steam_appid": 1522160,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\recolored\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\recolored\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Epic of Serinor: Dawnshadow": {
@@ -55670,7 +55670,7 @@
     "EVE Vanguard": {
       "steam_appid": 1872800,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\EVEVanguard\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\EVEVanguard\\Saved\\Config\\WindowsClient\\",
       "engine": "Unreal Engine 5"
     },
     "Eve Zero: Ark of the Matter": {},
@@ -60111,7 +60111,7 @@
     "Fighting EX Layer": {
       "steam_appid": 871200,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\EXF\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\EXF\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Fighting Fantasy Classics": {
@@ -61326,7 +61326,7 @@
     "Five Nights at Freddy's: Security Breach": {
       "steam_appid": 747660,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\fnaf9\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\fnaf9\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Five Nights at Freddy's: Sister Location": {
@@ -61878,7 +61878,7 @@
     "Flock": {
       "steam_appid": 1472930,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\HappyPlace\\Saved\\SaveGames\\CloudConfig.sav",
+      "config_path": "%LOCALAPPDATA%\\HappyPlace\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Flock of Dogs": {
@@ -62292,7 +62292,7 @@
       "steam_appid": 1298140,
       "dx11": true,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Fobia\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Fobia\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Focus on You": {
@@ -63378,7 +63378,7 @@
     },
     "Forza Street": {
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Packages\\Microsoft.331194F9F13CC_8wekyb3d8bbwe\\LocalState\\Gravity\\Saved\\Config\\UWP\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Packages\\Microsoft.331194F9F13CC_8wekyb3d8bbwe\\LocalState\\Gravity\\Saved\\Config\\UWP\\",
       "engine": "Unreal Engine 4"
     },
     "ForzeBreak": {
@@ -67866,7 +67866,7 @@
     },
     "Gigantosaurus: The Game": {
       "steam_appid": 1177020,
-      "config_path": "%USERPROFILE%\\Documents\\Gigantosaurus\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%USERPROFILE%\\Documents\\Gigantosaurus\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Gigapocalypse": {
@@ -70624,7 +70624,7 @@
     },
     "Gray Zone Warfare": {
       "steam_appid": 2479810,
-      "config_path": "%LOCALAPPDATA%\\GZW\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\GZW\\Saved\\Config\\WindowsClient\\",
       "engine": "Unreal Engine 5"
     },
     "Grayland": {
@@ -74477,7 +74477,7 @@
     "Headsnatchers": {
       "steam_appid": 797410,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Headsnatchers\\Saved\\Config\\WindowsNoEditor\\Engine.ini",
+      "config_path": "%LOCALAPPDATA%\\Headsnatchers\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Headspun": {
@@ -75134,7 +75134,7 @@
     "Hell is Us": {
       "steam_appid": 1620730,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\HellIsUs\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\HellIsUs\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Hell Knights": {
@@ -79589,7 +79589,7 @@
     "Hozy": {
       "steam_appid": 3326230,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\CozyGame\\Saved\\SaveGames\\HubSaveGame.sav",
+      "config_path": "%LOCALAPPDATA%\\CozyGame\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 5"
     },
     "HR: Human Remains": {
@@ -83857,7 +83857,7 @@
     "Into the Radius VR": {
       "steam_appid": 1012790,
       "dx11": true,
-      "config_path": "My Documents\\My Games\\IntoTheRadius\\v2.0\\Settings.ini",
+      "config_path": "My Documents\\My Games\\IntoTheRadius\\v2.0\\",
       "engine": "Unreal Engine 4"
     },
     "Into the Rhythm VR": {
@@ -86889,7 +86889,7 @@
       "steam_appid": 1977170,
       "dx12": true,
       "config_path": "%LOCALAPPDATA%\\ASC\\Saved\\Config\\Windows\\*.ini, %LOCALAPPDATA%\\ASC\\Saved\\SaveGames\\FullGame\\MachineSettings.sav, %LOCALAPPDATA%\\ASC\\Saved\\SaveGames\\FullGame\\UserSettings.sav",
-      "config_path_xbox": "%LOCALAPPDATA%\\Packages\\DONTNODEntertainment.Ascension-P9_1t8sv8k1cftdw\\Settings\\settings.dat",
+      "config_path_xbox": "%LOCALAPPDATA%\\Packages\\DONTNODEntertainment.Ascension-P9_1t8sv8k1cftdw\\Settings\\",
       "engine": "Unreal Engine 5"
     },
     "Just a Cleric": {
@@ -88194,7 +88194,7 @@
       "steam_appid": 2796130,
       "dx11": true,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Kiborg\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Kiborg\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Kick Ass Commandos": {
@@ -91930,7 +91930,7 @@
     },
     "Leaf Blower Co.": {
       "steam_appid": 3571710,
-      "config_path": "%LOCALAPPDATA%\\LeafBlowerSim\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\LeafBlowerSim\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Leaf Blower Revolution": {
@@ -93617,7 +93617,7 @@
     "Life Makeover": {
       "steam_appid": 2626940,
       "dx11": true,
-      "config_path": "<path-to-game>\\Azure\\Output\\userdata\\usercfg.lua",
+      "config_path": "<path-to-game>\\Azure\\Output\\userdata\\",
       "engine": "Unreal Engine 4"
     },
     "Life of a Capitalist": {
@@ -94626,7 +94626,7 @@
     "Little Nightmares III": {
       "steam_appid": 1392860,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\LittleNightmaresIII\\Saved\\SaveGames\\OptionSettings.sav",
+      "config_path": "%LOCALAPPDATA%\\LittleNightmaresIII\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Little Nightmares VR: Altered Echoes": {
@@ -99441,7 +99441,7 @@
     "March of Empires": {
       "steam_appid": 702320,
       "dx11": true,
-      "config_path_xbox": "%LOCALAPPDATA%\\MOE\\Saved\\Config\\WinGDK\\GameUserSettings.ini",
+      "config_path_xbox": "%LOCALAPPDATA%\\MOE\\Saved\\Config\\WinGDK\\",
       "engine": "Unreal Engine 5"
     },
     "March of Industry: Very Capitalist Factory Simulator Entertainments": {
@@ -99524,7 +99524,7 @@
     "Marie's Room": {
       "steam_appid": 648390,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\MariesRoom\\Saved\\SaveGames\\Settings.sav",
+      "config_path": "%LOCALAPPDATA%\\MariesRoom\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Mariko: Hot Nightlife": {
@@ -100056,7 +100056,7 @@
     },
     "Maskmaker": {
       "steam_appid": 1337530,
-      "config_path": "%USERPROFILE%\\AppData\\Local\\Maskmaker\\Saved\\SaveGames\\UserSettings.sav",
+      "config_path": "%USERPROFILE%\\AppData\\Local\\Maskmaker\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Masky": {
@@ -102150,7 +102150,7 @@
     },
     "Metal Garden": {
       "steam_appid": 3539440,
-      "config_path": "%LOCALAPPDATA%\\MetalGarden\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\MetalGarden\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Metal Gear": {},
@@ -102955,7 +102955,7 @@
       "engine": "FNA"
     },
     "Middle Aged Man-Like Safety Awareness Turtles": {
-      "config_path": "%LOCALAPPDATA%\\SJ25\\Saved\\SaveGames\\System.sav",
+      "config_path": "%LOCALAPPDATA%\\SJ25\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Middle Ages Hero": {
@@ -105252,7 +105252,7 @@
     "Monkey King: Hero Is Back": {
       "steam_appid": 967240,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Nirvana\\Saved\\SaveGames\\NirvanaConfig.sav",
+      "config_path": "%LOCALAPPDATA%\\Nirvana\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Monkey King: Master of the Clouds": {
@@ -105451,7 +105451,7 @@
     },
     "Monster Energy Supercross 2": {
       "steam_appid": 882020,
-      "config_path": "%USERPROFILE%\\Documents\\supercross2\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%USERPROFILE%\\Documents\\supercross2\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Monster Energy Supercross 25": {
@@ -110427,7 +110427,7 @@
     },
     "Need For Speed Mobile": {
       "dx11": true,
-      "config_path": "(Auto start configuration)%APPDATA%\\NFSMCloud\\config.ini",
+      "config_path": "(Auto start configuration)%APPDATA%\\NFSMCloud\\",
       "engine": "Unreal Engine 4"
     },
     "Need for Speed Payback": {
@@ -111189,13 +111189,13 @@
     "Nephise": {
       "steam_appid": 606860,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Nephise\\Saved\\SaveGames\\Settings.sav",
+      "config_path": "%LOCALAPPDATA%\\Nephise\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Nephise Begins": {
       "steam_appid": 628950,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\NephiseBegins\\Saved\\SaveGames\\Settings.sav",
+      "config_path": "%LOCALAPPDATA%\\NephiseBegins\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Nephise: Ascension": {
@@ -111846,7 +111846,7 @@
     },
     "Nexus 5X": {
       "steam_appid": 1983990,
-      "config_path": "%LOCALAPPDATA%\\Leaf\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Leaf\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 4"
     },
     "NeXus: One Core": {
@@ -112946,7 +112946,7 @@
     },
     "Nitro Gen Omega": {
       "steam_appid": 2525510,
-      "config_path": "%USERPROFILE%\\AppData\\Local\\Overdrive\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%USERPROFILE%\\AppData\\Local\\Overdrive\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Nitro Nation Drag & Drift": {},
@@ -114877,7 +114877,7 @@
     "Off The Grid": {
       "steam_appid": 3659280,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\G01\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\G01\\Saved\\Config\\WindowsClient\\",
       "engine": "Unreal Engine 5"
     },
     "Off the Record: Liberty Stone": {
@@ -119333,7 +119333,7 @@
     },
     "Paragon": {
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\OrionGame\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\OrionGame\\Saved\\Config\\WindowsClient\\",
       "engine": "Unreal Engine 4"
     },
     "Paragon: The Overprime": {
@@ -120180,8 +120180,8 @@
     "Pax Dei": {
       "steam_appid": 1995520,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\PaxDei\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
-      "config_path_xbox": "%LOCALAPPDATA%\\PaxDei\\Saved\\Config\\WinGDKClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\PaxDei\\Saved\\Config\\WindowsClient\\",
+      "config_path_xbox": "%LOCALAPPDATA%\\PaxDei\\Saved\\Config\\WinGDKClient\\",
       "engine": "Unreal Engine 5"
     },
     "Pax Imperia": {},
@@ -121201,7 +121201,7 @@
     },
     "Phantom Abyss": {
       "steam_appid": 989440,
-      "config_path": "%LOCALAPPDATA%\\PhantomAbyss\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\PhantomAbyss\\Saved\\Config\\WindowsNoEditor\\",
       "config_path_xbox": "%LOCALAPPDATA%\\PhantomAbyss\\Saved\\Config\\WindowsNoEditor\\WinGDK\\",
       "engine": "Unreal Engine 4"
     },
@@ -127254,7 +127254,7 @@
     "Psychonauts in the Rhombus of Ruin": {
       "steam_appid": 788690,
       "dx11": true,
-      "config_path": "%APPDATA%\\PsychonautsInTheRhombusOfRuin\\Saved\\SaveGames\\PsychonautsInTheRhombusOfRuinSettings0.sav",
+      "config_path": "%APPDATA%\\PsychonautsInTheRhombusOfRuin\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Psychopathics": {
@@ -133208,7 +133208,7 @@
     "ReThink 2": {
       "steam_appid": 934410,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\RT4\\Saved\\SaveGames\\SETTINGS_*.sav",
+      "config_path": "%LOCALAPPDATA%\\RT4\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "ReThink 3": {
@@ -133230,13 +133230,13 @@
     "ReThink: Evolved": {
       "steam_appid": 703500,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\ReThink2\\Saved\\SaveGames\\SETTINGS.sav",
+      "config_path": "%LOCALAPPDATA%\\ReThink2\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "ReThink: Evolved 2": {
       "steam_appid": 820600,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\ReThink3\\Saved\\SaveGames\\SETTINGS_RT3.sav",
+      "config_path": "%LOCALAPPDATA%\\ReThink3\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "ReThink: Evolved 3": {
@@ -133965,7 +133965,7 @@
     "Rhome": {
       "steam_appid": 1062060,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Rhome\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Rhome\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Rhya's Crusade: The Aradia's Reavers": {
@@ -143156,7 +143156,7 @@
     "Shashingo: Learn Japanese With Photography": {
       "steam_appid": 1632490,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Shashingo\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Shashingo\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Shatter": {
@@ -146662,7 +146662,7 @@
     "Slender: The Arrival (2023)": {
       "steam_appid": 252330,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\SlenderTheArrival\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\SlenderTheArrival\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Slender: The Eight Pages": {
@@ -147220,7 +147220,7 @@
       "steam_appid": 2437170,
       "dx11": true,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\SMITE2Alpha\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\SMITE2Alpha\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Smith and Winston": {
@@ -149433,7 +149433,7 @@
     "Soundfall": {
       "steam_appid": 1608700,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\BeatShooter\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\BeatShooter\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "SoundLites": {
@@ -152009,7 +152009,7 @@
     "SpongeBob SquarePants: Titans of the Tide": {
       "steam_appid": 2479650,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Ghost\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Ghost\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "SpongeBob SquarePants: Typing": {},
@@ -152896,7 +152896,7 @@
     "Star Overdrive": {
       "steam_appid": 2055590,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\StarOverdrive\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\StarOverdrive\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Star Phoenix": {
@@ -157532,7 +157532,7 @@
     },
     "Super Distro": {
       "steam_appid": 364690,
-      "config_path": "%LOCALAPPDATA%\\SUPERDITROXXL\\Saved\\Config\\WindowsNoEditor\\Engine.ini",
+      "config_path": "%LOCALAPPDATA%\\SUPERDITROXXL\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Super Dodge Ball": {},
@@ -161089,7 +161089,7 @@
     "Tandem: A Tale of Shadows": {
       "steam_appid": 1436920,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Shadows\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Shadows\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Tandis": {
@@ -162128,7 +162128,7 @@
       "steam_appid": 1486920,
       "dx11": true,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\Tempest\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Tempest\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Templar Battleforce": {
@@ -162907,7 +162907,7 @@
       "dx11": true,
       "dx12": true,
       "config_path": "<path-to-game>\\TetrisEffect\\Saved\\Config\\",
-      "config_path_xbox": "%LOCALAPPDATA%\\Packages\\48710EnhanceIncorporated.TRIP2.0_63vy8jfbpt4dt\\LocalCache\\LocalSaveGames\\CONF.json",
+      "config_path_xbox": "%LOCALAPPDATA%\\Packages\\48710EnhanceIncorporated.TRIP2.0_63vy8jfbpt4dt\\LocalCache\\LocalSaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "Tetris Elements": {},
@@ -166064,7 +166064,7 @@
     "The Expanse: A Telltale Series": {
       "steam_appid": 1708010,
       "dx11": true,
-      "config_path": "%USERPROFILE%\\AppData\\Local\\Artemis\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%USERPROFILE%\\AppData\\Local\\Artemis\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "The Expanse: Osiris Reborn": {
@@ -167512,7 +167512,7 @@
     "The Hunting God": {
       "steam_appid": 679190,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\TheHuntingGod\\Saved\\SaveGames\\Settings.sav",
+      "config_path": "%LOCALAPPDATA%\\TheHuntingGod\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "The Huntsman: Winter's Curse": {
@@ -169751,7 +169751,7 @@
     "The Mound: Omen of Cthulhu": {
       "steam_appid": 2569760,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\TheMound\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\TheMound\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "The Movie Trivia Challenge": {
@@ -169953,7 +169953,7 @@
     "The New Flesh": {
       "steam_appid": 3692660,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\RVRGame\\Saved\\SaveGames\\SystemSave_0.sav",
+      "config_path": "%LOCALAPPDATA%\\RVRGame\\Saved\\SaveGames\\",
       "engine": "Unreal Engine 4"
     },
     "The New Girl": {
@@ -171974,7 +171974,7 @@
     "The Smurfs 2: The Prisoner of the Green Stone": {
       "steam_appid": 2397500,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\SM2\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\SM2\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "The Smurfs: Dreams": {
@@ -183183,7 +183183,7 @@
     },
     "Upin & Ipin Universe": {
       "steam_appid": 3401920,
-      "config_path": "%LOCALAPPDATA%\\UIUniverse\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\UIUniverse\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "Uplands Motel": {
@@ -187744,7 +187744,7 @@
     "Warhammer 40,000: Boltgun": {
       "steam_appid": 2005010,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\Boltgun\\Saved\\Config\\WindowsNoEditor\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\Boltgun\\Saved\\Config\\WindowsNoEditor\\",
       "engine": "Unreal Engine 4"
     },
     "Warhammer 40,000: Boltgun - Words of Vengeance": {
@@ -187844,7 +187844,7 @@
     "Warhammer 40,000: Eternal Crusade": {
       "steam_appid": 375230,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\EternalCrusade\\Saved\\Config\\WindowsClient\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\EternalCrusade\\Saved\\Config\\WindowsClient\\",
       "engine": "Unreal Engine 4"
     },
     "Warhammer 40,000: Fire Warrior": {
@@ -189918,7 +189918,7 @@
     "While We Wait Here": {
       "steam_appid": 2213120,
       "dx11": true,
-      "config_path": "%LOCALAPPDATA%\\While_We_Wait_Here\\Saved\\Config\\Windows\\GameUserSettings.ini",
+      "config_path": "%LOCALAPPDATA%\\While_We_Wait_Here\\Saved\\Config\\Windows\\",
       "engine": "Unreal Engine 5"
     },
     "While You Are Downloading": {
