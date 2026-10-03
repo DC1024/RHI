@@ -17,6 +17,7 @@
 **UI Freezes**
 - Fixed a permanent freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3). The NR section was using the same star-column grid layout that caused the NVIDIA panel freeze in v2.8.0. Fixed the same way — calculated fixed-pixel column widths.
 - Fixed the Extras and Neural Rendering sections overflowing their containers, pushing cog and ✕ buttons off-screen.
+- Fixed a UI deadlock that has caused the app to freeze completely on startup or after changing settings, particularly on games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR). The Settings panel initializes several NVIDIA driver combos (G-Sync indicator, G-Sync mode, VSync, etc.) and was accidentally writing those values back to the driver during initialization — before the protection flag was cleared. This write happened concurrently with the NVIDIA panel reading driver settings for the selected game, causing an unsynchronized concurrent NVAPI access that locked up the driver API and froze the UI. The protection flag now stays active until all NVIDIA combos are fully populated.
 
 **DXVK**
 - Fixed the "Deploy dxvk.conf" button in the DXVK cog always deploying a generic conf. For Lilium HDR it now deploys the correct preset-specific content matching your selected preset.

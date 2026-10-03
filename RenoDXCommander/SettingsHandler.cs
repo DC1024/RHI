@@ -144,7 +144,12 @@ public class SettingsHandler
             catch { }
         });
         _window.DlssIndicatorCombo.SelectedIndex = dlssIndicatorEnabled ? 0 : 1; // 0=Enabled, 1=Disabled
-        _window._dlssIndicatorInitializing = false;
+        // Keep _dlssIndicatorInitializing = true until ALL NVAPI combos are populated below.
+        // Setting it false here was too early — GSyncIndicator and other combos further down
+        // would fire their SelectionChanged handlers, each calling SetGSyncIndicator / SetGSyncMode etc.
+        // which call _session.Save(). That runs concurrently with the NVAPI read Task.Run for the
+        // panel, causing an unsynchronized concurrent NVAPI access → UI deadlock. (#freeze bug)
+        // _dlssIndicatorInitializing is set false at the END of PopulateNvApiCombosFromSnapshot.
 
         // Initialize DLSS/Streamline auto-update combos
         _window.AutoUpdateDlssCombo.SelectedIndex = ViewModel.Settings.AutoUpdateDlss ? 1 : 0;
@@ -334,6 +339,9 @@ public class SettingsHandler
             ? Array.FindIndex(DlssPresetService.PowerManagementOptions, o => o.Value == snapshot.PowerMode.Value)
             : 0; // Default: Optimal Performance
         _window.GlobalPowerModeCombo.SelectedIndex = powerIdx >= 0 ? powerIdx : 0;
+
+        // All NVAPI combos are now populated — safe to let SelectionChanged handlers fire.
+        _window._dlssIndicatorInitializing = false;
     }
 
     /// <summary>

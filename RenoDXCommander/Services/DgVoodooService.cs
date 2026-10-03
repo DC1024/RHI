@@ -18,7 +18,7 @@ public class DgVoodooService
 {
     private const string D3D9Entry32 = "MS/x86/D3D9.dll";
     private const string D3D9Entry64 = "MS/x64/D3D9.dll";
-    private const string D3D9Dll     = "D3D9.dll";
+    private const string D3D9Dll     = "d3d9.dll";
     private const string ConfFile    = "dgVoodoo.conf";
 
     private static readonly string CacheDir = Path.Combine(
