@@ -1014,6 +1014,8 @@ public partial class MainViewModel
                 card.LumaStatus = GameStatus.Installed;
                 card.LumaActionMessage = "Luma installed!";
                 card.FadeMessage(m => card.LumaActionMessage = m, card.LumaActionMessage);
+                // Rebuild the detail panel so the addon label and author badge update immediately
+                RequestDetailPanelRebuild?.Invoke(card);
             });
 
             await ApplyLumaPostInstallAsync(card, record);
@@ -1205,6 +1207,7 @@ public partial class MainViewModel
             card.LumaRecord = null;
             card.LumaStatus = GameStatus.NotInstalled;
             card.LumaActionMessage = "✖ Luma removed.";
+            RequestDetailPanelRebuild?.Invoke(card);
 
             // Clean up nvngx_dlss.dll deployed by ApplyLumaPostInstallAsync.
             // It's not in InstalledFiles (deployed after record was saved), so handle it here.
