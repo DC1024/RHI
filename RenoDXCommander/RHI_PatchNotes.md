@@ -1,10 +1,14 @@
 ## v2.8.1 Beta 3
 
+## v2.8.1 Beta 3
+
 ### New
-- **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder — neither will remove it while the other still needs it. The ⚙ cog lets you pick which version to use, useful for games that work better with an older build.
-- **Control Ultimate Edition — OptiScaler FG** — the install dialog has two new options: "Install OptiScaler FG" sets up OptiScaler Nightly for Frame Generation in one click (Streamline deployed, DLLs renamed, INI settings all written), and "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset.
-- **GitHub API** — new section in Settings. Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour, improving reliability of update checks, manifest fetches, and DLSS version lookups. Token is stored in settings and applied automatically on next launch.
-- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you don't want RHI checking for updates unless you ask it to.
+- **dgVoodoo2** — standalone install now available in the Extras section for any DX9 game. Deploys the DX9→DX11 translation layer to the game folder, enabling ReShade compute shaders and DLSS5 Feeder on older titles. Coexists safely with Luma and Feeder. The ⚙ cog lets you pick which version to deploy.
+- **Control Ultimate Edition — OptiScaler FG** — the install dialog has two new options: "Install OptiScaler FG" sets up OptiScaler Nightly for Frame Generation in one click (Streamline, DLL renames, and INI settings all handled), and "Using HDR?" toggles the FgSlHdr10 flag in the RenoDX preset.
+- **GitHub API** — new section in Settings. Sign in with GitHub to raise the API rate limit from 60 to 5,000 requests per hour. Improves reliability of update checks, manifest fetches, and DLSS version lookups. Token is stored and applied automatically on launch.
+- **Background Update Checks** — new setting in the Updates section. "On" (default) keeps the current behaviour. "Minimal" stops all background component checks — only manifests, PCGW data, and DLSS versions fetch automatically. Useful if you prefer to check for updates manually.
+- **Luma mod info on game card** — when Luma is installed, the installed addon filename (e.g. `Luma-Prey.addon`) now appears in the badge row alongside any RenoDX addon. Both the RenoDX and Luma mod authors are shown as separate badges (e.g. RenoDX: Marat · Luma: Pumbo). The card updates immediately after install without needing a refresh.
+- **Card layout** — store and engine badges are now right-aligned on the same row as the Launch button. Graphics API and bitness badges are right-aligned on the same row as the installed mod names.
 
 ### Changes
 - **Game Overrides collapsed summary** now shows RS Channel, per-game Shaders/Addons mode, and any Update All exclusions at a glance.
@@ -16,17 +20,18 @@
 ### Bug Fixes
 
 **Freezes**
-- Fixed a UI freeze that affected games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR). The Settings panel was writing driver values back during initialisation — before it had finished loading — which collided with the NVIDIA panel reading those same values. The app would lock up completely. Fixed by keeping the protection flag active until all NVIDIA combos are fully populated.
-- Fixed a persistent UI freeze affecting games with a full DLSS install (SR + RR + FG + NR). The NVIDIA driver session object is not thread-safe, but multiple background tasks were accessing it simultaneously without any synchronisation. Panel reads and background writes would race each other and corrupt the driver state, permanently stalling the UI. All NVAPI session access is now serialised through a single lock.
+- Fixed a UI freeze that has affected games with a full NVIDIA driver profile (DLSS + Streamline + ReBAR) across multiple versions. The root cause was unsynchronised concurrent access to the NVIDIA driver session object from multiple background tasks — panel reads and user-triggered writes would race each other and corrupt the driver state, permanently stalling the UI. All NVAPI session access is now serialised through a single lock.
+- Fixed a second freeze path where the Settings panel was writing NVIDIA driver values back during initialisation before it had finished loading, colliding with the game panel reading those same values.
 - Fixed a freeze when selecting games with Neural Rendering installed (e.g. Control, The Witcher 3).
 - Fixed the Extras and Neural Rendering sections overflowing their containers and pushing buttons off-screen.
 
 **dgVoodoo2 + ReShade coexistence**
-- Fixed coexistence failing when installing dgVoodoo2 on a game that already had ReShade at d3d9.dll. ReShade is now correctly moved to dxgi.dll so it hooks dgVoodoo2's DX11 output. Uninstall now correctly cleans up without a full ReShade reinstall.
+- Fixed coexistence failing when installing dgVoodoo2 on a game that already had ReShade at d3d9.dll. ReShade is now correctly moved to dxgi.dll so it hooks dgVoodoo2's DX11 output. Uninstall cleans up without a full ReShade reinstall. Deployed file is now lowercase `d3d9.dll` matching the original.
 
 **Other**
 - Fixed the DXVK "Deploy dxvk.conf" button always deploying a generic config. For Lilium HDR it now deploys the correct preset-specific content.
 - Session logs now mask usernames, Steam user IDs, and Xbox package names before writing to disk.
+- Fixed UE4/5 config paths in PCGW data pointing to specific filenames instead of folders, which caused Engine.ini deployment to fail silently on several hundred games.
 
 ### Manifest Updates
 - Fixed Saints Row 2, Bye Sweet Carole using wrong ReShade bitness.
