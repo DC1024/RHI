@@ -1176,8 +1176,15 @@
                                                Text="Background Checks"/>
                                     <ComboBox Grid.Row="3" x:Name="BackgroundUpdateChecksCombo" x:FieldModifier="internal"
                                               FontSize="12" HorizontalAlignment="Stretch"
-                                              ToolTipService.ToolTip="On: all update checks run automatically on startup and every 4 hours, including Nexus Mods. Minimal: only manifest fetches run automatically — Nexus Mods checks only fire when you click Refresh or Update All."
                                               SelectionChanged="BackgroundUpdateChecksCombo_SelectionChanged">
+                                        <ToolTipService.ToolTip>
+                                            <ToolTip>
+                                                <TextBlock TextWrapping="Wrap" MaxWidth="280">
+                                                    <Run Text="On: all update checks run automatically on startup and every 4 hours, including Nexus Mods."/><LineBreak/>
+                                                    <Run Text="Minimal: only manifest fetches run automatically — Nexus Mods checks only fire when you click Refresh or Update All."/>
+                                                </TextBlock>
+                                            </ToolTip>
+                                        </ToolTipService.ToolTip>
                                         <ComboBoxItem Content="On"/>
                                         <ComboBoxItem Content="Minimal"/>
                                     </ComboBox>
@@ -1188,20 +1195,29 @@
                                         Background="{StaticResource BorderDefaultBrush}"
                                         VerticalAlignment="Stretch" Margin="12,0,12,0"/>
 
-                                <!-- Right: Automatic Updates -->
-                                <StackPanel Grid.Column="2" Spacing="8">
-                                    <TextBlock Text="Automatic Updates" FontSize="13" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextPrimaryBrush}"/>
-                                    <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource InlineDescriptionBrush}" LineHeight="18"
-                                               Text="When enabled, RHI silently installs component updates in the background after each update check. Games that are running when an update is detected will be retried automatically once they close. Does not apply to app updates."/>
-                                    <ComboBox x:Name="AutoUpdateComponentsCombo" x:FieldModifier="internal"
+                                <!-- Right: Automatic Updates — uses same Grid structure as left so the combo aligns with Background Checks -->
+                                <Grid Grid.Column="2" RowSpacing="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Spacing="8">
+                                        <TextBlock Text="Automatic Updates" FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource InlineDescriptionBrush}" LineHeight="18"
+                                                   Text="When enabled, RHI silently installs component updates in the background after each update check. Games that are running when an update is detected will be retried automatically once they close. Does not apply to app updates."/>
+                                    </StackPanel>
+                                    <!-- Rows 1–2 intentionally empty — spacers to match left column height -->
+                                    <ComboBox Grid.Row="3" x:Name="AutoUpdateComponentsCombo" x:FieldModifier="internal"
                                               FontSize="12" HorizontalAlignment="Stretch"
                                               ToolTipService.ToolTip="Automatically install ReShade, RenoDX, ReLimiter, DC, OptiScaler, RE Framework, Luma, DXVK and DOF Fix updates silently in the background"
                                               SelectionChanged="AutoUpdateComponentsCombo_SelectionChanged">
                                         <ComboBoxItem Content="No"/>
                                         <ComboBoxItem Content="Yes"/>
                                     </ComboBox>
-                                </StackPanel>
+                                </Grid>
                             </Grid>
                             </StackPanel>
                         </Border>
