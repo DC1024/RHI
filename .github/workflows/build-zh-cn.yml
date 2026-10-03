@@ -76,7 +76,7 @@ jobs:
       # One single file: RHI.exe. The official build is a .NET single-file bundle,
       # so RHI.dll + resources.pri live inside the exe. Replacing the exe is the
       # only thing that works; everything else in the install folder stays put.
-      - name: Build patch zip (one file: RHI.exe)
+      - name: 'Build patch zip (one file: RHI.exe)'
         shell: pwsh
         run: |
           $patchName = "RHI-zh-CN-patch-$($env:GITHUB_REF_NAME)"
