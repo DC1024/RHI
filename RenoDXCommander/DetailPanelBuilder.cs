@@ -209,16 +209,19 @@ public partial class DetailPanelBuilder
         // Install path + installed file
         _window.DetailInstallPath.Text = card.InstallPath;
 
-        // Determine label: RenoDX addon filename, or Luma mod name if Luma is installed without a RenoDX addon
-        string? fileLabel = card.InstalledAddonFileName;
-        if (string.IsNullOrEmpty(fileLabel)
-            && card.LumaStatus is GameStatus.Installed or GameStatus.UpdateAvailable
-            && card.LumaMod != null)
-        {
-            fileLabel = card.LumaMod.IsGenericLuma
-                ? "Luma"
-                : card.LumaMod.Name;
-        }
+        // Determine label: RenoDX addon filename + Luma mod name when both are present
+        string? fileLabel = null;
+        bool lumaInstalled = card.LumaStatus is GameStatus.Installed or GameStatus.UpdateAvailable;
+        string? lumaLabel = lumaInstalled && card.LumaMod != null
+            ? (card.LumaMod.IsGenericLuma ? "Luma" : card.LumaMod.Name)
+            : null;
+
+        if (!string.IsNullOrEmpty(card.InstalledAddonFileName) && lumaLabel != null)
+            fileLabel = $"{card.InstalledAddonFileName}  ·  {lumaLabel}";
+        else if (!string.IsNullOrEmpty(card.InstalledAddonFileName))
+            fileLabel = card.InstalledAddonFileName;
+        else if (lumaLabel != null)
+            fileLabel = lumaLabel;
 
         if (!string.IsNullOrEmpty(fileLabel))
         {
