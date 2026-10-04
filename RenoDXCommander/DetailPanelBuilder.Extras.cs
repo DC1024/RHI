@@ -1610,15 +1610,18 @@ public partial class DetailPanelBuilder
         var installPath = card.InstallPath ?? "";
 
         var currentDllName = _window.ViewModel.GetDeInstalledAs(gameName, store);
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:IsInstalled({card.GameName})");
         bool isInstalled   = deSvc.IsStandaloneInstalledIn(installPath, currentDllName);
 
         // Mutual exclusivity with OptiScaler
         bool osConflict = card.IsOsInstalled;
 
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:StagedVersion({card.GameName})");
         // Status text
         string statusText  = isInstalled ? (deSvc.StagedVersion ?? "Installed") : "Ready";
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:BuildGrid({card.GameName})");
         // ── Row grid matching Components section exactly ───────────────────────
         // Col 0: label (120)  Col 1: status (80)  Col 2: Info (36)
         // Col 3: install (*)  Col 4: cog (36)     Col 5: delete (36)
@@ -1812,6 +1815,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(removeBtn);
 
         body.Children.Add(row);
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:Done({card.GameName})");
     }
 
     private async Task<string?> ShowMfgDllPickerAsync(GameCardViewModel card, string? currentDllName)

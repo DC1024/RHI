@@ -520,6 +520,7 @@ public partial class MainViewModel
                             DispatcherQueue?.TryEnqueue(() =>
                             {
                                 _crashReporter.Log($"[BackgroundScan] Rebuilding panel for selected card '{cardToRebuild.GameName}'");
+                                SetLastUiAction($"BackgroundScan.PanelRebuild({cardToRebuild.GameName})");
                                 cardToRebuild.NotifyAll();
                                 RequestCardRebuild?.Invoke(cardToRebuild);
                             }));
@@ -540,6 +541,7 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Deferred ReShade sync failed — {ex.Message}"); }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: Streamline redeploy starting");
                 // Redeploy Streamline to all games where it's enabled (after OptiScaler staging is ready)
                 try
                 {
@@ -552,12 +554,14 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Streamline redeploy loop failed — {ex.Message}"); }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: ShaderPackReady await starting");
                 if (_shaderPackReadyTask != null)
                 {
                     try { await _shaderPackReadyTask; }
                     catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] ShaderPackReady failed — {ex.Message}"); }
                 }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: SyncShaders starting");
                 // Deploy shaders to all installed game locations
                 try
                 {
@@ -595,6 +599,7 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] SyncShaders failed — {ex.Message}"); }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: SyncAddons starting");
                 // Deploy managed addons to all installed game locations
                 try
                 {

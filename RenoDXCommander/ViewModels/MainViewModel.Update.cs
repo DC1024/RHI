@@ -13,7 +13,11 @@ public partial class MainViewModel
     private volatile string _lastUiAction = "none";
 
     /// <summary>Tracks the last action dispatched to the UI thread for freeze diagnostics.</summary>
-    internal void SetLastUiAction(string action) => _lastUiAction = action;
+    internal void SetLastUiAction(string action)
+    {
+        _lastUiAction = action;
+        _crashReporter.Log($"[UIAction] {action}");
+    }
 
     /// <summary>
     /// Starts a 10-second heartbeat timer. On each tick it posts a quick probe to the UI thread.
@@ -36,7 +40,7 @@ public partial class MainViewModel
                 _crashReporter.Log($"[Heartbeat] UI responsive — last action: {_lastUiAction}");
             else
                 _crashReporter.Log($"[Heartbeat] *** UI FROZEN *** last action before freeze: {_lastUiAction}");
-        }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+        }, null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
     }
 
     /// <summary>

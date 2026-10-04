@@ -762,28 +762,39 @@ public partial class DetailPanelBuilder
                 try { await _panelScanSemaphore.WaitAsync(scanToken).ConfigureAwait(false); }
                 catch (OperationCanceledException) { CrashReporter.Log($"[NeuralRendering.RefreshStatus] Semaphore cancelled: '{card.GameName}'"); return; }
                 CrashReporter.Log($"[NeuralRendering.RefreshStatus] Semaphore acquired, scanning: '{card.GameName}'");
+
+                // Declare all result variables before try so they're accessible after finally
+                bool d5i = false, sfi = false, nri = false, bri = false, fei = false;
+                bool dlssi = false, dlssdi = false, dlssgi = false, hostExeOk = true;
+                bool srOk = false, rrOk = false, fgOk = false, nrOk = false;
+                bool ualOk = false, feedFxPresent = false, lumeniteFxPresent = false;
+                bool isDx9Feeder = false, dgVoodooOk = false;
+                string? nrv = null, dlssv = null, dlssdv = null, dlssgv = null;
+                string? srv = null, rrv = null, fgv = null, nrv2 = null;
+                string? ualName = null;
+                bool scanSucceeded = false;
                 try
                 {
                 var host64Dir = Path.Combine(installPath, "host64");
                 // For 32-bit games: DLSS5 Tool lives in host64\, not game addon folder
-                bool d5i    = card.Is32Bit
+                d5i    = card.Is32Bit
                     ? File.Exists(Path.Combine(host64Dir, "renodx-dlss5.addon64"))
                     : rdx5Svc.IsInstalledIn(installPath);
                 // For 32-bit games: NR DLL also lives in host64\
-                bool nri    = File.Exists(Path.Combine(installPath, "nvngx_dlssnr.dll"))
-                           || (card.Is32Bit && File.Exists(Path.Combine(host64Dir, "nvngx_dlssnr.dll")));
-                bool sfi    = rdx5Svc.IsSfInstalledIn(installPath);
-                bool bri    = File.Exists(Path.Combine(installPath, BridgeDeployFile));
-                bool fei    = File.Exists(Path.Combine(installPath, card.Is32Bit ? FeederDeployFile32 : FeederDeployFile64));
-                bool dlssi  = File.Exists(Path.Combine(installPath, "nvngx_dlss.dll"));
-                bool dlssdi = File.Exists(Path.Combine(installPath, "nvngx_dlssd.dll"));
-                bool dlssgi = File.Exists(Path.Combine(installPath, "nvngx_dlssg.dll"));
+                nri    = File.Exists(Path.Combine(installPath, "nvngx_dlssnr.dll"))
+                       || (card.Is32Bit && File.Exists(Path.Combine(host64Dir, "nvngx_dlssnr.dll")));
+                sfi    = rdx5Svc.IsSfInstalledIn(installPath);
+                bri    = File.Exists(Path.Combine(installPath, BridgeDeployFile));
+                fei    = File.Exists(Path.Combine(installPath, card.Is32Bit ? FeederDeployFile32 : FeederDeployFile64));
+                dlssi  = File.Exists(Path.Combine(installPath, "nvngx_dlss.dll"));
+                dlssdi = File.Exists(Path.Combine(installPath, "nvngx_dlssd.dll"));
+                dlssgi = File.Exists(Path.Combine(installPath, "nvngx_dlssg.dll"));
                 // host64 exe presence (32-bit only)
-                bool hostExeOk = !card.Is32Bit || File.Exists(Path.Combine(host64Dir, "dlss5-feed-host64.exe"));
-                string? nrv    = nri    ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlssnr.dll"))) : null;
-                string? dlssv  = dlssi  ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlss.dll")))   : null;
-                string? dlssdv = dlssdi ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlssd.dll")))  : null;
-                string? dlssgv = dlssgi ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlssg.dll")))  : null;
+                hostExeOk = !card.Is32Bit || File.Exists(Path.Combine(host64Dir, "dlss5-feed-host64.exe"));
+                nrv    = nri    ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlssnr.dll"))) : null;
+                dlssv  = dlssi  ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlss.dll")))   : null;
+                dlssdv = dlssdi ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlssd.dll")))  : null;
+                dlssgv = dlssgi ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(Path.Combine(installPath, "nvngx_dlssg.dll")))  : null;
 
                 // Pre-compute all per-method file checks on the background thread so the
                 // UI thread (RefreshStatusWithData) does zero I/O.
@@ -793,34 +804,43 @@ public partial class DetailPanelBuilder
                 var rrPath = det?.DlssdPath ?? Path.Combine(installPath, "nvngx_dlssd.dll");
                 var fgPath = det?.DlssgPath ?? Path.Combine(installPath, "nvngx_dlssg.dll");
                 var nrPath = det?.DlssnrPath ?? Path.Combine(installPath, "nvngx_dlssnr.dll");
-                bool srOk = File.Exists(srPath);
-                bool rrOk = File.Exists(rrPath);
-                bool fgOk = File.Exists(fgPath);
-                bool nrOk = File.Exists(nrPath);
-                string? srv   = srOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(srPath))   : null;
-                string? rrv   = rrOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(rrPath))   : null;
-                string? fgv   = fgOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(fgPath))   : null;
-                string? nrv2  = nrOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(nrPath))   : null;
+                srOk = File.Exists(srPath);
+                rrOk = File.Exists(rrPath);
+                fgOk = File.Exists(fgPath);
+                nrOk = File.Exists(nrPath);
+                srv   = srOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(srPath))   : null;
+                rrv   = rrOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(rrPath))   : null;
+                fgv   = fgOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(fgPath))   : null;
+                nrv2  = nrOk ? DlssStreamlineService.FormatVersion(dlssSvc.GetFileVersion(nrPath))   : null;
 
                 // ASI Loader (ShortFuse)
-                var ualName = _window.ViewModel.GetUalInstalledAs(gameName, store);
-                bool ualOk  = !string.IsNullOrEmpty(ualName)
-                           && File.Exists(Path.Combine(installPath, ualName));
+                ualName = _window.ViewModel.GetUalInstalledAs(gameName, store);
+                ualOk  = !string.IsNullOrEmpty(ualName)
+                       && File.Exists(Path.Combine(installPath, ualName));
 
                 // Feeder shader files
                 var shadersDir = Path.Combine(installPath, ShaderPackService.GameReShadeShaders, "Shaders");
-                bool feedFxPresent = Directory.Exists(shadersDir) &&
+                feedFxPresent = Directory.Exists(shadersDir) &&
                     Directory.GetFiles(shadersDir, "DLSS5_Feed.fx", SearchOption.AllDirectories).Length > 0;
-                bool lumeniteFxPresent = Directory.Exists(shadersDir) &&
+                lumeniteFxPresent = Directory.Exists(shadersDir) &&
                     Directory.GetFiles(shadersDir, "lumenite_Kernel.fx", SearchOption.AllDirectories).Length > 0;
 
                 // dgVoodoo2 (DX9 Feeder)
-                bool isDx9Feeder = card.DetectedApis.Contains(GraphicsApiType.DirectX9)
-                                || (card.DetectedApis.Count == 0 && card.GraphicsApi == GraphicsApiType.DirectX9);
-                bool dgVoodooOk = isDx9Feeder && App.Services.GetRequiredService<DgVoodooService>().IsDeployed(installPath);
+                isDx9Feeder = card.DetectedApis.Contains(GraphicsApiType.DirectX9)
+                           || (card.DetectedApis.Count == 0 && card.GraphicsApi == GraphicsApiType.DirectX9);
+                dgVoodooOk = isDx9Feeder && App.Services.GetRequiredService<DgVoodooService>().IsDeployed(installPath);
+                scanSucceeded = true;
+                }
+                finally
+                {
+                    // Always release — even if a File.Exists or Directory.GetFiles throws.
+                    // Without this, any exception leaks the semaphore and permanently blocks
+                    // all subsequent BuildNvidiaProfileSection / BuildDriverProfileSection calls.
+                    _panelScanSemaphore.Release();
+                    CrashReporter.Log($"[NeuralRendering.RefreshStatus] Semaphore released (success={scanSucceeded}): '{card.GameName}'");
+                }
 
-                _panelScanSemaphore.Release();
-
+                if (!scanSucceeded) return;
                 _window.DispatcherQueue?.TryEnqueue(() =>
                 {
                     if (_window.ViewModel.SelectedGame != card) return;
@@ -831,10 +851,8 @@ public partial class DetailPanelBuilder
                         srOk, rrOk, fgOk, nrOk, srv, rrv, fgv, nrv2,
                         ualName, ualOk, feedFxPresent, lumeniteFxPresent, isDx9Feeder, dgVoodooOk);
                 });
-                }
-                finally { /* semaphore already released above */ }
-            });
-        }
+            });  // end Task.Run
+        }  // end RefreshStatus
 
         void RefreshStatusWithData(
             bool d5i, bool sfi, bool nri, bool bri, bool fei, bool rsi,

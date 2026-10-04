@@ -5,22 +5,22 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 ## v2.8.2
 
 ### New
-- **Donate button** — new button in the toolbar between Help and Settings. Opens a dialog listing all mod authors with what they make and a direct link to their Ko-fi page. Authors are sorted alphabetically and pulled from the manifest, so new entries show up without an app update.
+- **Donate button** — new button in the toolbar between Help and Settings. Opens a dialog listing all mod authors with what they make and a direct link to their Ko-fi page. Authors are sorted alphabetically and updated via the manifest, so new entries show up without an app update.
 
 ### Bug Fixes
 
-**NVAPI / Freezes**
-- Fixed a UI freeze where the NVIDIA driver API (NVAPI) session could hang indefinitely, blocking all subsequent NVAPI calls including those on the UI thread. All session lock acquisitions now have a 5-second timeout — if NVAPI is hung, the call returns a safe default and logs a warning instead of blocking forever. This resolves persistent freezes reported after installing mods on games with full DLSS profiles.
-- Fixed Quick Apply ignoring games where SR, RR, or FG version was set to NVIDIA Override. If your Quick Apply default is a specific version, it now disables the driver override first and then deploys the chosen version — same as manually changing the combo would do.
+**Freezes**
+- Fixed a UI freeze that occurred when selecting certain games (particularly those with a full DLSS profile — SR, RR, FG, and Streamline all installed). The freeze could last indefinitely and required killing the app. A 5-second safety timeout now prevents this from ever blocking permanently.
+- Fixed Quick Apply doing nothing on games where SR, RR, or FG version is set to NVIDIA Override. It now correctly disables the override and deploys the chosen version, the same as changing the combo manually.
 
 **Addons**
-- Fixed Unity (and other dual-bitness) addons being replaced with the wrong bitness after a session restart. When the background scan deployed a 32-bit addon (due to a misdetected bitness), the stale-removal pass was deleting the correctly-installed 64-bit file. The 64-bit and 32-bit versions of the same addon are now kept independently — a background scan deploying one bitness no longer removes the other.
-- Fixed MFG Ada Unlock being uninstalled from game folders after restarting the app or installing another mod. The stale addon cleanup was treating it as an unmanaged addon and removing it. It is now protected from cleanup like other Extras-managed files.
-- Fixed addon updates downloading a new version to staging but not deploying it to game folders. RHI now redeploys updated addons to all game folders where they were previously installed.
+- Fixed Unity addon (and any other dual-bitness addon) being silently swapped from 64-bit to 32-bit between sessions. RHI was removing the 64-bit file and replacing it with the 32-bit one whenever the background scan detected a different bitness. Both versions are now kept independently.
+- Fixed MFG Ada Unlock being removed from game folders after restarting the app or installing a mod. RHI was incorrectly treating it as an unmanaged addon and cleaning it up.
+- Fixed addon updates not being deployed to game folders. When a new version downloaded (e.g. MFG Ada Unlock), it would update in staging but the files in your game folders would remain at the old version until you manually reinstalled.
 
 **Other**
-- Fixed OptiScaler Nightly install silently deploying Streamline and DLSS Enabler to the game folder without actually installing OptiScaler when staging was unavailable (e.g. GitHub rate limited). The failed install now exits cleanly.
-- Fixed ultrawide fix links (Lyall) failing to load on startup with a 401 error when a GitHub token was configured. The shared HTTP client was sending the GitHub Bearer token to Codeberg, which rejected it.
+- Fixed OptiScaler Nightly install leaving behind Streamline and DLSS Enabler files in the game folder when the install itself failed (e.g. due to GitHub rate limiting). These files are now cleaned up properly if the install can't complete.
+- Fixed ultrawide fix links from Lyall not loading when a GitHub API token was configured. The token was being sent to the wrong server, which rejected it.
 
 ---
 
