@@ -101,6 +101,12 @@ public sealed partial class MainWindow
                     // the new brushes immediately instead of waiting for pointer interaction.
                     Microsoft.UI.Xaml.VisualStateManager.GoToState(UpdateBtn, "Normal", false);
                     break;
+                case nameof(ViewModel.IsBackgroundScanning):
+                    HdrModsListBtn.IsEnabled = !ViewModel.IsBackgroundScanning;
+                    ToolTipService.SetToolTip(HdrModsListBtn, ViewModel.IsBackgroundScanning
+                        ? "Loading mod data, please wait..."
+                        : "Browse all games with available HDR mods");
+                    break;
                 case nameof(ViewModel.CurrentPage):
                     UpdatePageVisibility();
                     break;

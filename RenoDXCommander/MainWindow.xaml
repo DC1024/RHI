@@ -59,10 +59,11 @@
                             ToolTipService.ToolTip="Quick Start Guide"/>
                     <Button x:Name="HdrModsListBtn" Content="Available HDR Mods"
                             Click="HdrModsListBtn_Click"
+                            IsEnabled="False"
                             Background="{StaticResource SurfaceInputBrush}" Foreground="{StaticResource AccentTealBrush}"
                             BorderBrush="{StaticResource AccentTealBorderBrush}" BorderThickness="1"
                             CornerRadius="8" Padding="12,7" FontSize="12"
-                            ToolTipService.ToolTip="Browse all games with available HDR mods"/>
+                            ToolTipService.ToolTip="Loading mod data, please wait..."/>
 
                     <Border Width="1" Height="20" Background="{StaticResource BorderSubtleBrush}" Margin="4,0"/>
 
