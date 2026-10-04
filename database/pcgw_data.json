@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "game_count": 55365,
-  "generated": "2026-10-03T14:33:56Z",
+  "game_count": 55373,
+  "generated": "2026-10-04T05:30:49Z",
   "name_overrides": {
     "ACE COMBAT 8: WINGS OF THEVE": "Ace Combat 8: Wings of Theve",
     "AFOP": "Avatar: Frontiers of Pandora",
@@ -12885,6 +12885,7 @@
     "Atlantis: Pearls of the Deep": {
       "steam_appid": 521280
     },
+    "Atlantis: The Lost Empire - The Lost Games": {},
     "Atlantis: The Lost Empire ÔÇô Trial by Fire": {
       "config_path": "<path-to-game>\\autoexec.cfg",
       "engine": "LithTech"
@@ -23116,7 +23117,6 @@
     },
     "Braid Anniversary Edition": {
       "steam_appid": 499180,
-      "dx11": true,
       "config_path": "%APPDATA%\\Braid, Anniversary Edition\\"
     },
     "Brain / Out": {
@@ -78394,7 +78394,7 @@
     "Homura Hime": {
       "steam_appid": 1820000,
       "dx11": true,
-      "config_path": "%USERPROFILE%\\AppData\\LocalLow\\Crimson Wings",
+      "config_path": "%USERPROFILE%\\AppData\\LocalLow\\CrimsonDusk\\HomuraHime",
       "engine": "Unity"
     },
     "Honey Comb Home": {
@@ -80572,6 +80572,7 @@
     "Hytale": {
       "config_path": "<path-to-game>\\UserData\\Settings.json"
     },
+    "Höllenjob": {},
     "H├Âllenjob": {},
     "H├ñr kommer Pippi L├Ñngstrump": {},
     "I (Don't) Hate Hentai Puzzles": {
@@ -85416,6 +85417,9 @@
       "steam_appid": 344220,
       "engine": "Unity"
     },
+    "Janosch: Tiger und Bär im Straßenverkehr": {
+      "engine": "Macromedia Director"
+    },
     "Janosch: Tiger und B├ñr im Stra├ƒenverkehr": {
       "engine": "Macromedia Director"
     },
@@ -85687,6 +85691,7 @@
     "Jersey Devil": {
       "config_path": "<path-to-game>\\bin\\config.pc"
     },
+    "Jerusalem: The Three Roads to the Holy Land": {},
     "Jesters Poker": {
       "steam_appid": 800840
     },
@@ -86766,6 +86771,7 @@
     "Jungle Juggle": {
       "steam_appid": 844580
     },
+    "Jungle Strike": {},
     "Jungle Z": {
       "steam_appid": 1015580
     },
@@ -106466,7 +106472,7 @@
     "Mortal Shell II": {
       "steam_appid": 2584270,
       "dx12": true,
-      "config_path": "%LOCALAPPDATA%\\MortalShell2\\Saved\\Config\\Windows\\",
+      "config_path": "%LOCALAPPDATA%/MortalShell2/Saved/Config/Windows",
       "engine": "Unreal Engine 5"
     },
     "Mortal Sin": {
@@ -112385,7 +112391,8 @@
       "engine": "Unity"
     },
     "Nightmare Files - Stoned": {
-      "steam_appid": 3212260
+      "steam_appid": 3212260,
+      "engine": "Unity"
     },
     "Nightmare Game (ÕÖ®µóªµ©©µêÅ)": {
       "steam_appid": 1114110
@@ -130237,6 +130244,7 @@
     "Ransomware Dating Sim": {
       "steam_appid": 1169430
     },
+    "Ranx: The Video Game": {},
     "Rap simulator": {
       "steam_appid": 1099510
     },
@@ -137473,6 +137481,7 @@
       "dx11": true,
       "engine": "NeoX"
     },
+    "Rules of the Game": {},
     "Rules of The Mafia: Trade & Blood": {
       "steam_appid": 996830
     },
@@ -168915,6 +168924,7 @@
       "config_path": "%APPDATA%\\Frontwing\\The Fruit of Grisaia -The Leisure of Grisaia-\\*.dat, %APPDATA%\\ÒâòÒâ¡Òâ│ÒâêÒéªÒéñÒâ│Òé░\\Òé░Òâ¬ÒéÂÒéñÒéóÒü«µ×£Õ«ƒ ´¢×Òé░Òâ¬ÒéÂÒéñÒéóÒü«µ£ëÚûæ´¢×\\*.dat",
       "engine": "CatSystem2"
     },
+    "The Lemmings Chronicles": {},
     "The Leopard Catgirl in Miaoli": {
       "steam_appid": 1149510
     },
