@@ -22,7 +22,7 @@
 > English: this is an **unofficial fork** of RankFTW/RHI whose only functional change is an added
 > Simplified Chinese UI. Upstream is untouched otherwise.
 >
-> - 默认分支：`zh-cn`（基于 upstream `1f8b36d`，v2.8.1 Beta 3）
+> - 默认分支：`zh-cn`（基于 upstream `e73fedc`，v2.8.1 正式版）
 > - 切换语言：Settings → Language → 简体中文
 > - 中文的实现细节、已知仍为英文的区域、重建命令见 **[ZH-CN-BUILD.md](ZH-CN-BUILD.md)**
 > - 翻译词条源自社区 PR [#20](https://github.com/RankFTW/RHI/pull/20)（HexBen123），本分支将其 rebase 到新主线
@@ -38,7 +38,7 @@ RHI detects your entire game library across every major store and handles ReShad
 
 ## Download
 
-**[Latest release](https://github.com/RankFTW/RenoDXChecker/releases/latest)** · **[Discord](https://discord.gg/ultraplace)**
+**[Latest release](https://github.com/DC1024/RHI/releases/latest)** · **[Discord](https://discord.gg/ultraplace)**
 
 ---
 
