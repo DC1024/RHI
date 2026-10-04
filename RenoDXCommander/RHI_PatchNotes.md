@@ -14,6 +14,7 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 
 **Other**
 - Fixed a second older RenoDX addon reappearing in The Witcher 3: Wild Hunt — Remastered (and potentially other games) after every app restart. When the install path was stored as the game root but the mod was installed in a subfolder, path reconciliation was copying the old root addon into the subfolder on every launch — overwriting the correct newer one. Reconciliation now skips this case.
+- Fixed the Available HDR Mods count showing different numbers (819, 838, 950+) depending on when you clicked the button. The button is now disabled until the background scan fully completes, ensuring the count is always accurate.
 
 ### Maintenance
 - Added detailed diagnostic logging for UI freeze investigation. Every UI action is now timestamped in the session log, the freeze heartbeat fires every 3 seconds instead of 10, and the Neural Rendering section logs each build step individually. This logging will be removed before the final release.
