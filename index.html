@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHI 简体中文版 — ReShade HDR Installer</title>
+<meta name="description" content="RHI（ReShade HDR Installer）简体中文分支。完整汉化界面，开源免费，GPL-3.0。">
+<style>
+  :root{
+    --bg:#0a0e17; --bg2:#0f1420; --card:#141b2b; --line:#1f2937;
+    --tx:#e6edf7; --tx2:#9aa8bd; --tx3:#6b7a91;
+    --blue:#4d8dff; --blue2:#2f6fe4; --cyan:#38bdf8;
+    --grn:#34d399; --amb:#fbbf24; --red:#f87171;
+    --r:12px; --max:1080px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--tx); line-height:1.7;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+  /* ── nav ── */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,14,23,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;height:60px;gap:28px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;letter-spacing:.3px}
+  .logo .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--blue);box-shadow:0 0 12px var(--blue);
+  }
+  nav .links{margin-left:auto;display:flex;gap:24px;font-size:14px}
+  nav .links a{color:var(--tx2)}
+  nav .links a:hover{color:var(--tx);text-decoration:none}
+
+  /* ── hero ── */
+  header{padding:84px 0 68px;position:relative;overflow:hidden}
+  header::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(760px 340px at 22% -8%,rgba(77,141,255,.20),transparent 62%),
+      radial-gradient(620px 300px at 88% 4%,rgba(56,189,248,.13),transparent 60%);
+    pointer-events:none;
+  }
+  header .wrap{position:relative}
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;
+    background:rgba(52,211,153,.11);border:1px solid rgba(52,211,153,.30);
+    color:var(--grn);border-radius:999px;padding:5px 14px;
+    font-size:12.5px;font-weight:600;margin-bottom:22px;
+  }
+  .badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:p 2s infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.35}}
+  h1{font-size:clamp(32px,5.4vw,52px);line-height:1.16;font-weight:800;letter-spacing:-.6px}
+  h1 .grad{
+    background:linear-gradient(96deg,var(--blue) 0%,var(--cyan) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .sub{color:var(--tx2);font-size:clamp(15px,2.1vw,18px);margin-top:18px;max-width:660px}
+  .cta{display:flex;flex-wrap:wrap;gap:13px;margin-top:32px}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:13px 25px;border-radius:10px;font-weight:650;font-size:15px;
+    border:1px solid transparent;transition:.18s;cursor:pointer;
+  }
+  .btn:hover{text-decoration:none;transform:translateY(-1px)}
+  .btn-p{background:linear-gradient(96deg,var(--blue2),var(--blue));color:#fff;box-shadow:0 6px 22px rgba(77,141,255,.28)}
+  .btn-p:hover{box-shadow:0 9px 28px rgba(77,141,255,.40)}
+  .btn-s{background:var(--card);color:var(--tx);border-color:var(--line)}
+  .btn-s:hover{border-color:var(--blue);background:#182135}
+  .meta{margin-top:19px;color:var(--tx3);font-size:13.5px;display:flex;flex-wrap:wrap;gap:9px 18px}
+  .meta code{background:var(--card);padding:2px 8px;border-radius:5px;color:var(--cyan);font-size:12.5px}
+
+  /* ── stats ── */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:52px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 18px}
+  .stat .n{font-size:27px;font-weight:800;color:var(--blue);letter-spacing:-.5px}
+  .stat .l{color:var(--tx3);font-size:12.5px;margin-top:5px}
+
+  /* ── sections ── */
+  section{padding:66px 0}
+  h2{font-size:clamp(24px,3.4vw,32px);font-weight:750;letter-spacing:-.4px;margin-bottom:12px}
+  .lead{color:var(--tx2);margin-bottom:36px;max-width:660px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;transition:.18s}
+  .card:hover{border-color:#2c3a52;transform:translateY(-2px)}
+  .card h3{font-size:16.5px;margin-bottom:9px;display:flex;align-items:center;gap:9px}
+  .card p{color:var(--tx2);font-size:14.5px}
+  .ico{
+    width:31px;height:31px;border-radius:8px;flex-shrink:0;
+    display:grid;place-items:center;font-size:15px;
+    background:rgba(77,141,255,.13);border:1px solid rgba(77,141,255,.24);
+  }
+
+  /* steps */
+  .steps{counter-reset:s;display:grid;gap:13px}
+  .step{
+    display:flex;gap:17px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r);padding:20px 22px;
+  }
+  .step::before{
+    counter-increment:s;content:counter(s);
+    width:29px;height:29px;flex-shrink:0;border-radius:50%;
+    background:linear-gradient(96deg,var(--blue2),var(--blue));
+    color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;
+  }
+  .step h4{margin:0 0 5px;font-size:15.5px}
+  .step p{color:var(--tx2);font-size:14px}
+
+  /* callout */
+  .note{
+    border-left:3px solid var(--amb);background:rgba(251,191,36,.07);
+    border-radius:0 var(--r) var(--r) 0;padding:17px 20px;margin-top:18px;
+  }
+  .note b{color:var(--amb)}
+  .note.blue{border-color:var(--blue);background:rgba(77,141,255,.07)}
+  .note.blue b{color:var(--blue)}
+  .note p{color:var(--tx2);font-size:14.5px}
+  .note p+p{margin-top:8px}
+
+  code.inl{background:#0d1420;border:1px solid var(--line);padding:2px 7px;border-radius:5px;
+    color:var(--cyan);font-size:13px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+
+  /* faq */
+  details{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    margin-bottom:11px;overflow:hidden}
+  summary{padding:16px 20px;cursor:pointer;font-weight:600;font-size:15px;list-style:none;
+    display:flex;align-items:center;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--blue);font-size:21px;font-weight:400;line-height:1}
+  details[open] summary::after{content:"−"}
+  details[open] summary{border-bottom:1px solid var(--line)}
+  details .body{padding:16px 20px;color:var(--tx2);font-size:14.5px}
+  details .body p+p{margin-top:9px}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{color:var(--tx3);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px}
+  td code{font-size:12.5px}
+  .hash{word-break:break-all;font-size:11.5px !important;color:var(--tx3)}
+
+  footer{border-top:1px solid var(--line);padding:38px 0;margin-top:26px;color:var(--tx3);font-size:13.5px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center}
+  footer .sp{margin-left:auto}
+
+  @media(max-width:760px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    nav .links{display:none}
+    header{padding:60px 0 48px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo"><span class="dot"></span>RHI 简体中文版</div>
+    <div class="links">
+      <a href="#features">功能</a>
+      <a href="#install">安装</a>
+      <a href="#faq">常见问题</a>
+      <a href="https://github.com/DC1024/RHI" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <div class="badge"><span class="pulse"></span>v2.8.1-zh-cn-10 · 已发布</div>
+    <h1>一个窗口，管好所有游戏的<br><span class="grad">HDR / ReShade / DLSS</span></h1>
+    <p class="sub">
+      RHI（ReShade HDR Installer）的<strong>简体中文分支</strong>。完整汉化界面，开源免费，
+      功能与上游保持同步——唯一改动就是新增了中文。
+    </p>
+    <div class="cta">
+      <a class="btn btn-p" href="https://github.com/DC1024/RHI/releases/download/v2.8.1-zh-cn-10/RHI-zh-CN-v2.8.1-zh-cn-10-win-x64.zip" download>⬇ 下载 v2.8.1-zh-cn-10</a>
+      <a class="btn btn-s" href="https://github.com/DC1024/RHI/releases" target="_blank" rel="noopener">全部版本</a>
+      <a class="btn btn-s" href="https://github.com/DC1024/RHI" target="_blank" rel="noopener">源码</a>
+    </div>
+    <div class="meta">
+      <span>版本 <code>v2.8.1-zh-cn-10</code></span>
+      <span>大小 <code>约 35 MB</code></span>
+      <span>许可 <code>GPL-3.0</code></span>
+      <span>平台 <code>Windows x64</code></span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n">1308</div><div class="l">已翻译界面词条</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">全口径扫描缺失项</div></div>
+      <div class="stat"><div class="n">2.8.1</div><div class="l">同步上游正式版</div></div>
+      <div class="stat"><div class="n">100%</div><div class="l">免费开源</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>它能做什么</h2>
+    <p class="lead">自动扫描你机器上所有商店的游戏库，一键装好 HDR、ReShade 与显卡驱动配置。</p>
+    <div class="grid2">
+      <div class="card">
+        <h3><span class="ico">🎮</span>全库游戏自动识别</h3>
+        <p>跨主流游戏平台扫描本地游戏库，无需手动添加路径。</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">🌈</span>一键 HDR</h3>
+        <p>自动匹配并安装对应游戏的 HDR 模组；没有专属模组的 Unity / UE 游戏走通用方案。</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">✨</span>ReShade 全托管</h3>
+        <p>取代官方安装器，自动识别图形 API 并正确命名 DLL，稳定版与 nightly 自动暂存。</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">⚡</span>DLSS / 帧率限制</h3>
+        <p>DLSS 启用与帧率限制统一管理，含 OptiScaler、UE-Extended、Luma 等模块。</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">🎨</span>着色器与特效包</h3>
+        <p>Reshade 着色器包、DXVK、Lilium HDR、NVIDIA 驱动配置档统一入口。</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">🌐</span>简体中文界面</h3>
+        <p>本分支的核心贡献：主界面、设置面板、全部对话框与提示均已汉化，即时切换。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2>安装步骤</h2>
+    <p class="lead">先退出正在运行的 RHI。已装官方版的话直接覆盖安装目录即可，设置和模组都会保留。</p>
+    <div class="steps">
+      <div class="step">
+        <div>
+          <h4>下载 zip 包</h4>
+          <p>取 <code class="inl">RHI-zh-CN-v2.8.1-zh-cn-10-win-x64.zip</code>（约 35 MB）。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h4>整目录解压</h4>
+          <p>解压到任意目录，然后运行其中的 <code class="inl">RHI.exe</code>。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h4>已装官方版 → 覆盖</h4>
+          <p>把解压出来的<strong>全部文件</strong>覆盖进安装目录（默认 <code class="inl">C:\Program Files\RHI</code>），
+             管理员权限点「继续」即可。游戏列表、已装模组、设置全部保留。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h4>切换中文</h4>
+          <p>启动 → Settings → Language → 简体中文，即时生效。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><b>⚠️ 不要只拷贝 exe</b></p>
+      <p>WinAppSDK 的运行时组件必须以真实文件形式放在 exe 旁边，否则启动会报
+         <code class="inl">0x80040111 ClassFactory</code> 并直接退出。官方那个约 100 MB 的单文件 exe
+         是把 <code class="inl">RHI.dll</code> 和 <code class="inl">resources.pri</code> 打包进去的，
+         同理无法这样单独替换。</p>
+    </div>
+
+    <div class="note blue">
+      <p><b>ℹ️ 关于自动更新</b></p>
+      <p>本中文分支<strong>已主动关闭程序内自更新</strong>。原因有两个：上游安装器是英文版，
+         「立即更新」会把中文版覆盖回英文；且本分支发布的是免安装 zip，内置更新器也无法正确应用。
+         要升级请到 <a href="https://github.com/DC1024/RHI/releases" target="_blank" rel="noopener">Releases 页面</a>
+         手动下载新的 <code class="inl">v*-zh-cn-*</code> 包覆盖即可。</p>
+    </div>
+  </div>
+</section>
+
+<section id="req">
+  <div class="wrap">
+    <h2>运行环境与校验</h2>
+    <p class="lead">本版本为 framework-dependent，需要系统已安装 .NET 8 桌面运行时（能正常跑官方版即可满足）。</p>
+    <div class="card" style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th>项目</th><th>值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>版本</td><td><code>v2.8.1-zh-cn-10</code></td></tr>
+          <tr><td>文件</td><td><code>RHI-zh-CN-v2.8.1-zh-cn-10-win-x64.zip</code></td></tr>
+          <tr><td>大小</td><td>36,513,640 字节（约 34.8 MiB）</td></tr>
+          <tr><td>SHA256</td><td><code class="hash">09BD58EF2A0C16012F4FB9FE3AD78A3DE42E3DBF613E0E0E5B635E7F176FE196</code></td></tr>
+          <tr><td>许可</td><td>GPL-3.0（随上游）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>常见问题</h2>
+    <p class="lead">关于分支关系、覆盖安装和已知遗留项。</p>
+
+    <details>
+      <summary>这是官方版本吗？和上游什么关系？</summary>
+      <div class="body">
+        <p>不是官方版本，本仓库是 <a href="https://github.com/RankFTW/RHI" target="_blank" rel="noopener">RankFTW/RHI</a>
+           的非官方分支。<strong>唯一功能性改动是新增简体中文界面</strong>，其余代码与上游保持同步。</p>
+        <p>翻译词条源自社区 <a href="https://github.com/RankFTW/RHI/pull/20" target="_blank" rel="noopener">PR #20</a>（原作者 HexBen123），
+           由本分支 rebase 到当前主线。遵循上游 GPL-3.0 许可，源码与所有修改均开放。</p>
+        <p>官方暂未提供中文支持。需要原版请到上游下载。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>覆盖安装后我的设置和模组会丢吗？</summary>
+      <div class="body">
+        <p>不会。覆盖的是程序文件本身，游戏库、已安装的模组记录、各项设置都保存在用户数据目录里，
+           覆盖后照常读取。详细步骤见包内的 <code class="inl">README-patch.md</code>。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>为什么关掉了自动更新？</summary>
+      <div class="body">
+        <p>两个原因：上游的更新安装器是官方英文版，点「立即更新」会把中文版覆盖回英文；
+           且本分支发布形态是免安装 zip，内置更新器依赖安装器流程，无法正确应用覆盖。</p>
+        <p>升级请到 Releases 页面手动下载新的 <code class="inl">v*-zh-cn-*</code> 包覆盖。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>还有哪些地方没翻译？</summary>
+      <div class="body">
+        <p>主界面、设置面板与常用流程已做到全口径扫描 0 缺失。上游 2026-05 之后新增的模块
+           （Extras / NeuralRendering / NvidiaProfile / DofFix）尚未翻译，详见仓库内
+           <code class="inl">ZH-CN-BUILD.md</code>。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>怎么参与或反馈？</summary>
+      <div class="body">
+        <p>直接开 issue 或 PR：<a href="https://github.com/DC1024/RHI" target="_blank" rel="noopener">github.com/DC1024/RHI</a>。
+           翻译改动集中在 <code class="inl">RenoDXCommander/Services/LocalizationService.cs</code> 的
+           <code class="inl">SimplifiedChinese</code> 字典，补充词条后跑一遍全口径扫描确认 0 缺失即可。</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>RHI 简体中文版 · v2.8.1-zh-cn-10</span>
+    <span class="sp">
+      <a href="https://github.com/DC1024/RHI" target="_blank" rel="noopener">源码仓库</a> ·
+      <a href="https://github.com/DC1024/RHI/releases" target="_blank" rel="noopener">Releases</a> ·
+      <a href="https://github.com/RankFTW/RHI" target="_blank" rel="noopener">上游 RankFTW/RHI</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>
