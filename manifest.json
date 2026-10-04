@@ -3,7 +3,7 @@
   "_doc": "Full field reference: docs/manifest-field-reference.md",
   "featureFlags": {
     "dlssNr": true,
-    "nexusMods": false,
+    "nexusMods": true,
     "resolutionControl": false
   },
   "blacklistPrefixes": [
