@@ -828,7 +828,9 @@ public partial class DetailPanelBuilder
                 Microsoft.UI.Dispatching.DispatcherQueuePriority.Low,
                 () =>
                 {
+                    _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:AddingGrid({capturedName})");
                     targetPanel.Children.Add(nvidiaGrid);
+                    _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:AddingNotice({capturedName})");
 
                     // Admin notice appended after the grid so it stays at the bottom
                     targetPanel.Children.Add(new TextBlock
@@ -841,6 +843,7 @@ public partial class DetailPanelBuilder
                         TextWrapping = TextWrapping.Wrap,
                         Margin = new Thickness(0, 8, 0, 0),
                     });
+                    _window.ViewModel.SetLastUiAction($"BuildDriverProfileSectionWithData:Done({capturedName})");
                 });
         }
         // Admin notice is now added inside the deferred TryEnqueue above when nvidiaPresetService.IsSupported.
