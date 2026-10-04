@@ -2,7 +2,7 @@
 
 To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. Takes about 30 seconds.
 
-## v2.8.4 Beta 1
+## v2.8.4
 
 ### Bug Fixes
 
