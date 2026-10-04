@@ -450,6 +450,7 @@ public partial class MainViewModel
             // 4. Await network tasks individually so failures don't block game display
             try { await wikiTask; } catch (Exception ex) { wikiFetchFailed = true; _crashReporter.Log($"[MainViewModel.InitializeAsync] Wiki fetch failed (offline?) — {ex.Message}"); }
             try { await lumaTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Luma fetch failed (offline?) — {ex.Message}"); }
+            try { await lumaRelTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Luma releases fetch failed (offline?) — {ex.Message}"); }
             try { await lumaUeTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Luma UE table fetch failed (offline?) — {ex.Message}"); }
             try { _manifest = await manifestTask; AuxInstallService.GlobalManifest = _manifest; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Manifest fetch failed — {ex.Message}"); }
             try { await osWikiTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] OptiScaler wiki task failed — {ex.Message}"); }

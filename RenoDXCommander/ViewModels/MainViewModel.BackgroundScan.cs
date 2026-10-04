@@ -87,10 +87,11 @@ public partial class MainViewModel
                 try { await _normalRsUpdateService.EnsureLatestAsync(); }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Normal ReShade update task failed — {ex.Message}"); }
             });
-            var shaderPackTask = Task.Run(async () => {
-                try { await _shaderPackService.EnsureLatestAsync(); }
-                catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Shader pack task failed — {ex.Message}"); }
-            });
+            // Shader packs are already being fetched by the shaderPackReadyTask started in MainWindow
+            // (either full EnsureLatestAsync when CacheAllShaders=true, or Task.CompletedTask).
+            // Do NOT start a second concurrent EnsureLatestAsync here — it races with the first,
+            // causing packs to be skipped ("already being downloaded") and never extracted.
+            // The deferred section below awaits _shaderPackReadyTask before SyncShaders.
             var addonPackTask = Task.Run(async () => {
                 try {
                     await _addonPackService.EnsureLatestAsync();
@@ -187,6 +188,7 @@ public partial class MainViewModel
             // Await network tasks individually so failures don't block
             try { await wikiTask; } catch (Exception ex) { wikiFetchFailed = true; _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Wiki fetch failed (offline?) — {ex.Message}"); }
             try { await lumaTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Luma fetch failed (offline?) — {ex.Message}"); }
+            try { await lumaRelTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Luma releases fetch failed (offline?) — {ex.Message}"); }
             try { await lumaUeTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Luma UE table fetch failed (offline?) — {ex.Message}"); }
             try { _manifest = await manifestTask; AuxInstallService.GlobalManifest = _manifest; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Manifest fetch failed — {ex.Message}"); }
             try { await osWikiTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler wiki task failed — {ex.Message}"); }

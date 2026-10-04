@@ -255,7 +255,8 @@ public partial class App : Application
 
         // Apply any stored GitHub OAuth token to the shared HttpClient before the window loads.
         // The HttpClient singleton was built before settings were loaded — patch it here.
-        ApplyStoredGitHubToken();
+        // Fire-and-forget: validates the token first (auto-clears if expired/revoked).
+        _ = ApplyStoredGitHubTokenAsync();
 
         // Check if first-launch setup is needed
         // Check if first-launch setup is needed.
@@ -431,7 +432,7 @@ public partial class App : Application
     /// apply it to DevUnlockService and the shared HttpClient so all API calls benefit from
     /// the higher rate limit (5,000/hr instead of 60/hr) right from startup.
     /// </summary>
-    private void ApplyStoredGitHubToken()
+    private async Task ApplyStoredGitHubTokenAsync()
     {
         try
         {
@@ -442,14 +443,38 @@ public partial class App : Application
             var settings = SettingsViewModel.LoadSettingsFile();
             if (!settings.TryGetValue("GitHubOAuthToken", out var token) || string.IsNullOrEmpty(token)) return;
 
-            // Apply to DevUnlockService cache so per-request callers (GitHubETagCache etc.) pick it up
-            DevUnlockService.UpdateToken(token);
-
-            // Patch the singleton HttpClient (already built — no Authorization header yet)
             var http = Services.GetRequiredService<HttpClient>();
-            GitHubAuthService.ApplyTokenToHttpClient(http, token);
 
+            // Apply the token IMMEDIATELY so startup network requests are authenticated.
+            // Validation happens after — if the token turns out to be revoked, we clear it
+            // on the next launch. This avoids a race where all startup requests fire before
+            // the async validation returns, hitting the unauthenticated 60 req/hour limit.
+            DevUnlockService.UpdateToken(token);
+            GitHubAuthService.ApplyTokenToHttpClient(http, token);
             CrashReporter.Log("[App.ApplyStoredGitHubToken] GitHub OAuth token applied from settings");
+
+            // Now validate in the background — clear if revoked so next launch is clean.
+            try
+            {
+                var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, "https://api.github.com/user");
+                req.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+                req.Headers.TryAddWithoutValidation("User-Agent", "RHI");
+                using var resp = await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+                if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    CrashReporter.Log("[App.ApplyStoredGitHubToken] Token is expired or revoked (401) — clearing from settings for next launch");
+                    // Remove from the default header so remaining requests in this session go unauthenticated
+                    // (better than sending a known-bad token that causes 401s everywhere)
+                    http.DefaultRequestHeaders.Remove("Authorization");
+                    DevUnlockService.UpdateToken(null);
+                    settings.Remove("GitHubOAuthToken");
+                    SettingsViewModel.SaveSettingsFile(settings);
+                }
+            }
+            catch (Exception valEx)
+            {
+                CrashReporter.Log($"[App.ApplyStoredGitHubToken] Token validation failed (network?) — keeping token — {valEx.Message}");
+            }
         }
         catch (Exception ex)
         {
