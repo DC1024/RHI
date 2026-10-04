@@ -90,9 +90,6 @@ public partial class MainViewModel
 
     public async Task RefreshAsync()
     {
-        // Refresh always bypasses the update check cooldown — the user explicitly asked for fresh data.
-        _forceUpdateCheck = true;
-
         // Re-check games in the DLSS skip cache before rebuilding cards.
         // Games confirmed as "no DLSS" after 3+ scans are skipped in BuildCards — this
         // gives them a fresh look so newly installed DLSS (e.g. game update) is detected
