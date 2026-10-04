@@ -8,8 +8,10 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 - **Donate button** — new button in the toolbar between Help and Settings. Opens a dialog listing all mod authors with what they make and a direct link to their Ko-fi page. Authors are sorted alphabetically and pulled from the manifest, so new entries show up without an app update.
 
 ### Bug Fixes
-- Fixed addon updates (e.g. MFG Ada Unlock) downloading a new version to staging but not deploying it to game folders. RHI now redeploys updated addons to all game folders where they were previously installed automatically.
+- Fixed MFG Ada Unlock being uninstalled from game folders after restarting the app or installing another mod. The stale addon cleanup was treating it as an unmanaged addon and removing it. It is now protected from cleanup like other Extras-managed files.
+- Fixed addon updates downloading a new version to staging but not deploying it to game folders. RHI now redeploys updated addons to all game folders where they were previously installed.
 - Fixed OptiScaler Nightly install silently deploying Streamline and DLSS Enabler to the game folder without actually installing OptiScaler when staging was unavailable (e.g. GitHub rate limited). The failed install now exits cleanly.
+- Fixed Quick Apply ignoring games where SR, RR, or FG version was set to NVIDIA Override. If your Quick Apply default is a specific version, it now disables the driver override first and then deploys the chosen version — same as manually changing the combo would do.
 - Fixed ultrawide fix links (Lyall) failing to load on startup with a 401 error when a GitHub token was configured. The shared HTTP client was sending the GitHub Bearer token to Codeberg, which rejected it.
 
 ### Changes

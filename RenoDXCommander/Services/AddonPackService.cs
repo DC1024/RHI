@@ -983,6 +983,11 @@ public class AddonPackService : IAddonPackService
                 if (fileName.Equals(DlssNrCostScalerService.CompanionAddonName, StringComparison.OrdinalIgnoreCase))
                     continue;
 
+                // Don't remove MFG Ada Unlock — managed by the Extras row, not the addon pack selection
+                if (fileName.Equals("renodx-mfgunlock.addon64", StringComparison.OrdinalIgnoreCase)
+                    || fileName.Equals("renodx-mfgunlock.addon32", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 try
                 {
                     File.Delete(file);
