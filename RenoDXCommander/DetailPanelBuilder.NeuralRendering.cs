@@ -116,6 +116,7 @@ public partial class DetailPanelBuilder
 
         // Re-clear the panel in case another card was selected while we were scanning
         _window.NeuralRenderingPanel.Children.Clear();
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:Init({card.GameName})");
 
         var installPath = card.InstallPath!;
         var gameName    = card.GameName;
@@ -745,10 +746,12 @@ public partial class DetailPanelBuilder
         }
 
         nrBody.Children.Add(row1);
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:Row1({card.GameName})");
 
         // ── Status line ───────────────────────────────────────────────────────
         statusPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(0, 4, 0, 0) };
         nrBody.Children.Add(statusPanel);
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:StatusPanel({card.GameName})");
 
         void RefreshStatus()
         {
@@ -845,6 +848,7 @@ public partial class DetailPanelBuilder
             bool isDx9Feeder, bool dgVoodooOk)
         {
             statusPanel.Children.Clear();
+            _window.ViewModel.SetLastUiAction($"NeuralRendering.RefreshStatusWithData:Building({card.GameName})");
 
             void Tag(string text, bool ok)
             {
@@ -945,6 +949,7 @@ public partial class DetailPanelBuilder
         descStack.Children.Add(descLink);
         descBorder.Child = descStack;
         nrBody.Children.Add(descBorder);
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:DescBorder({card.GameName})");
 
         void UpdateDescription(string methodKey)
         {
@@ -1591,6 +1596,7 @@ public partial class DetailPanelBuilder
         btnRow.Children.Add(sfCogBtn);
         btnRow.Children.Add(removeBtn);
         nrBody.Children.Add(btnRow);
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:BtnRow({card.GameName})");
 
         // ── NR Cost Scaler preference toggle ─────────────────────────────────
         var costScalerSvc = App.Services.GetRequiredService<DlssNrCostScalerService>();
@@ -1643,6 +1649,7 @@ public partial class DetailPanelBuilder
         costScalerRow.Children.Add(costScalerToggle);
         costScalerRow.Children.Add(costScalerStatus);
         nrBody.Children.Add(costScalerRow);
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:CostScalerRow({card.GameName})");
 
         // Note shown when ShortFuse method is selected — cost scaler is now built into 310.8.2
         if (effectiveMethod == NrMethodShortFuse)
@@ -1719,6 +1726,7 @@ public partial class DetailPanelBuilder
         linksRow.Children.Add(MakeLink("ShortFuse →",   "https://discord.com/channels/1408098019194310818/1543975158937821315"));
         linksRow.Children.Add(MakeLink("Feeder →",      "https://github.com/jlrouzies-fr/DLSS5-Feeder"));
         nrBody.Children.Add(linksRow);
+        _window.ViewModel.SetLastUiAction($"NeuralRenderingSectionWithData:Done({card.GameName})");
     }
 
     // ── Install helpers ───────────────────────────────────────────────────────

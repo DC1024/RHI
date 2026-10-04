@@ -959,6 +959,17 @@ public class AddonPackService : IAddonPackService
                 if (deployedFileNames.Contains(fileName))
                     continue;
 
+                // Don't remove the opposite-bitness twin of an addon we just deployed.
+                // Example: we deployed renodx-unityengine.addon32 (because Is32Bit is currently true),
+                // but renodx-unityengine.addon64 is still tracked from a previous 64-bit install.
+                // If Is32Bit was mis-detected this session, removing the .addon64 would permanently
+                // destroy the user's correct 64-bit installation. Keep both and let the user sort it out.
+                var fileBase = Path.GetFileNameWithoutExtension(fileName);
+                var fileExt  = Path.GetExtension(fileName);
+                var twinExt  = fileExt.Equals(".addon64", StringComparison.OrdinalIgnoreCase) ? ".addon32" : ".addon64";
+                if (deployedFileNames.Contains(fileBase + twinExt, StringComparer.OrdinalIgnoreCase))
+                    continue;
+
                 // Don't remove renodx-dlss5 addon if the Neural Rendering section owns it
                 // (detected by presence of nvngx_dlssnr.dll or its sentinel in the same folder)
                 if (fileName.Equals("renodx-dlss5.addon64", StringComparison.OrdinalIgnoreCase)
