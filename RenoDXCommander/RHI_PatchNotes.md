@@ -13,6 +13,7 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 - Fixed OptiScaler Nightly install silently deploying Streamline and DLSS Enabler to the game folder without actually installing OptiScaler when staging was unavailable (e.g. GitHub rate limited). The failed install now exits cleanly.
 - Fixed Quick Apply ignoring games where SR, RR, or FG version was set to NVIDIA Override. If your Quick Apply default is a specific version, it now disables the driver override first and then deploys the chosen version — same as manually changing the combo would do.
 - Fixed ultrawide fix links (Lyall) failing to load on startup with a 401 error when a GitHub token was configured. The shared HTTP client was sending the GitHub Bearer token to Codeberg, which rejected it.
+- Fixed a UI freeze where the NVIDIA driver API (NVAPI) session could hang indefinitely, blocking all subsequent NVAPI calls including those on the UI thread. All session lock acquisitions now have a 15-second timeout — if NVAPI is hung, the call returns a safe default and logs a warning instead of blocking forever. This resolves persistent freezes reported after installing mods on games with full DLSS profiles.
 
 ### Changes
 - dgVoodoo2 now appears in the Extras collapsed summary when installed.

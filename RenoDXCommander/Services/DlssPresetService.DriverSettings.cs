@@ -1274,7 +1274,11 @@ $session.Save()
     private bool SetRtxHdrRaw(string gameName, string installPath, uint settingId, uint value)
     {
         if (!_isSupported || _session == null) return false;
-        _sessionLock.Wait();
+        if (!_sessionLock.Wait(millisecondsTimeout: 15_000))
+        {
+            CrashReporter.Log($"[DlssPresetService.SetRtxHdrRaw] Lock timeout for '{gameName}' — NVAPI may be hung. Skipping.");
+            return false;
+        }
         try
         {
             var profile = FindProfile(gameName, installPath);
@@ -1339,7 +1343,11 @@ $session.Save()
         {
             var fetchTask = Task.Run(() =>
             {
-                _sessionLock.Wait();
+                if (!_sessionLock.Wait(millisecondsTimeout: 15_000))
+                {
+                    CrashReporter.Log("[DlssPresetService.FetchNvApiSettingsAsync] Lock timeout — NVAPI may be hung.");
+                    return NvApiSettingsSnapshot.Default;
+                }
                 try
                 {
                     CrashReporter.Log("[DlssPresetService.FetchNvApiSettingsAsync] Starting NVAPI reads on background thread");
