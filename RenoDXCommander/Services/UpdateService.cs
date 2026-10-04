@@ -51,6 +51,15 @@ public class UpdateService : IUpdateService
     /// </summary>
     public async Task<UpdateInfo?> CheckForUpdateAsync(bool betaOptIn = false)
     {
+        // zh-CN fork: self-update is intentionally disabled.
+        // 1) Upstream's installer is the official English build — "Update Now" would
+        //    overwrite this Chinese build (exactly what the update dialog offered).
+        // 2) This fork ships portable zip overrides (no installer), so the in-app
+        //    updater cannot apply them anyway.
+        // Update by downloading the latest v*-zh-cn-* zip from https://github.com/DC1024/RHI/releases
+        CrashReporter.Log("[UpdateService.CheckForUpdateAsync] Self-update disabled in zh-CN fork — update manually from DC1024/RHI releases");
+        return null;
+#pragma warning disable CS0162 // Unreachable code (upstream logic kept verbatim for merge-friendliness)
         try
         {
             // Always fetch the stable release — try /releases/latest first, then tag-based fallbacks
@@ -129,6 +138,7 @@ public class UpdateService : IUpdateService
             CrashReporter.Log($"[UpdateService.CheckForUpdateAsync] Check failed — {ex.Message}");
             return null;
         }
+#pragma warning restore CS0162 // Unreachable code (upstream logic kept verbatim for merge-friendliness)
     }
 
     /// <summary>
