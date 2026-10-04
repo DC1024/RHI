@@ -4,10 +4,12 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 
 ## v2.8.4 Beta 1
 
-### New
-- **Nexus Mods integration** — games with a Nexus page now show a Nexus button alongside the Discord link. Premium users can download directly from RHI; free users are taken to the mod's download page with the NXM handler pre-selected so the install kicks off automatically.
-
 ### Bug Fixes
+
+**GitHub Sign-In**
+- Fixed a startup race where all network requests fired before the stored GitHub token was applied, burning through the unauthenticated 60 req/hour limit instantly. The token is now applied before any requests go out. If the token turns out to be revoked, it's stripped mid-session and cleared from settings for the next launch.
+
+**Other**
 - Fixed the Available HDR Mods count being lower than expected on some launches. Luma release mods were being merged before the GitHub fetch completed, so however many had loaded by that point was what you got. The count is now always stable.
 
 ---
@@ -23,7 +25,7 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 - Fixed most shader packs not downloading when the shader cache was cleared. Two download tasks were racing at startup, causing packs to be skipped mid-download and never extracted.
 
 **GitHub Sign-In**
-- Fixed an expired or revoked GitHub sign-in token silently breaking all of RHI — wiki mods, RenoDX database, manifests, DLSS versions, shader packs, and update checks would all fail. RHI now validates the token on startup and automatically signs out if it has been revoked.
+- Fixed a revoked GitHub sign-in token causing 401 errors on every request. RHI now detects the revoked token on startup and clears it automatically, falling back to unauthenticated access.
 
 **Other**
 - Fixed ReShade not downloading when reshade.me returns a server error. Their server intermittently returns HTTP 500 even when the page loads correctly. RHI now reads the page regardless of the error code.
