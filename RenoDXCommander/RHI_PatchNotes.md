@@ -9,6 +9,9 @@ To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. 
 **Freezes**
 - Fixed the most likely root cause of persistent UI freezes after selecting certain games. The Neural Rendering status scan was not releasing its semaphore if any file check failed (e.g. a game folder that was deleted or had a permission error). Once leaked, the semaphore stayed blocked permanently — every subsequent DLSS and Driver Settings panel open would hang forever waiting for it. This affected all games with DLSS on subsequent selections, not just the one that triggered the failure.
 
+**OptiScaler Presets**
+- Fixed 6 settings not being saved when saving an OptiScaler preset: OptiScaler Version, Upscaler API, Upscaler, FG Enabled, Force Reflex, and Use Games Reflex Markers. These are now captured on Save and applied on Apply alongside the existing settings.
+
 ### Maintenance
 - Added detailed diagnostic logging for UI freeze investigation. Every UI action is now timestamped in the session log, the freeze heartbeat fires every 3 seconds instead of 10, and the Neural Rendering section logs each build step individually. This logging will be removed before the final release.
 
