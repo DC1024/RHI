@@ -225,7 +225,7 @@ public partial class DlssPresetService
 
     private void ReloadSession()
     {
-        if (!_sessionLock.Wait(millisecondsTimeout: 15_000))
+        if (!_sessionLock.Wait(millisecondsTimeout: 5_000))
         {
             CrashReporter.Log("[DlssPresetService.ReloadSession] Lock timeout — NVAPI may be hung. Skipping reload.");
             return;
