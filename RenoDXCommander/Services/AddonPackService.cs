@@ -725,6 +725,58 @@ public class AddonPackService : IAddonPackService
                     OldVersion    = storedVersion,
                     NewVersion    = remoteVersion,
                 });
+
+                // Auto-redeploy the updated file to all game folders that have it installed.
+                // Without this, the staged file is updated but game folders keep the old version
+                // until the user manually reinstalls (reported as "update shows as latest but wasn't").
+                try
+                {
+                    var safeName = SanitizeFileName(entry.PackageName);
+                    var staged64 = Path.Combine(StagingDir, safeName + ".addon64");
+                    var staged32 = Path.Combine(StagingDir, safeName + ".addon32");
+                    var deployments = LoadDeployments();
+                    int redeployed = 0;
+                    foreach (var (gamePath, trackedFiles) in deployments)
+                    {
+                        foreach (var trackedFile in trackedFiles.ToList())
+                        {
+                            var ext = Path.GetExtension(trackedFile);
+                            string? staged = ext.Equals(".addon64", StringComparison.OrdinalIgnoreCase) ? staged64
+                                           : ext.Equals(".addon32", StringComparison.OrdinalIgnoreCase) ? staged32
+                                           : null;
+                            if (staged == null || !File.Exists(staged)) continue;
+
+                            // Only redeploy if the deployed filename matches this addon's known names
+                            var vData = LoadVersions();
+                            vData.TryGetValue(entry.PackageName, out var vInfo);
+                            var knownName64 = vInfo?.OriginalName64;
+                            var knownName32 = vInfo?.OriginalName32;
+                            var trackedNoExt = Path.GetFileNameWithoutExtension(trackedFile);
+                            bool matches = trackedNoExt.Equals(safeName, StringComparison.OrdinalIgnoreCase)
+                                        || (!string.IsNullOrEmpty(knownName64) && trackedNoExt.Equals(knownName64, StringComparison.OrdinalIgnoreCase))
+                                        || (!string.IsNullOrEmpty(knownName32) && trackedNoExt.Equals(knownName32, StringComparison.OrdinalIgnoreCase));
+                            if (!matches) continue;
+
+                            var dest = Path.Combine(gamePath, trackedFile);
+                            if (!Directory.Exists(gamePath)) continue;
+                            try
+                            {
+                                File.Copy(staged, dest, overwrite: true);
+                                redeployed++;
+                            }
+                            catch (Exception copyEx)
+                            {
+                                CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeploy failed for '{trackedFile}' at '{gamePath}' — {copyEx.Message}");
+                            }
+                        }
+                    }
+                    if (redeployed > 0)
+                        CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeployed '{entry.PackageName}' to {redeployed} game folder(s).");
+                }
+                catch (Exception redeployEx)
+                {
+                    CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeploy pass failed for '{entry.PackageName}' — {redeployEx.Message}");
+                }
             }
             catch (Exception ex)
             {

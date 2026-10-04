@@ -392,9 +392,19 @@ public sealed partial class MainWindow
             FontSize = 12,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
             TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, 0, 0, 14),
+            Margin = new Thickness(0, 0, 0, 8),
         };
         panel.Children.Add(intro);
+
+        var warning = new TextBlock
+        {
+            Text = "⚠ Important: To receive early access to RenoDX mods, you MUST link your Discord account to Ko-fi BEFORE donating. Donations made without linking first cannot be retroactively credited.",
+            FontSize = 12,
+            Foreground = UIFactory.GetBrush("#F0A500"),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 0, 0, 14),
+        };
+        panel.Children.Add(warning);
 
         var handCursor  = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.Hand);
         var arrowCursor = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.Arrow);
