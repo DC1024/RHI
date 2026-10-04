@@ -156,7 +156,6 @@ public partial class DetailPanelBuilder
 
         // Wiki status badge — hidden from main UI, shown inside Info button dialog instead
         _window.DetailWikiBadge.Visibility = Visibility.Collapsed;
-        _window.DetailSepPlatformStatus.Visibility = Visibility.Collapsed;
 
         // Author badges
         _window.DetailAuthorBadgePanel.Children.Clear();
@@ -208,9 +207,32 @@ public partial class DetailPanelBuilder
 
         // Install path + installed file
         _window.DetailInstallPath.Text = card.InstallPath;
-        if (!string.IsNullOrEmpty(card.InstalledAddonFileName))
+
+        // Determine label: RenoDX addon filename + Luma mod name when both are present
+        string? fileLabel = null;
+        bool lumaInstalled = card.LumaStatus is GameStatus.Installed or GameStatus.UpdateAvailable;
+        string? lumaLabel = null;
+        if (lumaInstalled && card.LumaMod != null)
         {
-            _window.DetailInstalledFile.Text = $"{card.InstalledAddonFileName}";
+            // Prefer the actual installed addon filename (e.g. "Luma-Prey.addon") like RenoDX does
+            var addonFile = card.LumaRecord?.InstalledFiles
+                .Select(f => Path.GetFileName(f))
+                .FirstOrDefault(f => f.EndsWith(".addon", StringComparison.OrdinalIgnoreCase)
+                                  || f.EndsWith(".addon64", StringComparison.OrdinalIgnoreCase)
+                                  || f.EndsWith(".addon32", StringComparison.OrdinalIgnoreCase));
+            lumaLabel = addonFile ?? (card.LumaMod.IsGenericLuma ? "Luma" : card.LumaMod.Name);
+        }
+
+        if (!string.IsNullOrEmpty(card.InstalledAddonFileName) && lumaLabel != null)
+            fileLabel = $"{card.InstalledAddonFileName}  ·  {lumaLabel}";
+        else if (!string.IsNullOrEmpty(card.InstalledAddonFileName))
+            fileLabel = card.InstalledAddonFileName;
+        else if (lumaLabel != null)
+            fileLabel = lumaLabel;
+
+        if (!string.IsNullOrEmpty(fileLabel))
+        {
+            _window.DetailInstalledFile.Text = fileLabel;
             _window.DetailInstalledFileBadge.Visibility = Visibility.Visible;
             _window.DetailSepModPlatform.Visibility = Visibility.Visible;
         }

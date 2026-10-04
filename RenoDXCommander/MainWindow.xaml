@@ -370,9 +370,18 @@
                             <!-- Left box: Launch, links, badges -->
                             <Border Grid.Column="0" Background="{StaticResource SurfaceComponentTableBrush}" CornerRadius="12"
                                     BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1" Padding="16,14">
-                            <StackPanel Spacing="10">
-                                <!-- Action buttons row -->
-                                <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Grid RowSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Row 0, Col 0: Action buttons -->
+                                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="4">
                                         <Button x:Name="DetailLaunchBtn" x:FieldModifier="internal"
                                                 Background="#1A3A20"
                                                 Foreground="#6AE87A"
@@ -451,31 +460,9 @@
                                         </Button>
                                     </StackPanel>
 
-                                <!-- Addon file + info badges with Browse button -->
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <controls:WrapPanel Grid.Column="0" HorizontalSpacing="8" VerticalSpacing="6">
-                                    <!-- Group 1: Mod info (addon file + generic/extended badge) -->
-                                    <Border x:Name="DetailInstalledFileBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
-                                            Background="{StaticResource ChipDefaultBrush}" BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1"
-                                            VerticalAlignment="Center" Visibility="Collapsed">
-                                        <TextBlock x:Name="DetailInstalledFile" x:FieldModifier="internal" FontSize="11" Foreground="{StaticResource ChipTextBrush}"/>
-                                    </Border>
-                                    <TextBlock x:Name="DetailModStatusIcon" x:FieldModifier="internal" FontSize="12" VerticalAlignment="Center" Visibility="Collapsed"/>
-                                    <Border x:Name="DetailGenericBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
-                                            Background="{StaticResource ChipDefaultBrush}" BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1"
-                                            VerticalAlignment="Center" Visibility="Collapsed">
-                                        <TextBlock x:Name="DetailGenericText" x:FieldModifier="internal" FontSize="11" Foreground="{StaticResource ChipTextBrush}"/>
-                                    </Border>
-
-                                    <!-- Separator: mod → platform -->
-                                    <Border x:Name="DetailSepModPlatform" x:FieldModifier="internal" Width="1" Background="{StaticResource BorderSubtleBrush}"
-                                            VerticalAlignment="Stretch" Visibility="Collapsed"/>
-
-                                    <!-- Group 2: Platform info (source + engine + 32-bit) -->
+                                <!-- Row 0, Col 1: Store + Engine (right-aligned) -->
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="4"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
                                     <Border x:Name="DetailSourceBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
                                             Background="{StaticResource ChipDefaultBrush}" BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1"
                                             VerticalAlignment="Center">
@@ -495,6 +482,37 @@
                                             <TextBlock x:Name="DetailEngineText" x:FieldModifier="internal" FontSize="11" Foreground="{StaticResource ChipTextBrush}"/>
                                         </StackPanel>
                                     </Border>
+                                </StackPanel>
+
+                                <!-- Row 1, Col 0: Addon file + mod badges -->
+                                <controls:WrapPanel Grid.Row="1" Grid.Column="0" HorizontalSpacing="8" VerticalSpacing="6">
+                                    <!-- Group 1: Mod info (addon file + generic/extended badge) -->
+                                    <Border x:Name="DetailInstalledFileBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
+                                            Background="{StaticResource ChipDefaultBrush}" BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1"
+                                            VerticalAlignment="Center" Visibility="Collapsed">
+                                        <TextBlock x:Name="DetailInstalledFile" x:FieldModifier="internal" FontSize="11" Foreground="{StaticResource ChipTextBrush}"/>
+                                    </Border>
+                                    <TextBlock x:Name="DetailModStatusIcon" x:FieldModifier="internal" FontSize="12" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                    <Border x:Name="DetailGenericBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
+                                            Background="{StaticResource ChipDefaultBrush}" BorderBrush="{StaticResource BorderDefaultBrush}" BorderThickness="1"
+                                            VerticalAlignment="Center" Visibility="Collapsed">
+                                        <TextBlock x:Name="DetailGenericText" x:FieldModifier="internal" FontSize="11" Foreground="{StaticResource ChipTextBrush}"/>
+                                    </Border>
+                                    <!-- Separator: mod → status -->
+                                    <Border x:Name="DetailSepModPlatform" x:FieldModifier="internal" Width="1" Background="{StaticResource BorderSubtleBrush}"
+                                            VerticalAlignment="Stretch" Visibility="Collapsed"/>
+                                    <!-- Wiki status -->
+                                    <Border x:Name="DetailWikiBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
+                                            VerticalAlignment="Center">
+                                        <TextBlock x:Name="DetailWikiText" x:FieldModifier="internal" FontSize="11"/>
+                                    </Border>
+                                    <!-- Kept for code-behind compatibility — always collapsed -->
+                                    <Border x:Name="DetailSepPlatformStatus" x:FieldModifier="internal" Width="0" Visibility="Collapsed"/>
+                                </controls:WrapPanel>
+
+                                <!-- Row 1, Col 1: API + Bitness (right-aligned) -->
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="4"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
                                     <StackPanel x:Name="DetailGraphicsApiBadgePanel" x:FieldModifier="internal"
                                                 Orientation="Horizontal" Spacing="4"
                                                 VerticalAlignment="Center" Visibility="Collapsed"/>
@@ -508,19 +526,8 @@
                                             VerticalAlignment="Center" Visibility="Collapsed">
                                         <TextBlock Text="64-bit" FontSize="11" Foreground="{StaticResource ChipTextBrush}"/>
                                     </Border>
-
-                                    <!-- Separator: platform → status -->
-                                    <Border x:Name="DetailSepPlatformStatus" x:FieldModifier="internal" Width="1" Background="{StaticResource BorderSubtleBrush}"
-                                            VerticalAlignment="Stretch" Visibility="Collapsed"/>
-
-                                    <!-- Group 3: Status (wiki + luma) -->
-                                    <Border x:Name="DetailWikiBadge" x:FieldModifier="internal" CornerRadius="5" Padding="6,2"
-                                            VerticalAlignment="Center">
-                                        <TextBlock x:Name="DetailWikiText" x:FieldModifier="internal" FontSize="11"/>
-                                    </Border>
-                                </controls:WrapPanel>
-                                </Grid>
-                            </StackPanel>
+                                </StackPanel>
+                            </Grid>
                             </Border>
                             <!-- Right box: Hide, Favourite, Config, Browse -->
                             <Border Grid.Column="1" Background="{StaticResource SurfaceComponentTableBrush}"
