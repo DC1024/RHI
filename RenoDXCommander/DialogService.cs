@@ -112,25 +112,6 @@ public partial class DialogService
         }
     }
 
-    /// <summary>
-    /// Returns true if a dialog is currently open (gate is held).
-    /// Use this as a lightweight check to skip expensive UI work while a dialog is showing.
-    /// </summary>
     public static bool IsDialogOpen => _dialogs.IsOpen;
-
-    // Keep legacy gate methods as thin wrappers so existing call sites compile.
-    // These can be removed once all callers are migrated to ShowSafeAsync/ShowProgressAsync.
-    public static bool TryAcquireDialogGate() => _dialogs.IsOpen ? false : true; // best-effort
-    public static async Task<bool> WaitDialogGateAsync(int timeoutSeconds = 15)
-    {
-        // Callers that relied on WaitDialogGateAsync + ReleaseDialogGate should use
-        // ShowProgressAsync instead. This shim just waits for the gate to open.
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
-        try { await Task.Delay(Timeout.Infinite, cts.Token).ConfigureAwait(false); }
-        catch (OperationCanceledException) { }
-        return !_dialogs.IsOpen;
-    }
-    public static void ReleaseDialogGate() { /* no-op — lifecycle managed by DialogCoordinator */ }
-
     internal void Stop() => _dialogs.Stop();
 }

@@ -352,10 +352,6 @@ internal static class NativeInterop
         Microsoft.Win32.SafeHandles.SafePipeHandle pipe, out uint serverProcessId);
 
     [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, [MarshalAs(UnmanagedType.Bool)] bool fAttach);
-
-    [DllImport("user32.dll")]
     internal static extern IntPtr GetForegroundWindow();
 
     /// <summary>
