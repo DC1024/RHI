@@ -458,7 +458,7 @@ public class MassDlssDeployDialog
             card.NotifyAll();
         }
 
-        // Close progress dialog
+        // Close progress dialog — release gate explicitly before Hide
         await progressSession.DisposeAsync();
 
         // Restore auto-create flag
@@ -566,7 +566,6 @@ public class MassDlssDeployDialog
             if (presetReset) presetsResetCount++;
         }
 
-        // Close progress dialog — release gate explicitly before Hide
         await progressSession.DisposeAsync();
 
         var reportText = new System.Text.StringBuilder();

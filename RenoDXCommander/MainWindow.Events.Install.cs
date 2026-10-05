@@ -45,7 +45,6 @@ public sealed partial class MainWindow
             RequestedTheme = ElementTheme.Dark,
         };
 
-        // Show dialog non-blocking (it stays open while updates run)
         await using var progressSession = await DialogService.ShowProgressAsync(dialog);
         if (progressSession == null) return;
 

@@ -1013,10 +1013,7 @@ public sealed partial class MainWindow
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
             };
-            
-            // Use explicit gate pattern to avoid race condition where fire-and-forget ShowSafeAsync
-            // Use explicit gate pattern to avoid race condition where fire-and-forget ShowSafeAsync
-            // hasn't acquired the gate yet when progressDialog.Hide() is called
+
             await using var progressSession = await DialogService.ShowProgressAsync(progressDialog);
             if (progressSession == null) return;
 

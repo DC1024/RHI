@@ -113,5 +113,5 @@ public partial class DialogService
     }
 
     public static bool IsDialogOpen => _dialogs.IsOpen;
-    internal void Stop() => _dialogs.Stop();
+    internal static void Stop() => _dialogs.Stop();
 }

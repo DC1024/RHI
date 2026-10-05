@@ -405,7 +405,7 @@ public sealed partial class MainWindow : Window
         _shutdownSignalTimer?.Stop();
         _launchTimer?.Stop();
         _selectionDebounceTimer?.Stop();
-        RunShutdownStep("dialogs", _dialogService.Stop);
+        RunShutdownStep("dialogs", DialogService.Stop);
         RunShutdownStep("background timers", ViewModel.StopBackgroundWork);
         RunShutdownStep("panel scans", _detailPanelBuilder.StopBackgroundWork);
 

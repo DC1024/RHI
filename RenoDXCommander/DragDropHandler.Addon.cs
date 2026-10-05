@@ -801,7 +801,6 @@ public partial class DragDropHandler
             RequestedTheme = ElementTheme.Dark,
         };
 
-        // Show dialog non-blocking (acquire dialog gate to prevent concurrent dialogs)
         await using var progressSession = await DialogService.ShowProgressAsync(progressDialog);
         if (progressSession == null)
         {
