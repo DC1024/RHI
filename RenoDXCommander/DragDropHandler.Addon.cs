@@ -802,14 +802,12 @@ public partial class DragDropHandler
         };
 
         // Show dialog non-blocking (acquire dialog gate to prevent concurrent dialogs)
-        if (!DialogService.TryAcquireDialogGate())
+        await using var progressSession = await DialogService.ShowProgressAsync(progressDialog);
+        if (progressSession == null)
         {
             CrashReporter.Log("[DragDropHandler.Addon] Skipped progress dialog — another dialog is open");
             return;
         }
-        bool gateReleased = false;
-        progressDialog.Closed += (_, _) => { if (!gateReleased) { gateReleased = true; DialogService.ReleaseDialogGate(); } };
-        var dialogTask = progressDialog.ShowAsync();
 
         try
         {
@@ -820,8 +818,7 @@ public partial class DragDropHandler
                 if (!response.IsSuccessStatusCode)
                 {
                     _crashReporter.Log($"[DragDropHandler.ProcessDroppedUrl] HTTP {(int)response.StatusCode} for URL: {url}");
-                    progressDialog.Hide();
-                    if (!gateReleased) { gateReleased = true; DialogService.ReleaseDialogGate(); }
+                    await progressSession.DisposeAsync();
                     var errDialog = new ContentDialog
                     {
                         Title = "❌ Download Failed",
@@ -876,8 +873,7 @@ public partial class DragDropHandler
             catch (HttpRequestException ex)
             {
                 _crashReporter.Log($"[DragDropHandler.ProcessDroppedUrl] Network error downloading '{url}' — {ex.Message}");
-                progressDialog.Hide();
-                if (!gateReleased) { gateReleased = true; DialogService.ReleaseDialogGate(); }
+                await progressSession.DisposeAsync();
                 var errDialog = new ContentDialog
                 {
                     Title = "❌ Download Failed",
@@ -892,8 +888,7 @@ public partial class DragDropHandler
             catch (TaskCanceledException ex)
             {
                 _crashReporter.Log($"[DragDropHandler.ProcessDroppedUrl] Download timed out for '{url}' — {ex.Message}");
-                progressDialog.Hide();
-                if (!gateReleased) { gateReleased = true; DialogService.ReleaseDialogGate(); }
+                await progressSession.DisposeAsync();
                 var errDialog = new ContentDialog
                 {
                     Title = "❌ Download Timed Out",
@@ -916,8 +911,7 @@ public partial class DragDropHandler
             {
                 _crashReporter.Log($"[DragDropHandler.ProcessDroppedUrl] Downloaded file '{filename}' is not a valid PE binary — deleting");
                 try { File.Delete(cachePath); } catch { }
-                progressDialog.Hide();
-                if (!gateReleased) { gateReleased = true; DialogService.ReleaseDialogGate(); }
+                await progressSession.DisposeAsync();
                 var errDialog = new ContentDialog
                 {
                     Title = "❌ Invalid Addon File",
@@ -931,8 +925,7 @@ public partial class DragDropHandler
             }
 
             // ── Step 7: Dismiss progress and route to existing install flow ───────
-            progressDialog.Hide();
-            if (!gateReleased) { gateReleased = true; DialogService.ReleaseDialogGate(); };
+            await progressSession.DisposeAsync();
             _crashReporter.Log($"[DragDropHandler.ProcessDroppedUrl] PE validation passed for '{filename}', routing to ProcessDroppedAddon");
             await ProcessDroppedAddon(cachePath);
         }

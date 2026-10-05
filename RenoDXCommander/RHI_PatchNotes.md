@@ -2,6 +2,30 @@
 
 To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. Takes about 30 seconds.
 
+## v2.8.5 Beta 1
+
+### Changes
+
+**Lifecycle & Shutdown**
+- Window close now follows a safe ordered sequence: cancels background tasks first, stops timers and dialogs, then saves settings and library. Previously background tasks could post back to a destroyed UI thread after close.
+- Added a window lifetime token so all background tasks, timers, and `Task.Delay` loops cancel immediately when the app closes instead of running until the next checkpoint.
+- Progress dialogs now own their modal slot for the full duration including the close animation. The old raw semaphore pattern could leak the gate if a dialog closed abnormally, permanently blocking all future dialogs.
+- Startup dialogs (patch notes, MOTD, update check) now run sequentially instead of racing each other for the same modal slot.
+- The heartbeat freeze detector no longer uses `Thread.Sleep` — it now uses an async probe so it can't contribute to the freezes it's detecting.
+
+**Foreground Activation**
+- The installer no longer uses `AttachThreadInput` to bring RHI to the front after an update. The old approach could deadlock if the foreground process was unresponsive. The new approach uses a registered Win32 message — the installer finds the RHI window, grants it foreground permission, and posts the message asynchronously. RHI handles it on the next dispatcher tick without any cross-process synchronisation.
+
+**Single Instance & Admin Mode**
+- Fixed a race where the Admin Mode relaunch could fail silently because the mutex was still held by the exiting instance. The mutex is now released before starting the replacement process.
+- Fixed `FileReceived` handler being wired after `StartListening` in two code paths — a message from a second instance arriving in that window would be silently dropped.
+- Refresh and Full Refresh now hold a serialisation gate while running, so a second Refresh triggered mid-scan can't race the first.
+
+### Maintenance
+- Installer script no longer has hardcoded user paths — build output and icon locations are now derived automatically from the repo root.
+
+---
+
 ## v2.8.4
 
 ### Bug Fixes

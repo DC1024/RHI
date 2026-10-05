@@ -54,14 +54,6 @@ public sealed partial class MainWindow
     {
         _crashReporter.Log("[MainWindow.CheckForUpdatesButton_Click] User clicked Check For Updates");
 
-        // Acquire the dialog gate before showing — use WaitDialogGateAsync so we don't skip
-        // if another dialog is briefly open (e.g. MOTD)
-        if (!await DialogService.WaitDialogGateAsync(5))
-        {
-            _crashReporter.Log("[CheckForUpdatesButton_Click] Could not acquire dialog gate");
-            return;
-        }
-
         // Show progress dialog
         var progressPanel = new StackPanel { Spacing = 8 };
         var progressRow = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 12 };
@@ -79,9 +71,8 @@ public sealed partial class MainWindow
             RequestedTheme = ElementTheme.Dark,
         };
 
-        // Fire-and-forget the ShowAsync — we'll Hide() it when done
-        // (ShowAsync returns when the dialog is dismissed; we dismiss it via Hide())
-        _ = progressDialog.ShowAsync();
+        await using var progressSession = await DialogService.ShowProgressAsync(progressDialog, 5);
+        if (progressSession == null) return;
 
         try
         {
@@ -97,6 +88,8 @@ public sealed partial class MainWindow
 
             // Check app update
             DispatcherQueue?.TryEnqueue(() => progressText.Text = "Checking app version...");
+            // The update prompt needs the same modal slot; close progress first.
+            await progressSession.DisposeAsync();
             await _dialogService.CheckForAppUpdateAsync();
         }
         catch (Exception ex)
@@ -105,8 +98,7 @@ public sealed partial class MainWindow
         }
         finally
         {
-            progressDialog.Hide();
-            DialogService.ReleaseDialogGate();
+            await progressSession.DisposeAsync();
         }
     }
 

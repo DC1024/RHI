@@ -408,7 +408,7 @@ public partial class MainViewModel
             ReconcileDefaultNaming();
 
             // Merge fresh cards into displayed cards
-            MergeCards(freshCards);
+            await MergeCardsAsync(freshCards);
 
             // Save updated library
             _ = Task.Run(() => { try { SaveLibrary(); } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Fire-and-forget SaveLibrary failed — {ex.Message}"); } });
@@ -655,7 +655,7 @@ public partial class MainViewModel
     /// cached cards. Updates existing cards in-place (so WinUI bindings fire),
     /// adds new games, and removes stale games.
     /// </summary>
-    private void MergeCards(List<GameCardViewModel> freshCards)
+    private async Task MergeCardsAsync(List<GameCardViewModel> freshCards)
     {
         _crashReporter.Log($"[MergeCards] Merging {freshCards.Count} fresh cards into {_allCards.Count} existing cards...");
 
@@ -798,7 +798,7 @@ public partial class MainViewModel
         _crashReporter.Log($"[MergeCards] Updated {freshCards.Count - cardsToAdd.Count} existing, added {cardsToAdd.Count} new, removed {cardsToRemove.Count} stale");
 
         // Execute all mutations on the UI thread to prevent cross-thread PropertyChanged issues
-        DispatcherQueue?.TryEnqueue(() =>
+        await UiDispatch.InvokeAsync(action => DispatcherQueue?.TryEnqueue(() => action()) == true, () =>
         {
             // Apply all property updates
             foreach (var action in updateActions)
@@ -827,7 +827,9 @@ public partial class MainViewModel
 
             // Refresh the selected game's detail panel so merged data (LumaMod, wiki, etc.) is visible
             SelectedGame?.NotifyAll();
-        });
+
+            return true;
+        }, _backgroundLifetime.Token);
     }
 
     private static string FormatAge(DateTime utc)

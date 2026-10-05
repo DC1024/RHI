@@ -32,6 +32,15 @@ public class AutoUpdateService
     // Guard so two passes never run concurrently (startup + 4h timer can overlap).
     private int _running; // 0 = idle, 1 = running  (Interlocked)
 
+    private volatile bool _stopped;
+
+    public void Stop()
+    {
+        _stopped = true;
+        StopRetryTimer();
+        _retryQueue.Clear();
+    }
+
     private record RetryEntry(GameCardViewModel Card, string Component);
 
     public AutoUpdateService(ICrashReporter crashReporter, SettingsViewModel settings)
@@ -54,6 +63,7 @@ public class AutoUpdateService
     /// </summary>
     public void TriggerAsync()
     {
+        if (_stopped) return;
         if (!_settings.AutoUpdateComponents) return;
         if (_viewModel == null) return;
 
@@ -64,6 +74,7 @@ public class AutoUpdateService
 
     private async Task RunPassAsync()
     {
+        if (_stopped) return;
         if (System.Threading.Interlocked.CompareExchange(ref _running, 1, 0) != 0)
         {
             _crashReporter.Log("[AutoUpdateService] Pass skipped — previous pass still running");
@@ -90,7 +101,7 @@ public class AutoUpdateService
 
     private async Task RunUpdatePassAsync()
     {
-        if (_viewModel == null) return;
+        if (_stopped || _viewModel == null) return;
 
         // Collect every card with any pending update (mirrors AnyUpdateAvailable logic).
         var cards = _viewModel.AllCards.ToList();
@@ -303,6 +314,7 @@ public class AutoUpdateService
     /// </summary>
     private async Task TryUpdateOneAsync(string component, GameCardViewModel card, Func<Task> updateAll)
     {
+        if (_stopped) return;
         try
         {
             _crashReporter.Log($"[AutoUpdateService] Updating {component} for '{card.GameName}'");
@@ -323,6 +335,7 @@ public class AutoUpdateService
 
     private void EnqueueRetry(GameCardViewModel card, string component)
     {
+        if (_stopped) return;
         // Avoid duplicate entries for the same card+component.
         // ConcurrentQueue has no Contains — we accept rare duplicates harmlessly
         // since UpdateAll* is idempotent when nothing needs updating.
@@ -334,7 +347,7 @@ public class AutoUpdateService
     {
         lock (_retryTimerLock)
         {
-            if (_retryTimer != null) return; // already running
+            if (_stopped || _retryTimer != null) return;
             _retryTimer = new System.Threading.Timer(
                 _ => _ = Task.Run(RetryPassAsync),
                 null,
@@ -346,7 +359,15 @@ public class AutoUpdateService
 
     private async Task RetryPassAsync()
     {
-        if (_viewModel == null) return;
+        if (_stopped || Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
+        try { await RetryPassCoreAsync().ConfigureAwait(false); }
+        catch (Exception ex) { _crashReporter.Log($"[AutoUpdateService] Retry pass failed — {ex.Message}"); }
+        finally { Interlocked.Exchange(ref _running, 0); }
+    }
+
+    private async Task RetryPassCoreAsync()
+    {
+        if (_stopped || _viewModel == null) return;
         if (_retryQueue.IsEmpty)
         {
             StopRetryTimer();
@@ -364,6 +385,7 @@ public class AutoUpdateService
 
         foreach (var entry in snapshot)
         {
+            if (_stopped) return;
             if (entry.Card.IsRunning)
             {
                 // Still running — re-queue.
@@ -427,5 +449,5 @@ public class AutoUpdateService
     }
 
     /// <summary>2-second breathing gap between individual card updates — keeps the pass non-disruptive.</summary>
-    private static Task Pause() => Task.Delay(TimeSpan.FromSeconds(2));
+    private Task Pause() => _stopped ? Task.CompletedTask : Task.Delay(TimeSpan.FromSeconds(2));
 }

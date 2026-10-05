@@ -141,12 +141,8 @@ public partial class App : Application
         Services = services.BuildServiceProvider();
     }
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // ── One-time migration from legacy AppData folders ───────
-        MigrateLegacyAppData();
-        DownloadsMigrationService.RunOnce();
-
         // Single-instance check: if another instance is already running,
         // forward the addon file path and exit immediately.
         var cmdArgs = Environment.GetCommandLineArgs();
@@ -213,13 +209,17 @@ public partial class App : Application
             return;
         }
 
+        // Only the owning instance may migrate shared application data.
+        MigrateLegacyAppData();
+        DownloadsMigrationService.RunOnce();
+
         // Store pending launch for after window initializes
         _pendingLaunchGame = launchGameArg;
         // Set minimized flag BEFORE creating the window so the constructor can read it
         _startMinimized = startMinimized;
 
         // ── Admin Mode: if the scheduled task exists and we're not elevated, relaunch via task ──
-        if (!IsRunningAsAdmin() && IsAdminTaskRegistered())
+        if (!IsRunningAsAdmin() && await IsAdminTaskRegisteredAsync())
         {
             try
             {
@@ -238,6 +238,9 @@ public partial class App : Application
                     UseShellExecute = false,
                     CreateNoWindow = true,
                 };
+                // Release ownership before starting the replacement or it can mistake
+                // this exiting process for an active instance and exit itself.
+                SingleInstanceService.Stop();
                 System.Diagnostics.Process.Start(psi);
                 try { File.Delete(CrashReporter.CurrentSessionLogPath); } catch { }
                 Environment.Exit(0);
@@ -246,6 +249,11 @@ public partial class App : Application
             catch (Exception ex)
             {
                 CrashReporter.Log($"[App.OnLaunched] Admin Mode relaunch failed — continuing non-elevated: {ex.Message}");
+                if (!SingleInstanceService.TryAcquire())
+                {
+                    Exit();
+                    return;
+                }
             }
         }
 
@@ -281,16 +289,14 @@ public partial class App : Application
                 SettingsViewModel.SaveSettingsFile(rawSettings);
                 CrashReporter.Log($"[App.OnLaunched] Setup complete — manageReShade={manageReShade}");
 
-                CrashReporter.Log($"[App.OnLaunched] Setup complete — manageReShade={manageReShade}");
-
                 setupWindow.AppWindow.Hide();
                 try
                 {
                     _window = Services.GetRequiredService<MainWindow>();
                     if (!startMinimized)
                         _window.Activate();
-                    SingleInstanceService.StartListening();
                     SingleInstanceService.FileReceived += OnFileReceived;
+                    SingleInstanceService.StartListening();
                     if (addonArg != null && _window is MainWindow mwAddon)
                         mwAddon.HandleAddonFile(addonArg);
                     if (nxmArg != null && _window is MainWindow mwNxm)
@@ -300,6 +306,8 @@ public partial class App : Application
                 catch (Exception ex)
                 {
                     CrashReporter.Log($"[App.OnLaunched] MainWindow creation failed after setup — {ex.Message}");
+                    setupWindow.AppWindow.Show();
+                    setupWindow.Activate();
                 }
             };
             setupWindow.Activate();
@@ -319,8 +327,8 @@ public partial class App : Application
         }
 
         // Start listening for file paths from subsequent instances
-        SingleInstanceService.StartListening();
         SingleInstanceService.FileReceived += OnFileReceived;
+        SingleInstanceService.StartListening();
 
         // Handle addon file passed on first launch
         if (addonArg != null)
@@ -482,20 +490,24 @@ public partial class App : Application
         }
     }
 
-    private static bool IsAdminTaskRegistered()
+    private static async Task<bool> IsAdminTaskRegisteredAsync()
     {
         try
         {
             var psi = new System.Diagnostics.ProcessStartInfo("schtasks.exe", "/Query /TN \"RHI Admin Mode\" /FO LIST")
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
             using var proc = System.Diagnostics.Process.Start(psi)!;
-            proc.StandardOutput.ReadToEnd();
-            proc.WaitForExit(5000);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            try { await proc.WaitForExitAsync(timeout.Token); }
+            catch (OperationCanceledException)
+            {
+                try { proc.Kill(); } catch { }
+                CrashReporter.Log("[App] Admin task query timed out — continuing normal startup");
+                return false;
+            }
             return proc.ExitCode == 0;
         }
         catch { return false; }

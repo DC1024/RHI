@@ -46,7 +46,8 @@ public sealed partial class MainWindow
         };
 
         // Show dialog non-blocking (it stays open while updates run)
-        var dialogTask = DialogService.ShowSafeAsync(dialog);
+        await using var progressSession = await DialogService.ShowProgressAsync(dialog);
+        if (progressSession == null) return;
 
         try
         {
@@ -93,7 +94,7 @@ public sealed partial class MainWindow
         }
 
         // Close the dialog
-        dialog.Hide();
+        await progressSession.DisposeAsync();
         ViewModel.NotifyUpdateButtonChanged();
     }
 
@@ -1170,17 +1171,14 @@ public sealed partial class MainWindow
             XamlRoot = Content.XamlRoot,
             RequestedTheme = ElementTheme.Dark,
         };
-        
-        // Use explicit gate pattern to ensure proper gate release even if operation completes quickly
-        bool refreshGateReleased = false;
-        progressDialog.Closed += (_, _) => { if (!refreshGateReleased) { refreshGateReleased = true; DialogService.ReleaseDialogGate(); } };
-        _ = DialogService.ShowSafeAsync(progressDialog);
+
+        await using var progressSession = await DialogService.ShowProgressAsync(progressDialog);
+        if (progressSession == null) return;
 
         var uiProgress = new Progress<string>(msg => DispatcherQueue?.TryEnqueue(() => progressText.Text = msg));
         await ViewModel.FullRefreshAsync(uiProgress);
 
-        refreshGateReleased = true;
-        progressDialog.Hide();
+        await progressSession.DisposeAsync();
         RestoreScrollAndSelection(selectedName);
     }
 

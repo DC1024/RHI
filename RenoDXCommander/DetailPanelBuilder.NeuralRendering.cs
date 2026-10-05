@@ -2943,14 +2943,8 @@ public partial class DetailPanelBuilder
         catch (Exception ex) { CrashReporter.Log($"[{logCtx}] Delete failed '{path}' — {ex.Message}"); }
     }
 
-    private static Task<T> DispatchAsync<T>(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, Func<T> func)
+    private Task<T> DispatchAsync<T>(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, Func<T> func)
     {
-        var tcs = new TaskCompletionSource<T>();
-        dispatcher.TryEnqueue(() =>
-        {
-            try   { tcs.SetResult(func()); }
-            catch (Exception ex) { tcs.SetException(ex); }
-        });
-        return tcs.Task;
+        return UiDispatch.InvokeAsync(action => dispatcher.TryEnqueue(() => action()), func, _window.LifetimeToken);
     }
 }
