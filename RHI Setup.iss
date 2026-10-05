@@ -4,7 +4,7 @@
 
 #define MyAppName "RHI"
 #ifndef PublishDir
-  #define PublishDir SourcePath + "RenoDXCommander\bin\installer\publish"
+  #define PublishDir "C:\Users\Mark\OneDrive\Documents\RDXC\Publish\RHI"
 #endif
 #ifndef InstallerOutputDir
   #define InstallerOutputDir SourcePath + "RenoDXCommander\bin\installer"
