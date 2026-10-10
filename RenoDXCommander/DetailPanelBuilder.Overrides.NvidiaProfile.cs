@@ -754,10 +754,19 @@ public partial class DetailPanelBuilder
                 if (pSvc.IsSupported && settings.DefaultFgDriverOverride && targetCard.HasDlssg)
                     pSvc.SetFgDriverOverride(targetCard.GameName, targetCard.InstallPath ?? "", true);
 
-                // Re-read override state after applying defaults (may have just been enabled above)
-                srOverride = pSvc.IsSupported && (srOverride || settings.DefaultSrDriverOverride);
-                rrOverride = pSvc.IsSupported && (rrOverride || settings.DefaultRrDriverOverride);
-                fgOverride = pSvc.IsSupported && (fgOverride || settings.DefaultFgDriverOverride);
+                // If the default is a specific version (NOT NVIDIA Override) but the game currently
+                // has driver override active, clear it first so the DLL swap can take effect.
+                if (pSvc.IsSupported && !settings.DefaultSrDriverOverride && srOverride && !string.IsNullOrEmpty(settings.DefaultDlssVersion))
+                    pSvc.SetSrDriverOverride(targetCard.GameName, targetCard.InstallPath ?? "", false);
+                if (pSvc.IsSupported && !settings.DefaultRrDriverOverride && rrOverride && !string.IsNullOrEmpty(settings.DefaultDlssdVersion))
+                    pSvc.SetRrDriverOverride(targetCard.GameName, targetCard.InstallPath ?? "", false);
+                if (pSvc.IsSupported && !settings.DefaultFgDriverOverride && fgOverride && !string.IsNullOrEmpty(settings.DefaultDlssgVersion))
+                    pSvc.SetFgDriverOverride(targetCard.GameName, targetCard.InstallPath ?? "", false);
+
+                // Re-read override state after applying defaults (may have just been enabled or disabled above)
+                srOverride = pSvc.IsSupported && settings.DefaultSrDriverOverride;
+                rrOverride = pSvc.IsSupported && settings.DefaultRrDriverOverride;
+                fgOverride = pSvc.IsSupported && settings.DefaultFgDriverOverride;
 
                 if (!string.IsNullOrEmpty(settings.DefaultDlssVersion) && targetCard.HasDlss && targetCard.DlssDetection.DlssPath != null
                     && !(targetCard.DlssInstalledVersion?.StartsWith("1.") == true) && !srOverride)

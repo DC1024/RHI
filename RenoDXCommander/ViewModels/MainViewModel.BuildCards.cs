@@ -236,6 +236,16 @@ public partial class MainViewModel
                 && !record.InstallPath.Equals(installPath, StringComparison.OrdinalIgnoreCase))
             {
                 var oldPath = record.InstallPath;
+
+                // Skip reconciliation if the old path is a parent of the new path (subfolder case).
+                // e.g. old="\The Witcher 3", new="\The Witcher 3\bin\x64_dx12" — the new path is
+                // just a corrected subfolder, not a genuine move. Copying the old addon here would
+                // overwrite a newly-installed different addon with the wrong file.
+                bool oldIsParentOfNew = installPath.StartsWith(oldPath.TrimEnd('\\', '/') + Path.DirectorySeparatorChar,
+                    StringComparison.OrdinalIgnoreCase);
+
+                if (!oldIsParentOfNew)
+                {
                 var addonFile = record.AddonFileName;
                 // Check both raw install path and addon deploy subfolder
                 var newDeployPath = ModInstallService.GetAddonDeployPath(installPath);
@@ -270,6 +280,7 @@ public partial class MainViewModel
                 {
                     _crashReporter.Log($"[BuildCards] Path reconciliation: '{game.Name}' path changed '{oldPath}' → '{installPath}', addon not found at either path (mod lost during game update)");
                 }
+                } // end !oldIsParentOfNew
 
                 // Always update the record to the new detected path
                 record.InstallPath = installPath;

@@ -19,6 +19,7 @@ public class WindowStateManager
     private IntPtr _origWndProc;
     private NativeInterop.WndProcDelegate? _wndProcDelegate; // prevent GC
     private OleDropTarget? _oleDropTarget; // prevent GC of COM drop target
+    private bool _oleInitialized;
 
     private static readonly string _windowSettingsPath = System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -108,6 +109,7 @@ public class WindowStateManager
     /// </summary>
     public void EnableDragAccept(bool launchDropHelper = true)
     {
+        if (_oleInitialized) return;
         // Allow drag messages through UIPI when running as admin
         NativeInterop.ChangeWindowMessageFilterEx(_hwnd, NativeInterop.WM_DROPFILES, NativeInterop.MSGFLT_ALLOW, IntPtr.Zero);
         NativeInterop.ChangeWindowMessageFilterEx(_hwnd, NativeInterop.WM_COPYGLOBALDATA, NativeInterop.MSGFLT_ALLOW, IntPtr.Zero);
@@ -138,6 +140,7 @@ public class WindowStateManager
                 return;
             }
 
+            _oleInitialized = true;
             _oleDropTarget = new OleDropTarget(this);
             int regHr = NativeInterop.RegisterDragDrop(_hwnd, _oleDropTarget);
             if (regHr != 0)
@@ -527,12 +530,9 @@ public class WindowStateManager
     /// </summary>
     public void CleanupOleDragDrop()
     {
-        if (_oleDropTarget == null)
-            return;
-
         try
         {
-            int hr = NativeInterop.RevokeDragDrop(_hwnd);
+            int hr = _oleDropTarget != null ? NativeInterop.RevokeDragDrop(_hwnd) : 0;
             if (hr != 0)
             {
                 _crashReporter.Log($"[WindowStateManager.CleanupOleDragDrop] RevokeDragDrop failed with HRESULT 0x{hr:X8} — continuing shutdown");
@@ -545,6 +545,11 @@ public class WindowStateManager
         finally
         {
             _oleDropTarget = null;
+            if (_oleInitialized)
+            {
+                _oleInitialized = false;
+                NativeInterop.OleUninitialize();
+            }
         }
     }
 

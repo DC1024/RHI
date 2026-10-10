@@ -2193,5 +2193,13 @@ public static class LocalizationService
         ["Deploy relimiter.ini"] = "部署 relimiter.ini",
         ["Open ReShade.ini"] = "打开 ReShade.ini",
         ["Register RHI as the nxm:// handler so Nexus \"Mod Manager Download\" buttons open directly in RHI."] = "将 RHI 注册为 nxm:// 处理程序，使 Nexus 的「Mod Manager Download」按钮直接在 RHI 中打开。",
+        ["Donate"] = "捐赠",
+        ["Loading mod data, please wait..."] = "正在加载模组数据，请稍候...",
+        ["No donation links available."] = "暂无可用的捐赠链接。",
+        ["Support the Mod Authors"] = "支持模组作者",
+        ["Support the mod authors"] = "支持模组作者",
+        ["These are the people who make the mods RHI manages. If you enjoy their work, consider supporting them."] = "这些人正是 RHI 所管理的模组的创作者。如果你喜欢他们的作品，不妨考虑支持他们。",
+        ["⚠ Important: To receive early access to RenoDX mods, you MUST link your Discord account to Ko-fi BEFORE donating. Donations made without linking first cannot be retroactively credited."] = "⚠ 重要提示：要抢先体验 RenoDX 模组，你必须在捐赠前先将 Discord 账号绑定到 Ko-fi。未先绑定的捐赠无法补记。",
+        ["❤ Support the Mod Authors"] = "❤ 支持模组作者",
     };
 }

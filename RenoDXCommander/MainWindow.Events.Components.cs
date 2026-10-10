@@ -2336,6 +2336,10 @@ public sealed partial class MainWindow
         ComboBox? nrWorkingScaleCombo = null;
         ComboBox? nrFinishedPicCombo  = null;
         (string Item1, string Item2)[]? nrScaleMap = null;
+        // Nightly-only combos also hoisted to method scope for preset capture
+        ComboBox? fgEnabledCombo      = null;
+        ComboBox? forceReflexCombo    = null;
+        ComboBox? reflexMarkersCombo  = null;
 
         if (isNightly || isDlssNr)
         {
@@ -2361,7 +2365,7 @@ public sealed partial class MainWindow
 
             // Row 4: FG Enabled — master on/off, first option in the FG section
             var currentFgEnabled = ReadOsIniValue("FrameGen", "Enabled");
-            var fgEnabledCombo = new ComboBox
+            fgEnabledCombo = new ComboBox
             {
                 ItemsSource = new[] { "Auto (false)", "True" },
                 SelectedItem = currentFgEnabled.Equals("true", StringComparison.OrdinalIgnoreCase) ? "True" : "Auto (false)",
@@ -2455,7 +2459,7 @@ public sealed partial class MainWindow
                 return "";
             }
             var currentForceReflex = ReadOsIniValue("fakenvapi", "ForceReflex");
-            var forceReflexCombo = new ComboBox
+            forceReflexCombo = new ComboBox
             {
                 ItemsSource = new[] { "Auto (0)", "Force Disable (1)", "Force Enable (2)" },
                 SelectedItem = currentForceReflex switch { "1" => "Force Disable (1)", "2" => "Force Enable (2)", _ => "Auto (0)" },
@@ -2464,7 +2468,7 @@ public sealed partial class MainWindow
                 "ForceReflex: controls Reflex state when using DLSS FG.\n0 = follow in-game setting (default), 1 = force disable, 2 = force enable.");
 
             var currentReflexMarkers = ReadOsIniValue("DLSSG", "UseGamesReflexMarkers");
-            var reflexMarkersCombo = new ComboBox
+            reflexMarkersCombo = new ComboBox
             {
                 ItemsSource = new[] { "True", "False" },
                 SelectedItem = currentReflexMarkers.Equals("false", StringComparison.OrdinalIgnoreCase) ? "False" : "True",
@@ -2970,6 +2974,18 @@ public sealed partial class MainWindow
                     string? capturedRenderScale = rsCombo?.SelectedItem as string;
                     bool?   capturedFlip        = flipCombo?.SelectedItem as string == "On";
                     string? capturedHudFix      = hudFixCombo?.SelectedItem is string hf ? (hf == "On" ? "true" : hf == "Off" ? "false" : "auto") : null;
+
+                    // Capture the 6 previously missing settings
+                    string? capturedVariant     = variantCombo.SelectedItem as string; // "Stable", "Nightly", "DLSS NR"
+                    string? capturedUpscalerApi = apiCombo.SelectedItem as string;     // "DX11", "DX12", "Vulkan"
+                    string? capturedUpscaler    = apiCombo.SelectedItem is string upApi && apiUpscalerCombo.SelectedItem is string upSel
+                                                  ? UpscalerOptionToIni(upApi, upSel) : null;
+                    string? capturedFgEnabled   = fgEnabledCombo.SelectedItem is string fge
+                                                  ? (fge == "True" ? "true" : fge == "Auto (false)" ? "auto" : null) : null;
+                    string? capturedForceReflex = forceReflexCombo.SelectedItem is string fr ? fr switch
+                                                  { "Force Disable (1)" => "1", "Force Enable (2)" => "2", _ => "0" } : null;
+                    string? capturedReflexMarkers = reflexMarkersCombo.SelectedItem is string rm
+                                                    ? (rm == "False" ? "false" : "true") : null;
                     float?  capturedFps         = null;
                     if (fpsLimitCombo.SelectedItem is string fpsSel)
                     {
@@ -3005,6 +3021,13 @@ public sealed partial class MainWindow
                     p.NrPasses            = capturedNrPasses;
                     p.NrWorkingScale      = capturedNrWorkingScale;
                     p.NrFinishedPicture   = capturedNrFinishedPic;
+                    // Previously missing fields
+                    p.OsVariant           = capturedVariant;
+                    p.UpscalerApi         = capturedUpscalerApi;
+                    p.Upscaler            = capturedUpscaler;
+                    p.FgEnabled           = capturedFgEnabled;
+                    p.ForceReflex         = capturedForceReflex;
+                    p.UseGamesReflexMarkers = capturedReflexMarkers;
 
                     OsPresetService.Save(presets);
                     applyBtn.IsEnabled = true;
@@ -3115,6 +3138,26 @@ public sealed partial class MainWindow
                         if (p.NrPasses         != null) OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "DlssNr", "Passes",          p.NrPasses);
                         if (p.NrWorkingScale   != null) OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "DlssNr", "WorkingScale",    p.NrWorkingScale);
                         if (p.NrFinishedPicture != null) OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "DlssNr", "FinishedPicture", p.NrFinishedPicture);
+
+                        // Previously missing: FG Enabled, Upscaler, Force Reflex, Reflex Markers
+                        if (p.FgEnabled != null && p.FgEnabled != "auto")
+                            OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "FrameGen", "Enabled", p.FgEnabled);
+                        if (p.UpscalerApi != null && p.Upscaler != null)
+                        {
+                            var iniKey = p.UpscalerApi switch { "DX12" => "Dx12Upscaler", "Vulkan" => "VulkanUpscaler", _ => "Dx11Upscaler" };
+                            OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "Upscalers", iniKey, p.Upscaler);
+                        }
+                        if (p.ForceReflex != null)
+                            OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "fakenvapi", "ForceReflex", p.ForceReflex);
+                        if (p.UseGamesReflexMarkers != null)
+                            OptiScalerService.SetOptiScalerIniValue(card.InstallPath, "DLSSG", "UseGamesReflexMarkers", p.UseGamesReflexMarkers);
+                    }
+
+                    // OsVariant — change if preset has one and it differs from current
+                    if (p.OsVariant != null)
+                    {
+                        var internalVariant = p.OsVariant switch { "DLSS NR" => "DlssNr", "Stable" => null, _ => p.OsVariant };
+                        ViewModel.SetOsVariant(card.GameName, internalVariant, card.Source ?? "");
                     }
 
                     // NR runtime swap (outside InstallPath guard — needs async)

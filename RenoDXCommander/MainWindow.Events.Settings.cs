@@ -769,19 +769,14 @@ public sealed partial class MainWindow
             XamlRoot = Content.XamlRoot,
             RequestedTheme = ElementTheme.Dark,
         };
-        
-        // Use explicit gate pattern to avoid race condition where fire-and-forget ShowSafeAsync
-        // hasn't acquired the gate yet when progressDialog.Hide() is called
-        bool importGateReleased = false;
-        progressDialog.Closed += (_, _) => { if (!importGateReleased) { importGateReleased = true; DialogService.ReleaseDialogGate(); } };
-        _ = DialogService.ShowSafeAsync(progressDialog);
-        await Task.Delay(100); // Let dialog render
+
+        await using var progressSession = await DialogService.ShowProgressAsync(progressDialog);
+        if (progressSession == null) return;
 
         var presetService = App.Services.GetRequiredService<DlssPresetService>();
         var count = await Task.Run(() => presetService.ImportProfiles(data));
 
-        importGateReleased = true;
-        progressDialog.Hide();
+        await progressSession.DisposeAsync();
 
         // Refresh settings page to reflect imported global values
         await _settingsHandler.RefreshGlobalNvidiaSettingsAsync();
@@ -1021,12 +1016,9 @@ public sealed partial class MainWindow
                 XamlRoot = Content.XamlRoot,
                 RequestedTheme = ElementTheme.Dark,
             };
-            
-            // Use explicit gate pattern to avoid race condition where fire-and-forget ShowSafeAsync
-            // hasn't acquired the gate yet when progressDialog.Hide() is called
-            bool resetGateReleased = false;
-            progressDialog.Closed += (_, _) => { if (!resetGateReleased) { resetGateReleased = true; DialogService.ReleaseDialogGate(); } };
-            _ = DialogService.ShowSafeAsync(progressDialog);
+
+            await using var progressSession = await DialogService.ShowProgressAsync(progressDialog);
+            if (progressSession == null) return;
 
             int resetCount = 0;
             await Task.Run(() =>
@@ -1050,8 +1042,7 @@ public sealed partial class MainWindow
                 presetSvc.ResetGlobalProfile();
             });
 
-            resetGateReleased = true;
-            progressDialog.Hide();
+            await progressSession.DisposeAsync();
 
             // Refresh all cards so the detail panel reflects cleared presets
             foreach (var card in ViewModel.AllCards)

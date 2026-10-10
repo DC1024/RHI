@@ -141,12 +141,8 @@ public partial class App : Application
         Services = services.BuildServiceProvider();
     }
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // ── One-time migration from legacy AppData folders ───────
-        MigrateLegacyAppData();
-        DownloadsMigrationService.RunOnce();
-
         // Single-instance check: if another instance is already running,
         // forward the addon file path and exit immediately.
         var cmdArgs = Environment.GetCommandLineArgs();
@@ -213,13 +209,17 @@ public partial class App : Application
             return;
         }
 
+        // Only the owning instance may migrate shared application data.
+        MigrateLegacyAppData();
+        DownloadsMigrationService.RunOnce();
+
         // Store pending launch for after window initializes
         _pendingLaunchGame = launchGameArg;
         // Set minimized flag BEFORE creating the window so the constructor can read it
         _startMinimized = startMinimized;
 
         // ── Admin Mode: if the scheduled task exists and we're not elevated, relaunch via task ──
-        if (!IsRunningAsAdmin() && IsAdminTaskRegistered())
+        if (!IsRunningAsAdmin() && await IsAdminTaskRegisteredAsync())
         {
             try
             {
@@ -238,6 +238,9 @@ public partial class App : Application
                     UseShellExecute = false,
                     CreateNoWindow = true,
                 };
+                // Release ownership before starting the replacement or it can mistake
+                // this exiting process for an active instance and exit itself.
+                SingleInstanceService.Stop();
                 System.Diagnostics.Process.Start(psi);
                 try { File.Delete(CrashReporter.CurrentSessionLogPath); } catch { }
                 Environment.Exit(0);
@@ -246,6 +249,11 @@ public partial class App : Application
             catch (Exception ex)
             {
                 CrashReporter.Log($"[App.OnLaunched] Admin Mode relaunch failed — continuing non-elevated: {ex.Message}");
+                if (!SingleInstanceService.TryAcquire())
+                {
+                    Exit();
+                    return;
+                }
             }
         }
 
@@ -255,7 +263,8 @@ public partial class App : Application
 
         // Apply any stored GitHub OAuth token to the shared HttpClient before the window loads.
         // The HttpClient singleton was built before settings were loaded — patch it here.
-        ApplyStoredGitHubToken();
+        // Fire-and-forget: validates the token first (auto-clears if expired/revoked).
+        _ = ApplyStoredGitHubTokenAsync();
 
         // Check if first-launch setup is needed
         // Check if first-launch setup is needed.
@@ -280,16 +289,14 @@ public partial class App : Application
                 SettingsViewModel.SaveSettingsFile(rawSettings);
                 CrashReporter.Log($"[App.OnLaunched] Setup complete — manageReShade={manageReShade}");
 
-                CrashReporter.Log($"[App.OnLaunched] Setup complete — manageReShade={manageReShade}");
-
                 setupWindow.AppWindow.Hide();
                 try
                 {
                     _window = Services.GetRequiredService<MainWindow>();
                     if (!startMinimized)
                         _window.Activate();
-                    SingleInstanceService.StartListening();
                     SingleInstanceService.FileReceived += OnFileReceived;
+                    SingleInstanceService.StartListening();
                     if (addonArg != null && _window is MainWindow mwAddon)
                         mwAddon.HandleAddonFile(addonArg);
                     if (nxmArg != null && _window is MainWindow mwNxm)
@@ -299,6 +306,8 @@ public partial class App : Application
                 catch (Exception ex)
                 {
                     CrashReporter.Log($"[App.OnLaunched] MainWindow creation failed after setup — {ex.Message}");
+                    setupWindow.AppWindow.Show();
+                    setupWindow.Activate();
                 }
             };
             setupWindow.Activate();
@@ -318,8 +327,8 @@ public partial class App : Application
         }
 
         // Start listening for file paths from subsequent instances
-        SingleInstanceService.StartListening();
         SingleInstanceService.FileReceived += OnFileReceived;
+        SingleInstanceService.StartListening();
 
         // Handle addon file passed on first launch
         if (addonArg != null)
@@ -431,7 +440,7 @@ public partial class App : Application
     /// apply it to DevUnlockService and the shared HttpClient so all API calls benefit from
     /// the higher rate limit (5,000/hr instead of 60/hr) right from startup.
     /// </summary>
-    private void ApplyStoredGitHubToken()
+    private async Task ApplyStoredGitHubTokenAsync()
     {
         try
         {
@@ -442,14 +451,38 @@ public partial class App : Application
             var settings = SettingsViewModel.LoadSettingsFile();
             if (!settings.TryGetValue("GitHubOAuthToken", out var token) || string.IsNullOrEmpty(token)) return;
 
-            // Apply to DevUnlockService cache so per-request callers (GitHubETagCache etc.) pick it up
-            DevUnlockService.UpdateToken(token);
-
-            // Patch the singleton HttpClient (already built — no Authorization header yet)
             var http = Services.GetRequiredService<HttpClient>();
-            GitHubAuthService.ApplyTokenToHttpClient(http, token);
 
+            // Apply the token IMMEDIATELY so startup network requests are authenticated.
+            // Validation happens after — if the token turns out to be revoked, we clear it
+            // on the next launch. This avoids a race where all startup requests fire before
+            // the async validation returns, hitting the unauthenticated 60 req/hour limit.
+            DevUnlockService.UpdateToken(token);
+            GitHubAuthService.ApplyTokenToHttpClient(http, token);
             CrashReporter.Log("[App.ApplyStoredGitHubToken] GitHub OAuth token applied from settings");
+
+            // Now validate in the background — clear if revoked so next launch is clean.
+            try
+            {
+                var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, "https://api.github.com/user");
+                req.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+                req.Headers.TryAddWithoutValidation("User-Agent", "RHI");
+                using var resp = await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+                if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    CrashReporter.Log("[App.ApplyStoredGitHubToken] Token is expired or revoked (401) — clearing from settings for next launch");
+                    // Remove from the default header so remaining requests in this session go unauthenticated
+                    // (better than sending a known-bad token that causes 401s everywhere)
+                    http.DefaultRequestHeaders.Remove("Authorization");
+                    DevUnlockService.UpdateToken(null);
+                    settings.Remove("GitHubOAuthToken");
+                    SettingsViewModel.SaveSettingsFile(settings);
+                }
+            }
+            catch (Exception valEx)
+            {
+                CrashReporter.Log($"[App.ApplyStoredGitHubToken] Token validation failed (network?) — keeping token — {valEx.Message}");
+            }
         }
         catch (Exception ex)
         {
@@ -457,20 +490,24 @@ public partial class App : Application
         }
     }
 
-    private static bool IsAdminTaskRegistered()
+    private static async Task<bool> IsAdminTaskRegisteredAsync()
     {
         try
         {
             var psi = new System.Diagnostics.ProcessStartInfo("schtasks.exe", "/Query /TN \"RHI Admin Mode\" /FO LIST")
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
             using var proc = System.Diagnostics.Process.Start(psi)!;
-            proc.StandardOutput.ReadToEnd();
-            proc.WaitForExit(5000);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            try { await proc.WaitForExitAsync(timeout.Token); }
+            catch (OperationCanceledException)
+            {
+                try { proc.Kill(); } catch { }
+                CrashReporter.Log("[App] Admin task query timed out — continuing normal startup");
+                return false;
+            }
             return proc.ExitCode == 0;
         }
         catch { return false; }

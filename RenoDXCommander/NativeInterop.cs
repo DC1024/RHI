@@ -208,6 +208,9 @@ internal static class NativeInterop
     internal static extern int OleInitialize(IntPtr pvReserved);
 
     [DllImport("ole32.dll")]
+    internal static extern void OleUninitialize();
+
+    [DllImport("ole32.dll")]
     internal static extern int RegisterDragDrop(IntPtr hwnd, IDropTarget pDropTarget);
 
     [DllImport("ole32.dll")]
@@ -291,17 +294,9 @@ internal static class NativeInterop
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
-    /// <summary>
-    /// Forces a window to the foreground, bypassing Windows' foreground-lock restrictions.
-    /// More reliable than SetForegroundWindow when called outside the foreground time window.
-    /// fAltTab=true mimics Alt+Tab behaviour (activates and shows the window).
-    /// </summary>
-    [DllImport("user32.dll")]
-    internal static extern void SwitchToThisWindow(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)] bool fAltTab);
-
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool AllowSetForegroundWindow(int dwProcessId);
+    internal static extern bool AllowSetForegroundWindow(uint dwProcessId);
 
     [DllImport("user32.dll")]
     internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
@@ -309,31 +304,64 @@ internal static class NativeInterop
     [DllImport("kernel32.dll")]
     internal static extern uint GetCurrentThreadId();
 
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern uint RegisterWindowMessage(string message);
+
+    internal delegate IntPtr SubclassProc(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam,
+        UIntPtr subclassId, UIntPtr referenceData);
+
+    [DllImport("comctl32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool SetWindowSubclass(IntPtr hwnd, SubclassProc procedure, UIntPtr subclassId, UIntPtr referenceData);
+
+    [DllImport("comctl32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool RemoveWindowSubclass(IntPtr hwnd, SubclassProc procedure, UIntPtr subclassId);
+
+    [DllImport("comctl32.dll")]
+    internal static extern IntPtr DefSubclassProc(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool SetProp(IntPtr hwnd, string name, IntPtr value);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    internal static extern IntPtr RemoveProp(IntPtr hwnd, string name);
+
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, [MarshalAs(UnmanagedType.Bool)] bool fAttach);
+    internal static extern bool IsIconic(IntPtr hwnd);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct FLASHWINFO
+    {
+        internal uint cbSize;
+        internal IntPtr hwnd;
+        internal uint dwFlags;
+        internal uint uCount;
+        internal uint dwTimeout;
+    }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool FlashWindowEx(ref FLASHWINFO info);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool GetNamedPipeServerProcessId(
+        Microsoft.Win32.SafeHandles.SafePipeHandle pipe, out uint serverProcessId);
 
     [DllImport("user32.dll")]
     internal static extern IntPtr GetForegroundWindow();
 
     /// <summary>
-    /// Forces a window to the foreground by temporarily attaching to the foreground thread's
-    /// input queue. This is the only reliable way to steal focus on launch without a user event.
+    /// Requests foreground activation without joining another process's input queue.
+    /// Windows may refuse focus stealing; that is preferable to hanging our UI when
+    /// the foreground process (including the installer) is blocked or unresponsive.
     /// </summary>
     internal static void ForceToForeground(IntPtr hwnd)
     {
-        var foregroundHwnd = GetForegroundWindow();
-        var foregroundThread = GetWindowThreadProcessId(foregroundHwnd, out _);
-        var currentThread = GetCurrentThreadId();
-
-        if (foregroundThread != currentThread)
-            AttachThreadInput(currentThread, foregroundThread, true);
-
-        SetForegroundWindow(hwnd);
-        BringWindowToTop(hwnd);
-
-        if (foregroundThread != currentThread)
-            AttachThreadInput(currentThread, foregroundThread, false);
+        Services.ForegroundActivation.Request(hwnd);
     }
 
     [DllImport("user32.dll")]

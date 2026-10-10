@@ -48,6 +48,11 @@ public sealed partial class MainWindow : Window
     private string? _pendingReselect;
     private bool _forceClose;
     private DispatcherTimer? _shutdownSignalTimer;
+    private DispatcherTimer? _launchTimer;
+    private readonly CancellationTokenSource _lifetime = new();
+    private ForegroundActivationTarget? _foregroundTarget;
+    internal CancellationToken LifetimeToken => _lifetime.Token;
+    internal bool IsShuttingDown => _lifetime.IsCancellationRequested;
 
     public MainWindow(MainViewModel viewModel, ICrashReporter crashReporter)
     {
@@ -250,12 +255,8 @@ public sealed partial class MainWindow : Window
         // Rebuild custom filter chips when the collection changes
         ViewModel.Filter.CustomFilters.CollectionChanged += (_, _) =>
             DispatcherQueue.TryEnqueue(RebuildCustomFilterChips);
-        // Silent update check — runs in background, shows dialog only if update found
-        CheckForAppUpdateAsync().SafeFireAndForget("MainWindow.UpdateCheck");
-        // Show patch notes on first launch after update
-        ShowPatchNotesIfNewVersionAsync().SafeFireAndForget("MainWindow.PatchNotes");
-        // Show MOTD if there's a new message
-        ShowMotdIfNewAsync().SafeFireAndForget("MainWindow.Motd");
+        // Startup prompts must not race for the same modal slot after an update.
+        _dialogService.ShowStartupDialogsAsync().SafeFireAndForget("MainWindow.StartupDialogs");
         // Register .addon64/.addon32 file associations (per-user, no admin)
         FileAssociationService.Register(crashReporter);
         // Watch Downloads folder for addon files
@@ -278,7 +279,7 @@ public sealed partial class MainWindow : Window
             var name = App._pendingLaunchGame;
             App._pendingLaunchGame = null;
             // Use a DispatcherTimer to wait for cards to be built (avoids TryEnqueue + async + Task.Delay deadlock risk)
-            var launchTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            var launchTimer = _launchTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
             launchTimer.Tick += (_, _) =>
             {
                 launchTimer.Stop();
@@ -302,8 +303,7 @@ public sealed partial class MainWindow : Window
                 try { File.Delete(signalPath); } catch { }
                 _shutdownSignalTimer?.Stop();
                 _crashReporter.Log("[MainWindow] Shutdown signal received from installer — exiting");
-                _forceClose = true;
-                this.Close();
+                RequestExit();
             }
         };
         _shutdownSignalTimer.Start();
@@ -316,6 +316,17 @@ public sealed partial class MainWindow : Window
             DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
             {
                 AppWindow.Hide();
+            });
+        }
+        else
+        {
+            // Publish after construction/initial presentation. The installer discovers
+            // the final window's PID, including when Admin Mode relaunches via a task.
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                if (!IsShuttingDown)
+                    _foregroundTarget = new ForegroundActivationTarget(_windowStateManager.Hwnd,
+                        action => DispatcherQueue.TryEnqueue(() => action()), BringToFront);
             });
         }
     }
@@ -366,8 +377,7 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            // Bring to front now that WinUI has presented the window — Activate() alone
-            // doesn't steal focus from whichever app was foreground when RHI launched.
+            // Request focus without attaching to another process's input queue.
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             NativeInterop.ForceToForeground(hwnd);
 
@@ -385,6 +395,7 @@ public sealed partial class MainWindow : Window
 
     private void MainWindow_Closed(object? sender, WindowEventArgs e)
     {
+        if (IsShuttingDown) return;
         if (ViewModel.Settings.CloseToTray && !_forceClose)
         {
             e.Handled = true;
@@ -395,32 +406,59 @@ public sealed partial class MainWindow : Window
         ViewModel.PropertyChanged -= OnViewModelChanged;
         LocalizationService.LanguageChanged -= LocalizationService_LanguageChanged;
 
-        // Normal close cleanup
+        _foregroundTarget?.Dispose();
+        _lifetime.Cancel();
+        _shutdownSignalTimer?.Stop();
+        _launchTimer?.Stop();
+        _selectionDebounceTimer?.Stop();
+        RunShutdownStep("dialogs", DialogService.Stop);
+        RunShutdownStep("background timers", ViewModel.StopBackgroundWork);
+        RunShutdownStep("panel scans", _detailPanelBuilder.StopBackgroundWork);
+
+        // An auxiliary Window keeps WinUI alive even after the main Window closes.
+        RunShutdownStep("update log window", () => _updateLogWindow?.Close());
         ViewModel.PropertyChanged -= OnViewModelChanged;
         if (_detailPanelBuilder.CurrentDetailCard != null)
             _detailPanelBuilder.CurrentDetailCard.PropertyChanged -= _detailPanelBuilder.DetailCard_PropertyChanged;
-        _addonFileWatcher.Dispose();
-        _windowStateManager.CleanupOleDragDrop();
-        TrayIconService.Dispose();
-        SingleInstanceService.Stop();
-        ViewModel.FlushPendingSaves(); // Flush any debounced saves before final save
-        ViewModel.SaveSettingsPublic();
-        ViewModel.SaveLibraryPublic();
-        _windowStateManager.SaveWindowBounds();
+        RunShutdownStep("file watcher", _addonFileWatcher.Dispose);
+        RunShutdownStep("drag and drop", _windowStateManager.CleanupOleDragDrop);
+        RunShutdownStep("tray", TrayIconService.Dispose);
+        // Save first, then flush: SaveSettingsPublic schedules a debounced write.
+        RunShutdownStep("settings", () => { ViewModel.SaveSettingsPublic(); ViewModel.FlushPendingSaves(); });
+        // During initialization the card list can be empty/partial. Preserve the last good library.
+        if (!ViewModel.IsLoading)
+            RunShutdownStep("library", ViewModel.SaveLibraryPublic);
+        RunShutdownStep("window bounds", _windowStateManager.SaveWindowBounds);
+        RunShutdownStep("single instance", SingleInstanceService.Stop);
+        Application.Current.Exit();
+    }
+
+    internal void RequestExit()
+    {
+        if (IsShuttingDown) return;
+        _forceClose = true;
+        Close();
+    }
+
+    private void RunShutdownStep(string name, Action cleanup)
+    {
+        try { cleanup(); }
+        catch (Exception ex) { _crashReporter.Log($"[Shutdown] {name} failed — {ex.Message}"); }
     }
 
     // ── Addon file handling (Downloads watcher + file association) ───────────────
 
     /// <summary>
-    /// Reliably brings the window to the foreground from any state (hidden, behind other windows).
+    /// Shows/restores the window and requests foreground activation, flashing the taskbar if refused.
     /// Must be called on the UI thread.
     /// </summary>
     internal void BringToFront()
     {
+        if (IsShuttingDown) return;
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
         AppWindow.Show();                               // unhide if hidden (CloseToTray / start-minimized)
-        NativeInterop.ForceToForeground(hwnd);          // AttachThreadInput trick — bypasses foreground lock
         this.Activate();                                // update WinUI internal state
+        NativeInterop.ForceToForeground(hwnd);
     }
 
     /// <summary>
@@ -434,7 +472,8 @@ public sealed partial class MainWindow : Window
 
             // Wait for game list to be populated before showing the picker
             while (ViewModel.IsLoading)
-                await Task.Delay(200);
+                await Task.Delay(200, LifetimeToken);
+            if (IsShuttingDown) return;
 
             // Bring window to front
             NativeInterop.SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
@@ -479,11 +518,19 @@ public sealed partial class MainWindow : Window
         // Wait for initialization to complete before processing — same pattern as HandleAddonFile
         _ = Task.Run(async () =>
         {
-            while (ViewModel.IsLoading)
-                await Task.Delay(200);
-
-            DispatcherQueue?.TryEnqueue(() => NativeInterop.SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)));
-            DispatcherQueue?.TryEnqueue(() => _ = ViewModel.HandleNxmLinkAsync(link));
+            try
+            {
+                while (ViewModel.IsLoading)
+                    await Task.Delay(200, LifetimeToken);
+                if (IsShuttingDown) return;
+                DispatcherQueue?.TryEnqueue(() =>
+                {
+                    if (IsShuttingDown) return;
+                    BringToFront();
+                    _ = ViewModel.HandleNxmLinkAsync(link);
+                });
+            }
+            catch (OperationCanceledException) when (IsShuttingDown) { }
         });
     }
 
@@ -494,8 +541,8 @@ public sealed partial class MainWindow : Window
             _crashReporter.Log($"[MainWindow.HandleArchiveFile] Processing '{Path.GetFileName(filePath)}'");
 
             while (ViewModel.IsLoading)
-                await Task.Delay(200);
-
+                await Task.Delay(200, LifetimeToken);
+            if (IsShuttingDown) return;
             NativeInterop.SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
 
             // Check if this is a Luma mod archive

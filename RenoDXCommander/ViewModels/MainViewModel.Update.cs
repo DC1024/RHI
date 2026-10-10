@@ -11,9 +11,31 @@ public partial class MainViewModel
     private System.Threading.Timer? _updateCheckTimer;
     private System.Threading.Timer? _heartbeatTimer;
     private volatile string _lastUiAction = "none";
+    private readonly object _backgroundTimerLock = new();
+    private volatile bool _backgroundStopped;
+    private readonly CancellationTokenSource _backgroundLifetime = new();
+
+    internal void StopBackgroundWork()
+    {
+        lock (_backgroundTimerLock)
+        {
+            _backgroundStopped = true;
+            _heartbeatTimer?.Dispose();
+            _heartbeatTimer = null;
+            _updateCheckTimer?.Dispose();
+            _updateCheckTimer = null;
+        }
+        _backgroundLifetime.Cancel();
+        PeriodicAppUpdateCheck = null;
+        _autoUpdateService.Stop();
+    }
 
     /// <summary>Tracks the last action dispatched to the UI thread for freeze diagnostics.</summary>
-    internal void SetLastUiAction(string action) => _lastUiAction = action;
+    internal void SetLastUiAction(string action)
+    {
+        _lastUiAction = action;
+        _crashReporter.Log($"[UIAction] {action}");
+    }
 
     /// <summary>
     /// Starts a 10-second heartbeat timer. On each tick it posts a quick probe to the UI thread.
@@ -22,21 +44,27 @@ public partial class MainViewModel
     /// </summary>
     internal void StartHeartbeatTimer()
     {
-        _heartbeatTimer = new System.Threading.Timer(_ =>
+        lock (_backgroundTimerLock)
         {
-            var probeReceived = false;
-            DispatcherQueue?.TryEnqueue(() => { probeReceived = true; });
-
-            // Wait up to 3 seconds for the UI thread to process the probe
-            var deadline = Environment.TickCount64 + 3000;
-            while (!probeReceived && Environment.TickCount64 < deadline)
-                System.Threading.Thread.Sleep(100);
-
-            if (probeReceived)
-                _crashReporter.Log($"[Heartbeat] UI responsive — last action: {_lastUiAction}");
-            else
-                _crashReporter.Log($"[Heartbeat] *** UI FROZEN *** last action before freeze: {_lastUiAction}");
-        }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+            if (_backgroundStopped || _heartbeatTimer != null) return;
+            _heartbeatTimer = new System.Threading.Timer(async _ =>
+            {
+                if (_backgroundStopped) return;
+                var probe = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                if (DispatcherQueue?.TryEnqueue(() => probe.TrySetResult(true)) != true) return;
+                try
+                {
+                    await probe.Task.WaitAsync(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+                    if (!_backgroundStopped)
+                        _crashReporter.Log($"[Heartbeat] UI responsive — last action: {_lastUiAction}");
+                }
+                catch (TimeoutException)
+                {
+                    if (!_backgroundStopped)
+                        _crashReporter.Log($"[Heartbeat] *** UI FROZEN *** last action before freeze: {_lastUiAction}");
+                }
+            }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+        }
     }
 
     /// <summary>
@@ -45,9 +73,20 @@ public partial class MainViewModel
     /// </summary>
     internal void StartPeriodicUpdateCheckTimer()
     {
-        var interval = TimeSpan.FromHours(4);
-        _updateCheckTimer = new System.Threading.Timer(async _ =>
+        lock (_backgroundTimerLock)
         {
+            if (_backgroundStopped || _updateCheckTimer != null) return;
+            _updateCheckTimer = CreatePeriodicUpdateCheckTimer();
+            _crashReporter.Log("[MainViewModel] Periodic update check timer started (4h interval)");
+        }
+    }
+
+    private System.Threading.Timer CreatePeriodicUpdateCheckTimer()
+    {
+        var interval = TimeSpan.FromHours(4);
+        return new System.Threading.Timer(async _ =>
+        {
+            if (_backgroundStopped) return;
             try
             {
                 _crashReporter.Log("[MainViewModel] Periodic update check triggered (4h timer)");
@@ -207,7 +246,6 @@ public partial class MainViewModel
                 PeriodicAppUpdateCheck?.Invoke();
             });
         }, null, interval, interval);
-        _crashReporter.Log("[MainViewModel] Periodic update check timer started (4h interval)");
     }
 
     /// <summary>Callback set by MainWindow to trigger app update check from the periodic timer.</summary>
@@ -256,6 +294,7 @@ public partial class MainViewModel
             var sections = new List<string>();
             var currentSection = new List<string>();
             bool inSection = false;
+            var preamble = new List<string>();
 
             foreach (var line in lines)
             {
@@ -285,15 +324,25 @@ public partial class MainViewModel
                         currentSection.Add(line);
                     }
                 }
+                else
+                {
+                    preamble.Add(line);
+                }
             }
 
             // Capture final section if still in progress
             if (inSection && currentSection.Count > 0 && sections.Count < count)
                 sections.Add(string.Join("\n", currentSection));
 
-            return sections.Count > 0
+            var body = sections.Count > 0
                 ? string.Join("\n\n---\n\n", sections)
                 : "No patch notes available.";
+
+            // Prepend preamble (e.g. the GitHub API warning banner) if present
+            var preambleText = string.Join("\n", preamble).Trim();
+            return string.IsNullOrEmpty(preambleText)
+                ? body
+                : preambleText + "\n\n---\n\n" + body;
         }
         catch (Exception ex)
         {

@@ -14,7 +14,11 @@ public partial class DlssPresetService
         if (!_isSupported || _session == null || _cachedProfiles == null)
             return 0;
 
-        _sessionLock.Wait();
+        if (!_sessionLock.Wait(millisecondsTimeout: 5_000))
+        {
+            CrashReporter.Log($"[DlssPresetService.GetPreset] Lock timeout for '{gameName}' — NVAPI may be hung. Returning 0.");
+            return 0;
+        }
         try
         {
             var profile = FindProfile(gameName, installPath);
@@ -47,7 +51,11 @@ public partial class DlssPresetService
         if (!_isSupported || _session == null || _cachedProfiles == null)
             return false;
 
-        _sessionLock.Wait();
+        if (!_sessionLock.Wait(millisecondsTimeout: 5_000))
+        {
+            CrashReporter.Log($"[DlssPresetService.SetPreset] Lock timeout for '{gameName}' — NVAPI may be hung. Skipping.");
+            return false;
+        }
         try
         {
             var profile = FindProfile(gameName, installPath);
@@ -120,7 +128,11 @@ public partial class DlssPresetService
         if (!_isSupported || _session == null || _cachedProfiles == null)
             return false;
 
-        _sessionLock.Wait();
+        if (!_sessionLock.Wait(millisecondsTimeout: 5_000))
+        {
+            CrashReporter.Log($"[DlssPresetService.DeletePreset] Lock timeout for '{gameName}' — NVAPI may be hung. Skipping.");
+            return false;
+        }
         try
         {
             var profile = FindProfile(gameName, installPath);

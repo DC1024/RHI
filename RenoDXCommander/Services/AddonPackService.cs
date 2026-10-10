@@ -725,6 +725,58 @@ public class AddonPackService : IAddonPackService
                     OldVersion    = storedVersion,
                     NewVersion    = remoteVersion,
                 });
+
+                // Auto-redeploy the updated file to all game folders that have it installed.
+                // Without this, the staged file is updated but game folders keep the old version
+                // until the user manually reinstalls (reported as "update shows as latest but wasn't").
+                try
+                {
+                    var safeName = SanitizeFileName(entry.PackageName);
+                    var staged64 = Path.Combine(StagingDir, safeName + ".addon64");
+                    var staged32 = Path.Combine(StagingDir, safeName + ".addon32");
+                    var deployments = LoadDeployments();
+                    int redeployed = 0;
+                    foreach (var (gamePath, trackedFiles) in deployments)
+                    {
+                        foreach (var trackedFile in trackedFiles.ToList())
+                        {
+                            var ext = Path.GetExtension(trackedFile);
+                            string? staged = ext.Equals(".addon64", StringComparison.OrdinalIgnoreCase) ? staged64
+                                           : ext.Equals(".addon32", StringComparison.OrdinalIgnoreCase) ? staged32
+                                           : null;
+                            if (staged == null || !File.Exists(staged)) continue;
+
+                            // Only redeploy if the deployed filename matches this addon's known names
+                            var vData = LoadVersions();
+                            vData.TryGetValue(entry.PackageName, out var vInfo);
+                            var knownName64 = vInfo?.OriginalName64;
+                            var knownName32 = vInfo?.OriginalName32;
+                            var trackedNoExt = Path.GetFileNameWithoutExtension(trackedFile);
+                            bool matches = trackedNoExt.Equals(safeName, StringComparison.OrdinalIgnoreCase)
+                                        || (!string.IsNullOrEmpty(knownName64) && trackedNoExt.Equals(knownName64, StringComparison.OrdinalIgnoreCase))
+                                        || (!string.IsNullOrEmpty(knownName32) && trackedNoExt.Equals(knownName32, StringComparison.OrdinalIgnoreCase));
+                            if (!matches) continue;
+
+                            var dest = Path.Combine(gamePath, trackedFile);
+                            if (!Directory.Exists(gamePath)) continue;
+                            try
+                            {
+                                File.Copy(staged, dest, overwrite: true);
+                                redeployed++;
+                            }
+                            catch (Exception copyEx)
+                            {
+                                CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeploy failed for '{trackedFile}' at '{gamePath}' — {copyEx.Message}");
+                            }
+                        }
+                    }
+                    if (redeployed > 0)
+                        CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeployed '{entry.PackageName}' to {redeployed} game folder(s).");
+                }
+                catch (Exception redeployEx)
+                {
+                    CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeploy pass failed for '{entry.PackageName}' — {redeployEx.Message}");
+                }
             }
             catch (Exception ex)
             {
@@ -907,6 +959,17 @@ public class AddonPackService : IAddonPackService
                 if (deployedFileNames.Contains(fileName))
                     continue;
 
+                // Don't remove the opposite-bitness twin of an addon we just deployed.
+                // Example: we deployed renodx-unityengine.addon32 (because Is32Bit is currently true),
+                // but renodx-unityengine.addon64 is still tracked from a previous 64-bit install.
+                // If Is32Bit was mis-detected this session, removing the .addon64 would permanently
+                // destroy the user's correct 64-bit installation. Keep both and let the user sort it out.
+                var fileBase = Path.GetFileNameWithoutExtension(fileName);
+                var fileExt  = Path.GetExtension(fileName);
+                var twinExt  = fileExt.Equals(".addon64", StringComparison.OrdinalIgnoreCase) ? ".addon32" : ".addon64";
+                if (deployedFileNames.Contains(fileBase + twinExt, StringComparer.OrdinalIgnoreCase))
+                    continue;
+
                 // Don't remove renodx-dlss5 addon if the Neural Rendering section owns it
                 // (detected by presence of nvngx_dlssnr.dll or its sentinel in the same folder)
                 if (fileName.Equals("renodx-dlss5.addon64", StringComparison.OrdinalIgnoreCase)
@@ -929,6 +992,11 @@ public class AddonPackService : IAddonPackService
 
                 // Don't remove dlssnr-companion addon — managed by Cost Scaler, not tracked here
                 if (fileName.Equals(DlssNrCostScalerService.CompanionAddonName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Don't remove MFG Ada Unlock — managed by the Extras row, not the addon pack selection
+                if (fileName.Equals("renodx-mfgunlock.addon64", StringComparison.OrdinalIgnoreCase)
+                    || fileName.Equals("renodx-mfgunlock.addon32", StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 try

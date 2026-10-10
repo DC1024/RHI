@@ -14,6 +14,19 @@ namespace RenoDXCommander.ViewModels;
 
 public partial class MainViewModel
 {
+    private readonly SemaphoreSlim _libraryOperationGate = new(1, 1);
+
+    private async Task RunLibraryOperationAsync(Func<Task> operation)
+    {
+        try { await _libraryOperationGate.WaitAsync(_backgroundLifetime.Token); }
+        catch (OperationCanceledException) when (_backgroundStopped) { return; }
+        try
+        {
+            if (!_backgroundStopped) await operation();
+        }
+        finally { _libraryOperationGate.Release(); }
+    }
+
     // Normalize titles for tolerant lookup: remove punctuation, trademarks, parenthetical text, diacritics
     private static string NormalizeForLookup(string s)
     {
@@ -88,7 +101,9 @@ public partial class MainViewModel
 
     // ── Commands ──────────────────────────────────────────────────────────────────
 
-    public async Task RefreshAsync()
+    public Task RefreshAsync() => RunLibraryOperationAsync(RefreshCoreAsync);
+
+    private async Task RefreshCoreAsync()
     {
         // Re-check games in the DLSS skip cache before rebuilding cards.
         // Games confirmed as "no DLSS" after 3+ scans are skipped in BuildCards — this
@@ -111,7 +126,7 @@ public partial class MainViewModel
             catch (Exception ex) { _crashReporter.Log($"[MainViewModel.RefreshAsync] RecheckSkipList failed — {ex.Message}"); }
         });
 
-        await InitializeAsync(forceRescan: true);
+        await InitializeCoreAsync(forceRescan: true);
 
         // Check for custom ReShade DLL changes and redeploy
         try
@@ -124,7 +139,10 @@ public partial class MainViewModel
     }
 
     [RelayCommand]
-    public async Task FullRefreshAsync(IProgress<string>? progress = null)
+    public Task FullRefreshAsync(IProgress<string>? progress = null)
+        => RunLibraryOperationAsync(() => FullRefreshCoreAsync(progress));
+
+    private async Task FullRefreshCoreAsync(IProgress<string>? progress)
     {
         // Clear all caches so every game is re-scanned from disk.
         progress?.Report("Clearing caches...");
@@ -157,7 +175,7 @@ public partial class MainViewModel
         }
         catch (Exception ex) { _crashReporter.Log($"[FullRefreshAsync] Install record validation failed — {ex.Message}"); }
 
-        await InitializeAsync(forceRescan: true, progress: progress);
+        await InitializeCoreAsync(forceRescan: true, progress: progress);
     }
 
     /// <summary>Forces the next update check to bypass the 4-hour cooldown.</summary>
@@ -165,7 +183,10 @@ public partial class MainViewModel
 
     // ── Init ──
 
-    public async Task InitializeAsync(bool forceRescan = false, IProgress<string>? progress = null)
+    public Task InitializeAsync(bool forceRescan = false, IProgress<string>? progress = null)
+        => RunLibraryOperationAsync(() => InitializeCoreAsync(forceRescan, progress));
+
+    private async Task InitializeCoreAsync(bool forceRescan = false, IProgress<string>? progress = null)
     {
         IsLoading = true;
         if (!_hasInitialized) DisplayedGames.Clear();
@@ -175,7 +196,8 @@ public partial class MainViewModel
         foreach (var c in _allCards)
             prevUpdateStatus[c.GameName] = (c.Status, c.RsStatus, c.DcStatus, c.UlStatus, c.RefStatus, c.OsStatus, c.DxvkStatus);
 
-        _allCards.Clear();
+        // Keep the last complete snapshot until the replacement is built. Clearing
+        // it here made shutdown and background saves persist an empty library.
         _originalDetectedNames.Clear();
 
         _crashReporter.Log($"[MainViewModel.InitializeAsync] Started (forceRescan={forceRescan})");
@@ -284,7 +306,9 @@ public partial class MainViewModel
                 // Restore saved Digital Vibrance levels on startup
                 _ = Task.Run(() => { try { DigitalVibranceService.RestoreSavedLevels(Settings.DigitalVibranceSettings); } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] DVC restore failed — {ex.Message}"); } });
                 await LoadCacheAndBuildCardsAsync(savedLib!);
-                _ = RunBackgroundScanAndMergeAsync(savedLib!, isStartup: true);
+                // Cache cards are already visible; retain operation ownership until
+                // the merge finishes so Refresh cannot race this second phase.
+                await RunBackgroundScanAndMergeAsync(savedLib!, isStartup: true);
                 return;
             }
 
@@ -450,6 +474,7 @@ public partial class MainViewModel
             // 4. Await network tasks individually so failures don't block game display
             try { await wikiTask; } catch (Exception ex) { wikiFetchFailed = true; _crashReporter.Log($"[MainViewModel.InitializeAsync] Wiki fetch failed (offline?) — {ex.Message}"); }
             try { await lumaTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Luma fetch failed (offline?) — {ex.Message}"); }
+            try { await lumaRelTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Luma releases fetch failed (offline?) — {ex.Message}"); }
             try { await lumaUeTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Luma UE table fetch failed (offline?) — {ex.Message}"); }
             try { _manifest = await manifestTask; AuxInstallService.GlobalManifest = _manifest; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] Manifest fetch failed — {ex.Message}"); }
             try { await osWikiTask; } catch (Exception ex) { _crashReporter.Log($"[MainViewModel.InitializeAsync] OptiScaler wiki task failed — {ex.Message}"); }
@@ -625,7 +650,7 @@ public partial class MainViewModel
 
             // Merge manifest-provided author donation URLs and display names
             if (_manifest != null)
-                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames);
+                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames, _manifest.AuthorRoles);
 
             // Apply manifest-driven wiki status overrides to mod list
             ApplyManifestStatusOverrides();

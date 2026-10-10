@@ -2,6 +2,88 @@
 
 To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. Takes about 30 seconds.
 
+## v2.8.5 Beta 1
+
+### Changes
+
+**Lifecycle & Shutdown**
+- Window close now follows a safe ordered sequence: cancels background tasks first, stops timers and dialogs, then saves settings and library. Previously background tasks could post back to a destroyed UI thread after close.
+- Added a window lifetime token so all background tasks, timers, and `Task.Delay` loops cancel immediately when the app closes instead of running until the next checkpoint.
+- Progress dialogs now own their modal slot for the full duration including the close animation. The old raw semaphore pattern could leak the gate if a dialog closed abnormally, permanently blocking all future dialogs.
+- Startup dialogs (patch notes, MOTD, update check) now run sequentially instead of racing each other for the same modal slot.
+- The heartbeat freeze detector no longer uses `Thread.Sleep` — it now uses an async probe so it can't contribute to the freezes it's detecting.
+
+**Foreground Activation**
+- The installer no longer uses `AttachThreadInput` to bring RHI to the front after an update. The old approach could deadlock if the foreground process was unresponsive. The new approach uses a registered Win32 message — the installer finds the RHI window, grants it foreground permission, and posts the message asynchronously. RHI handles it on the next dispatcher tick without any cross-process synchronisation.
+
+**Single Instance & Admin Mode**
+- Fixed a race where the Admin Mode relaunch could fail silently because the mutex was still held by the exiting instance. The mutex is now released before starting the replacement process.
+- Fixed `FileReceived` handler being wired after `StartListening` in two code paths — a message from a second instance arriving in that window would be silently dropped.
+- Refresh and Full Refresh now hold a serialisation gate while running, so a second Refresh triggered mid-scan can't race the first.
+
+### Maintenance
+- Installer script no longer has hardcoded user paths — build output and icon locations are now derived automatically from the repo root.
+
+---
+
+## v2.8.4
+
+### Bug Fixes
+
+**GitHub Sign-In**
+- Fixed a startup race where all network requests fired before the stored GitHub token was applied, burning through the unauthenticated 60 req/hour limit instantly. The token is now applied before any requests go out. If the token turns out to be revoked, it's stripped mid-session and cleared from settings for the next launch.
+
+**Other**
+- Fixed the Available HDR Mods count being lower than expected on some launches. Luma release mods were being merged before the GitHub fetch completed, so however many had loaded by that point was what you got. The count is now always stable.
+
+---
+
+## v2.8.3
+
+### Bug Fixes
+
+**Freezes**
+- Fixed the most common cause of persistent UI freezes after selecting games with DLSS installed. An internal scan lock was not being released if a game folder was deleted or had a permission error, causing every subsequent DLSS and Driver Settings panel to hang indefinitely.
+
+**Shader Packs**
+- Fixed most shader packs not downloading when the shader cache was cleared. Two download tasks were racing at startup, causing packs to be skipped mid-download and never extracted.
+
+**GitHub Sign-In**
+- Fixed a revoked GitHub sign-in token causing 401 errors on every request. RHI now detects the revoked token on startup and clears it automatically, falling back to unauthenticated access.
+
+**Other**
+- Fixed ReShade not downloading when reshade.me returns a server error. Their server intermittently returns HTTP 500 even when the page loads correctly. RHI now reads the page regardless of the error code.
+- Fixed OptiScaler presets not saving 6 settings: OptiScaler Version, Upscaler API, Upscaler, FG Enabled, Force Reflex, and Use Games Reflex Markers.
+- Fixed a second older RenoDX addon reappearing in The Witcher 3: Wild Hunt — Remastered (and potentially other games) after every restart.
+- Fixed the Available HDR Mods button showing inconsistent counts depending on when it was clicked. The button is now disabled until the scan completes.
+
+### Maintenance
+- Added detailed diagnostic logging to help investigate remaining UI freeze reports.
+
+---
+
+## v2.8.2
+
+### New
+- **Donate button** — new button in the toolbar between Help and Settings. Opens a dialog listing all mod authors with what they make and a direct link to their Ko-fi page. Authors are sorted alphabetically and updated via the manifest, so new entries show up without an app update.
+
+### Bug Fixes
+
+**Freezes**
+- Fixed a UI freeze that occurred when selecting certain games (particularly those with a full DLSS profile — SR, RR, FG, and Streamline all installed). The freeze could last indefinitely and required killing the app. A 5-second safety timeout now prevents this from ever blocking permanently.
+- Fixed Quick Apply doing nothing on games where SR, RR, or FG version is set to NVIDIA Override. It now correctly disables the override and deploys the chosen version, the same as changing the combo manually.
+
+**Addons**
+- Fixed Unity addon (and any other dual-bitness addon) being silently swapped from 64-bit to 32-bit between sessions. RHI was removing the 64-bit file and replacing it with the 32-bit one whenever the background scan detected a different bitness. Both versions are now kept independently.
+- Fixed MFG Ada Unlock being removed from game folders after restarting the app or installing a mod. RHI was incorrectly treating it as an unmanaged addon and cleaning it up.
+- Fixed addon updates not being deployed to game folders. When a new version downloaded (e.g. MFG Ada Unlock), it would update in staging but the files in your game folders would remain at the old version until you manually reinstalled.
+
+**Other**
+- Fixed OptiScaler Nightly install leaving behind Streamline and DLSS Enabler files in the game folder when the install itself failed (e.g. due to GitHub rate limiting). These files are now cleaned up properly if the install can't complete.
+- Fixed ultrawide fix links from Lyall not loading when a GitHub API token was configured. The token was being sent to the wrong server, which rejected it.
+
+---
+
 ## v2.8.1
 
 ### New

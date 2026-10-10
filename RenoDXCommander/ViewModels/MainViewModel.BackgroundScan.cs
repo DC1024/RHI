@@ -87,10 +87,11 @@ public partial class MainViewModel
                 try { await _normalRsUpdateService.EnsureLatestAsync(); }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Normal ReShade update task failed — {ex.Message}"); }
             });
-            var shaderPackTask = Task.Run(async () => {
-                try { await _shaderPackService.EnsureLatestAsync(); }
-                catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Shader pack task failed — {ex.Message}"); }
-            });
+            // Shader packs are already being fetched by the shaderPackReadyTask started in MainWindow
+            // (either full EnsureLatestAsync when CacheAllShaders=true, or Task.CompletedTask).
+            // Do NOT start a second concurrent EnsureLatestAsync here — it races with the first,
+            // causing packs to be skipped ("already being downloaded") and never extracted.
+            // The deferred section below awaits _shaderPackReadyTask before SyncShaders.
             var addonPackTask = Task.Run(async () => {
                 try {
                     await _addonPackService.EnsureLatestAsync();
@@ -187,6 +188,7 @@ public partial class MainViewModel
             // Await network tasks individually so failures don't block
             try { await wikiTask; } catch (Exception ex) { wikiFetchFailed = true; _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Wiki fetch failed (offline?) — {ex.Message}"); }
             try { await lumaTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Luma fetch failed (offline?) — {ex.Message}"); }
+            try { await lumaRelTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Luma releases fetch failed (offline?) — {ex.Message}"); }
             try { await lumaUeTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Luma UE table fetch failed (offline?) — {ex.Message}"); }
             try { _manifest = await manifestTask; AuxInstallService.GlobalManifest = _manifest; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Manifest fetch failed — {ex.Message}"); }
             try { await osWikiTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler wiki task failed — {ex.Message}"); }
@@ -358,7 +360,7 @@ public partial class MainViewModel
             }
 
             if (_manifest != null)
-                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames);
+                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames, _manifest.AuthorRoles);
             ApplyManifestStatusOverrides();
 
             // Remove manifest-blacklisted entries
@@ -406,7 +408,7 @@ public partial class MainViewModel
             ReconcileDefaultNaming();
 
             // Merge fresh cards into displayed cards
-            MergeCards(freshCards);
+            await MergeCardsAsync(freshCards);
 
             // Save updated library
             _ = Task.Run(() => { try { SaveLibrary(); } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Fire-and-forget SaveLibrary failed — {ex.Message}"); } });
@@ -520,6 +522,7 @@ public partial class MainViewModel
                             DispatcherQueue?.TryEnqueue(() =>
                             {
                                 _crashReporter.Log($"[BackgroundScan] Rebuilding panel for selected card '{cardToRebuild.GameName}'");
+                                SetLastUiAction($"BackgroundScan.PanelRebuild({cardToRebuild.GameName})");
                                 cardToRebuild.NotifyAll();
                                 RequestCardRebuild?.Invoke(cardToRebuild);
                             }));
@@ -540,6 +543,7 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Deferred ReShade sync failed — {ex.Message}"); }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: Streamline redeploy starting");
                 // Redeploy Streamline to all games where it's enabled (after OptiScaler staging is ready)
                 try
                 {
@@ -552,12 +556,14 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Streamline redeploy loop failed — {ex.Message}"); }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: ShaderPackReady await starting");
                 if (_shaderPackReadyTask != null)
                 {
                     try { await _shaderPackReadyTask; }
                     catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] ShaderPackReady failed — {ex.Message}"); }
                 }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: SyncShaders starting");
                 // Deploy shaders to all installed game locations
                 try
                 {
@@ -595,6 +601,7 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] SyncShaders failed — {ex.Message}"); }
 
+                _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: SyncAddons starting");
                 // Deploy managed addons to all installed game locations
                 try
                 {
@@ -648,7 +655,7 @@ public partial class MainViewModel
     /// cached cards. Updates existing cards in-place (so WinUI bindings fire),
     /// adds new games, and removes stale games.
     /// </summary>
-    private void MergeCards(List<GameCardViewModel> freshCards)
+    private async Task MergeCardsAsync(List<GameCardViewModel> freshCards)
     {
         _crashReporter.Log($"[MergeCards] Merging {freshCards.Count} fresh cards into {_allCards.Count} existing cards...");
 
@@ -791,7 +798,7 @@ public partial class MainViewModel
         _crashReporter.Log($"[MergeCards] Updated {freshCards.Count - cardsToAdd.Count} existing, added {cardsToAdd.Count} new, removed {cardsToRemove.Count} stale");
 
         // Execute all mutations on the UI thread to prevent cross-thread PropertyChanged issues
-        DispatcherQueue?.TryEnqueue(() =>
+        await UiDispatch.InvokeAsync(action => DispatcherQueue?.TryEnqueue(() => action()) == true, () =>
         {
             // Apply all property updates
             foreach (var action in updateActions)
@@ -820,7 +827,9 @@ public partial class MainViewModel
 
             // Refresh the selected game's detail panel so merged data (LumaMod, wiki, etc.) is visible
             SelectedGame?.NotifyAll();
-        });
+
+            return true;
+        }, _backgroundLifetime.Token);
     }
 
     private static string FormatAge(DateTime utc)

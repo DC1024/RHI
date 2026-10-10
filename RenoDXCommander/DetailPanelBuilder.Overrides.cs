@@ -86,6 +86,7 @@ public partial class DetailPanelBuilder
         // Cancel any in-flight NVAPI background scans from the previous game.
         // Tasks waiting on _panelScanSemaphore will observe the cancellation and
         // bail out immediately, freeing their thread pool threads.
+        if (_window.IsShuttingDown) return;
         _panelScanCts.Cancel();
         _panelScanCts = new CancellationTokenSource();
 

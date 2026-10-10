@@ -54,14 +54,6 @@ public sealed partial class MainWindow
     {
         _crashReporter.Log("[MainWindow.CheckForUpdatesButton_Click] User clicked Check For Updates");
 
-        // Acquire the dialog gate before showing — use WaitDialogGateAsync so we don't skip
-        // if another dialog is briefly open (e.g. MOTD)
-        if (!await DialogService.WaitDialogGateAsync(5))
-        {
-            _crashReporter.Log("[CheckForUpdatesButton_Click] Could not acquire dialog gate");
-            return;
-        }
-
         // Show progress dialog
         var progressPanel = new StackPanel { Spacing = 8 };
         var progressRow = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 12 };
@@ -79,9 +71,8 @@ public sealed partial class MainWindow
             RequestedTheme = ElementTheme.Dark,
         };
 
-        // Fire-and-forget the ShowAsync — we'll Hide() it when done
-        // (ShowAsync returns when the dialog is dismissed; we dismiss it via Hide())
-        _ = progressDialog.ShowAsync();
+        await using var progressSession = await DialogService.ShowProgressAsync(progressDialog, 5);
+        if (progressSession == null) return;
 
         try
         {
@@ -97,6 +88,8 @@ public sealed partial class MainWindow
 
             // Check app update
             DispatcherQueue?.TryEnqueue(() => progressText.Text = "Checking app version...");
+            // The update prompt needs the same modal slot; close progress first.
+            await progressSession.DisposeAsync();
             await _dialogService.CheckForAppUpdateAsync();
         }
         catch (Exception ex)
@@ -105,8 +98,7 @@ public sealed partial class MainWindow
         }
         finally
         {
-            progressDialog.Hide();
-            DialogService.ReleaseDialogGate();
+            await progressSession.DisposeAsync();
         }
     }
 
@@ -352,6 +344,146 @@ public sealed partial class MainWindow
     {
         _ = Windows.System.Launcher.LaunchUriAsync(
             new Uri("https://github.com/RankFTW/ReLimiter"));
+    }
+
+    // ── Donate dialog ─────────────────────────────────────────────────────────
+
+    private async void DonateButton_Click(object sender, RoutedEventArgs e)
+    {
+        var donationUrls = GameCardViewModel.GetAllDonationUrls();
+        // Always prefer live manifest roles (most up to date after a fetch).
+        // Fall back to the merged static dict if manifest hasn't loaded yet.
+        var manifestRoles = ViewModel.Manifest?.AuthorRoles;
+        var roles = (manifestRoles != null && manifestRoles.Count > 0)
+            ? (IReadOnlyDictionary<string, string>)manifestRoles
+            : GameCardViewModel.AuthorRoles;
+
+        var entries = donationUrls.Keys
+            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (entries.Count == 0)
+        {
+            await DialogService.ShowSafeAsync(new ContentDialog
+            {
+                Title = "Support the Mod Authors",
+                Content = "No donation links available.",
+                CloseButtonText = "Close",
+                XamlRoot = Content.XamlRoot,
+                RequestedTheme = ElementTheme.Dark,
+            });
+            return;
+        }
+
+        // ── Build the dialog content ──────────────────────────────────────────
+        var panel = new StackPanel { Spacing = 0 };
+
+        var intro = new TextBlock
+        {
+            Text = "These are the people who make the mods RHI manages. If you enjoy their work, consider supporting them.",
+            FontSize = 12,
+            Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 0, 0, 8),
+        };
+        panel.Children.Add(intro);
+
+        var warning = new TextBlock
+        {
+            Text = "⚠ Important: To receive early access to RenoDX mods, you MUST link your Discord account to Ko-fi BEFORE donating. Donations made without linking first cannot be retroactively credited.",
+            FontSize = 12,
+            Foreground = UIFactory.GetBrush("#F0A500"),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 0, 0, 14),
+        };
+        panel.Children.Add(warning);
+
+        var handCursor  = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.Hand);
+        var arrowCursor = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.Arrow);
+        var cursorProp  = DetailPanelBuilder.CursorProp;
+
+        foreach (var name in entries)
+        {
+            if (!donationUrls.TryGetValue(name, out var url)) continue;
+            roles.TryGetValue(name, out var role);
+
+            // Row: [Name (fixed)] [Role (fills middle)] [Ko-fi (right)]
+            var row = new Grid { Margin = new Thickness(0, 2, 0, 2), ColumnSpacing = 12 };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var nameBlock = new TextBlock
+            {
+                Text = name,
+                FontSize = 13,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            Grid.SetColumn(nameBlock, 0);
+            row.Children.Add(nameBlock);
+
+            var roleBlock = new TextBlock
+            {
+                Text = role ?? "",
+                FontSize = 12,
+                Foreground = UIFactory.Brush(ResourceKeys.TextTertiaryBrush),
+                VerticalAlignment = VerticalAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+            };
+            Grid.SetColumn(roleBlock, 1);
+            row.Children.Add(roleBlock);
+
+            // Ko-fi button
+            var kofiBtn = new Button
+            {
+                Content = "Ko-fi",
+                FontSize = 11,
+                Padding = new Thickness(10, 4, 10, 4),
+                CornerRadius = new CornerRadius(6),
+                Background = UIFactory.GetBrush("#FF5E5B"),
+                Foreground = UIFactory.GetBrush("#FFFFFF"),
+                BorderThickness = new Thickness(0),
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            var capturedUrl = url;
+            kofiBtn.Click += (s, ev) => _ = Windows.System.Launcher.LaunchUriAsync(new Uri(capturedUrl));
+            ToolTipService.SetToolTip(kofiBtn, capturedUrl);
+            Grid.SetColumn(kofiBtn, 2);
+            row.Children.Add(kofiBtn);
+
+            panel.Children.Add(row);
+
+            // Subtle separator between rows
+            if (name != entries.Last())
+                panel.Children.Add(new Border
+                {
+                    Height = 1,
+                    Background = UIFactory.Brush(ResourceKeys.BorderSubtleBrush),
+                    Margin = new Thickness(0, 2, 0, 2),
+                    Opacity = 0.4,
+                });
+        }
+
+        var scroll = new ScrollViewer
+        {
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = panel,
+            Padding = new Thickness(0, 0, 12, 0),
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = "❤ Support the Mod Authors",
+            Content = scroll,
+            CloseButtonText = "Close",
+            XamlRoot = Content.XamlRoot,
+            Background = UIFactory.Brush(ResourceKeys.SurfaceToolbarBrush),
+            RequestedTheme = ElementTheme.Dark,
+        };
+
+        await DialogService.ShowSafeAsync(dialog);
     }
 
 

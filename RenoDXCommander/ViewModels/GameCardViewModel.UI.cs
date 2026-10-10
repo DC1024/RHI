@@ -294,6 +294,10 @@ public partial class GameCardViewModel
         ["Bit Viper"] = "https://ko-fi.com/bitviper",
     };
 
+    /// <summary>What each author is known for, keyed by display name. Shown in the Donate dialog.</summary>
+    internal static readonly Dictionary<string, string> AuthorRoles =
+        new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>Returns the donation URL for the given author display name, or null if none is known.</summary>
     public static string? GetAuthorDonationUrl(string displayName)
     {
@@ -304,13 +308,18 @@ public partial class GameCardViewModel
         return AuthorDonationUrls.TryGetValue(name, out var url) ? url : null;
     }
 
+    /// <summary>Returns a snapshot of all known author → donation URL pairs (manifest-merged).</summary>
+    public static IReadOnlyDictionary<string, string> GetAllDonationUrls()
+        => AuthorDonationUrls;
+
     /// <summary>
-    /// Merges manifest-provided donation URLs and display-name overrides into the
-    /// hardcoded dictionaries. Manifest entries take priority over hardcoded ones.
+    /// Merges manifest-provided donation URLs, display-name overrides, and author roles
+    /// into the in-memory dictionaries. Manifest entries take priority over hardcoded ones.
     /// </summary>
     public static void MergeManifestAuthorData(
         Dictionary<string, string>? donationUrls,
-        Dictionary<string, string>? displayNames)
+        Dictionary<string, string>? displayNames,
+        Dictionary<string, string>? authorRoles)
     {
         if (displayNames != null)
             foreach (var (key, value) in displayNames)
@@ -319,6 +328,10 @@ public partial class GameCardViewModel
         if (donationUrls != null)
             foreach (var (key, value) in donationUrls)
                 AuthorDonationUrls[key] = value;
+
+        if (authorRoles != null)
+            foreach (var (key, value) in authorRoles)
+                AuthorRoles[key] = value;
     }
 
     /// <summary>Splits an author string on '&amp;' or ' and ' (case-insensitive), trims, and drops empties.</summary>

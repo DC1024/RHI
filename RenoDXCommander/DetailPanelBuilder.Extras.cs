@@ -68,6 +68,8 @@ public partial class DetailPanelBuilder
         var gn = card.GameName;
         var gs = card.Source ?? "";
         var installPath = card.InstallPath ?? "";
+        var dgSvc = App.Services.GetRequiredService<DgVoodooService>();
+        bool dgvInstalled = !string.IsNullOrEmpty(installPath) && dgSvc.IsDeployed(installPath);
         var exSummaryEntries = new List<(string, string?)>();
         if (!string.IsNullOrEmpty(vm.GetUalInstalledAs(gn, gs)))                           exSummaryEntries.Add(("ASI Loader", vm.GetUalInstalledAs(gn, gs)));
         if (vm.GetRtx40MfgInstalled(gn, gs))                                               exSummaryEntries.Add(("RTX 40 MFG", "On"));
@@ -76,6 +78,7 @@ public partial class DetailPanelBuilder
         if (card.IsOsInstalled)                                                             exSummaryEntries.Add(("OptiScaler", card.OsInstalledVersion));
         if (!string.IsNullOrEmpty(vm.GetDeInstalledAs(gn, gs)))                            exSummaryEntries.Add(("DLSS Enabler", "On"));
         if (card.IsDxvkInstalled)                                                           exSummaryEntries.Add(("DXVK", card.DxvkInstalledVersion ?? "On"));
+        if (dgvInstalled)                                                                   exSummaryEntries.Add(("dgVoodoo2", vm.GetDgVoodooVersion(gn, gs) ?? _window.ViewModel.Manifest?.DgVoodooVersions?.Keys.FirstOrDefault()));
         var exSummary = DetailPanelBuilder.MakeSectionSummaryInlines(exSummaryEntries);
         if (exSummary != null)
         {
@@ -143,8 +146,7 @@ public partial class DetailPanelBuilder
         // ── dgVoodoo2 standalone row — DX9 games or already installed ─────────
         bool isDx9ForDgv = card.DetectedApis.Contains(GraphicsApiType.DirectX9)
                         || (card.DetectedApis.Count == 0 && card.GraphicsApi == GraphicsApiType.DirectX9);
-        var dgSvcCheck = App.Services.GetRequiredService<DgVoodooService>();
-        bool dgvInstalled = !string.IsNullOrEmpty(card.InstallPath) && dgSvcCheck.IsDeployed(card.InstallPath);
+        // dgvInstalled already computed above for the summary
         if (isDx9ForDgv || dgvInstalled)
         {
             if (!card.IsDxvkToggleVisible) // Show separator only if DXVK row wasn't shown
@@ -1608,15 +1610,18 @@ public partial class DetailPanelBuilder
         var installPath = card.InstallPath ?? "";
 
         var currentDllName = _window.ViewModel.GetDeInstalledAs(gameName, store);
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:IsInstalled({card.GameName})");
         bool isInstalled   = deSvc.IsStandaloneInstalledIn(installPath, currentDllName);
 
         // Mutual exclusivity with OptiScaler
         bool osConflict = card.IsOsInstalled;
 
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:StagedVersion({card.GameName})");
         // Status text
         string statusText  = isInstalled ? (deSvc.StagedVersion ?? "Installed") : "Ready";
         string statusColor = isInstalled ? "#5ECB7D" : "#A0AABB";
 
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:BuildGrid({card.GameName})");
         // ── Row grid matching Components section exactly ───────────────────────
         // Col 0: label (120)  Col 1: status (80)  Col 2: Info (36)
         // Col 3: install (*)  Col 4: cog (36)     Col 5: delete (36)
@@ -1810,6 +1815,7 @@ public partial class DetailPanelBuilder
         row.Children.Add(removeBtn);
 
         body.Children.Add(row);
+        _window.ViewModel.SetLastUiAction($"BuildDlssEnablerRow:Done({card.GameName})");
     }
 
     private async Task<string?> ShowMfgDllPickerAsync(GameCardViewModel card, string? currentDllName)
