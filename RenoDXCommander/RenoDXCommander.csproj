@@ -201,6 +201,11 @@
     <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
     <PackageReference Include="SharpCompress" Version="0.37.2" />
     <PackageReference Include="System.Management" Version="8.0.0" />
+    <!-- Restored to the NuGet global cache only (assets excluded so it never reaches the
+         WinAppSDK XAML compiler / publish, which would crash). The DLL is copied to the
+         output via the <None Include> above that reads it from the cache. This keeps a
+         clean CI runner able to build without a pre-populated local NuGet cache. -->
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="3.1.512801" ExcludeAssets="all" PrivateAssets="all" />
   </ItemGroup>
 
   <Target Name="CopyWindowIconToPublishDirectory" AfterTargets="Publish">
