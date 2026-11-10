@@ -1,28 +1,758 @@
-⚠ **Sign in with GitHub — strongly recommended** — almost everything RHI downloads comes from GitHub: ReShade, RenoDX, OptiScaler, DLSS versions, shader packs, Luma mods, manifests, update checks, and more. Without a GitHub account connected, all of this shares a single limit of **60 requests per hour**. That quota runs out fast, and when it does, downloads silently fail — installs abort, update checks are skipped, and staging shows as unavailable with no obvious reason why. Signing in raises the limit to **5,000 requests per hour**.
+**Recommended: add a GitHub token.** Without one, RHI is limited to 60 GitHub requests an hour, so installs and update checks can fail. A token raises that to 5,000.
 
-To connect: open **Settings → GitHub API** and click **Sign in with GitHub**. Takes about 30 seconds.
+1. Go to [github.com/settings/tokens](https://github.com/settings/tokens) and choose **Generate new token (classic)**. Any name and expiry; leave every scope unticked.
+2. In RHI open **Settings → Accounts & Data → GitHub token**, paste it and click **Save**.
 
-## v2.8.5 Beta 1
+## v2.9.2
+
+### New
+
+**GITC Uplift**
+- New Neural Rendering method: GITC Uplift by ghostinthecamera. It brings NVIDIA's DLSS Neural Rendering to almost any game on an RTX card, even games that don't support DLSS at all: DirectX 9 to 12, Vulkan and OpenGL, 64-bit and 32-bit.
+- Built for performance and ease of use: drop it in, switch it on. Choose a Look, keep characters' faces true to the original with Keep faces, and lower the Resolution to trade a little detail for more speed and less video memory. A status card in ReShade tells you whether it's working and, if not, what to fix.
+- It now replaces DLSS5 Feeder as the default method for 64-bit DX11, DX12 and Vulkan games without DLSS. Games that already have a method keep theirs.
+- Install it from the Neural Rendering section, then in game open ReShade (Home), go to the GITC Uplift tab and tick Enable. For single-player games only.
+- Uplift Version lets you follow the latest release or stay on one. RHI keeps it up to date, and only removes its own files when you uninstall or switch method.
+- OpenGL games such as OpenMW are set up for it automatically, so it works with anti-aliasing on.
+
+**Steam and Xbox achievements (Spotlight)**
+- Turn them on in Settings › Achievements. The Spotlight page then shows your progress, latest unlock and recent unlocks under the Launch button. Click it for the full list with unlock dates, rarity and search. Hidden achievements stay hidden until you unlock them.
+- Steam: read from Steam's files on your PC, so no sign-in or public profile is needed. A game shows its achievements once you've run it on this PC.
+- Xbox and Game Pass: read from the Xbox app, with Gamerscore and progress too. If a game shows nothing or misses recent unlocks, open its page in the Xbox app once.
+
+**Game collections**
+- Make your own lists of games, like Racing or Souls-likes: right-click a game (X on a controller) and choose Add to collection. A game can be in as many collections as you like.
+- Your collections show as buttons above the game list (beside the search box in Spotlight). Click one to show only its games, and click it again to show everything. Right-click one to rename, move or delete it. Deleting a collection never removes any games.
+- On a controller, click the right stick to switch between your collections.
+
+**Custom OptiScaler builds**
+- Use any OptiScaler build you like. Add one in Settings › Components › Custom OptiScaler builds from a download link (GitHub, Discord or anywhere else), a zip, 7z or rar file, a folder, or just an OptiScaler.dll. You can also drag the file onto RHI.
+- Then pick it as the Version in a game's OptiScaler ⚙, or as your Default version. It installs and uninstalls like the built-in versions and keeps your OptiScaler settings.
+- RHI never updates custom builds. When a new version comes out, use Replace and RHI offers to update the games that use it.
+- Adding a Neural Rendering fork? Tick DLSS NR DLL on it so RHI adds NVIDIA's Neural Rendering file too.
+- Only add builds from people you trust.
+
+**More OptiScaler versions**
+- Popular OptiScaler forks now sit alongside Stable, Nightly, DLSS NR and F5 DLSSNR: Venom, NR PreSR MFG and OpenNR to start with. RHI downloads them and keeps them up to date like the others, and more can be added without an RHI update.
 
 ### Changes
 
-**Lifecycle & Shutdown**
-- Window close now follows a safe ordered sequence: cancels background tasks first, stops timers and dialogs, then saves settings and library. Previously background tasks could post back to a destroyed UI thread after close.
-- Added a window lifetime token so all background tasks, timers, and `Task.Delay` loops cancel immediately when the app closes instead of running until the next checkpoint.
-- Progress dialogs now own their modal slot for the full duration including the close animation. The old raw semaphore pattern could leak the gate if a dialog closed abnormally, permanently blocking all future dialogs.
-- Startup dialogs (patch notes, MOTD, update check) now run sequentially instead of racing each other for the same modal slot.
-- The heartbeat freeze detector no longer uses `Thread.Sleep` — it now uses an async probe so it can't contribute to the freezes it's detecting.
+**OptiScaler**
+- The OptiScaler ⚙ shows the version you have and the latest one, with Check now to look for an update straight away and Update to install it.
+- New Release setting in the OptiScaler ⚙: keep a game on an older release of Stable, DLSS NR, F5 DLSSNR or a fork. Pinned games aren't updated.
+- New Remove old Nightly builds option (Settings › Components › OptiScaler, off by default). Every Nightly build RHI downloads takes 200-300 MB, so turn this on to delete old ones automatically. The newest build and any build a game is pinned to are kept.
 
-**Foreground Activation**
-- The installer no longer uses `AttachThreadInput` to bring RHI to the front after an update. The old approach could deadlock if the foreground process was unresponsive. The new approach uses a registered Win32 message — the installer finds the RHI window, grants it foreground permission, and posts the message asynchronously. RHI handles it on the next dispatcher tick without any cross-process synchronisation.
+**Moving games**
+- After Change install folder or Reset install folder, RHI offers to move the game's mods, settings and presets to the new folder. When RHI corrects a folder itself, it moves them automatically. Nothing is moved while the game is running.
 
-**Single Instance & Admin Mode**
-- Fixed a race where the Admin Mode relaunch could fail silently because the mutex was still held by the exiting instance. The mutex is now released before starting the replacement process.
-- Fixed `FileReceived` handler being wired after `StartListening` in two code paths — a message from a second instance arriving in that window would be silently dropped.
-- Refresh and Full Refresh now hold a serialisation gate while running, so a second Refresh triggered mid-scan can't race the first.
+**Spotlight**
+- New Covers at bottom button (right of the search box) moves the game covers, search and filters below the game page. Click Covers at top to undo. The controller follows the layout.
+- The Filters button is now a small filter icon to the left of All / Installed / Favourites / Hidden.
+- The game banner gets taller on wide windows (ultrawide screens, or a small interface size), so its artwork is no longer cropped to a thin, zoomed-in strip.
+- Resize the banner and the game covers with the mouse: drag the banner's bottom edge, or the edge of the cover strip facing the game page, and they change size as you drag. RHI remembers the sizes. Double-click an edge to reset it.
+- Hold the left mouse button on the game covers and drag left or right to scroll through them. A click still selects a game.
+
+**Controller**
+- Steam Controllers now work with no setup: the new one and the original, by USB or wireless dongle. This is still a work in progress.
+- Button hints now sit in the bottom bar instead of floating over the page.
+
+**Interface size**
+- Interface size (Settings › General, or Ctrl + mouse wheel) now changes in smaller 5% steps and goes up to 200%.
+
+**Other**
+- What's New: the search box is now a small box above the version list, so the notes are taller. The arrow on the left hides the versions and search to widen the notes, and + and − change the text size. RHI remembers both.
+- With a GitHub token (Settings › Accounts & Data), RHI now checks for updates every hour while it's open instead of every 4 hours. Without a token it stays at every 4 hours, because GitHub allows far fewer requests without one.
+- MFG Ada Unlock is now called MFG Unlock, to match the mod. It brings DLSS frame generation to RTX 20 and 30 Series cards (experimental). Your installs and settings carry over.
+- Support the Mod Authors (Help › Donate) can show both Ko-fi and Patreon buttons for an author.
+
+### Bug Fixes
+
+**Performance**
+- Fixed RHI showing "Not Responding" for a minute or more, and sometimes restarting itself, while a demanding game was running.
+
+**OptiScaler**
+- Fixed F5 DLSSNR, DLSS NR and Nightly installing an old downloaded copy when a newer release was out (for example F5 0.1.29 instead of 0.1.37), even after reinstalling.
+- Fixed a fresh F5 DLSSNR install skipping your Streamline, DLSS Enabler and frame generation settings.
+- Fixed updating F5 DLSSNR not updating its Neural Rendering file, and updating DLSS NR replacing the NR Runtime you picked.
+- Fixed F5 DLSSNR showing the Stable version number on some games, and not being downloaded at startup like the other versions.
+
+**Running games**
+- Fixed RHI tracking a game's crash reporter instead of the game itself (Phantom Blade Zero and other Unreal Engine games from Steam or Epic). The game could show as running after it closed, and HDR and resolution could switch back at the wrong time.
+
+**Game detection**
+- Fixed some games from the new Epic Games launcher not being found (for example Cyberpunk 2077 and Alan Wake 2).
+- Fixed Launch doing nothing for some Epic games (for example Alan Wake 2): RHI now starts them the same way Epic's own desktop shortcuts do.
+- Fixed some games being detected as DirectX 12 when they aren't (for example OpenMW, which uses OpenGL), so the wrong ReShade setup was offered.
+
+**Install folders and DLSS**
+- Fixed Reset install folder going back to the folder you picked instead of the one RHI found.
+- Fixed the game header still showing the old folder after you changed it.
+- Fixed DLSS / Streamline finding no files for some Unreal Engine games (for example Phantom Blade Zero), including after their install folder was changed.
+
+**Updates**
+- Fixed RE Framework getting stuck on an older version once GitHub's hourly limit was reached (without a GitHub token).
+- Fixed Check for updates spinning forever when GitHub's website was slow to respond. RHI now stops waiting for GitHub's pages after 30 seconds and carries on without them, and the check tells you when it's waiting for RHI's game scan to finish.
+
+**Game Overrides**
+- Fixed changing the ReShade DLL name renaming Display Commander's file to "--------" (or the other way round). Games this happened to are fixed the next time you open them.
+
+**Display**
+- Fixed games using RTX HDR or Auto HDR showing "—" instead of RTX HDR or Auto HDR on the RenoDX row, the Overview card and Spotlight.
+- Fixed hard-to-read headings in What's New, the message of the day and mod release notes when Windows is in Light mode.
+- Fixed the Luma filter chip being cut off when Filters is open.
+- Fixed dropping a ReShade preset onto RHI failing with "Storage Error ... being used by another process" when the preset came from RHI's own presets folder.
+- Fixed the version numbers on the Tabs and Spotlight component cards not opening the mod's page when clicked, and not showing the hand cursor.
+
+### Manifest Updates
+
+- Support the Mod Authors: Ko-fi links for Kronir and Vaxis (Ultra+), and Patreon links for Lazorr and SammiLucia.
+
+## v2.9.1
+
+### Bug Fixes
+
+- Fixed installing or updating OptiScaler F5 DLSSNR failing with "OptiScaler F5 staging not available". The F5 release renamed its download, and RHI no longer recognised it.
+- Fixed some Unreal Engine games (for example Phantom Blade Zero) showing "No RenoDX mod available" even though the game page said Unreal Engine. This happened when RHI's scan of the game folder didn't recognise the engine, for example if it was scanned while still downloading. Games RHI knows are Unreal Engine 4 or 5 now always get the Unreal Engine mod.
+
+## v2.9.0
+
+### New
+
+**Tabs layout**
+- A new layout switch on the top bar (Classic+ | Tabs | Spotlight). Tabs is a redesigned RHI window that shows the game page one tab at a time instead of one long page. Classic+, the layout you know with the new top bar, stays the default, and every setting is available in every layout.
+- **Game header:** the game's name in large type with a Favourite star and Hide, tags for the store, engine, graphics API, 32/64-bit and mod author, the install path with Open folder and Config folder, and links to Nexus Mods, PCGamingWiki, ultrawide fixes and Ultra+. A large Launch button has a menu for the executable, launch arguments and a desktop shortcut, and HDR on launch and Resolution switch are labelled toggles.
+- **Overview tab:** a card for each component (ReShade, RenoDX or Luma, RE Framework, DOF Fix and the frame limiter) with its version, a short description, the main button and Info, ⚙ and remove. ReLimiter and Display Commander share one card with a switch between them. Below, an At a glance tile for every other section shows its summary; click one to open that tab.
+- **Section tabs:**
+  - Game Overrides is grouped into four cards: Names and matching, ReShade, DLL names, and Updates and launch.
+  - DLSS / Streamline has a column each for Super Resolution, Ray Reconstruction, Frame Generation and Neural Rendering, with Streamline underneath. Driver Settings keeps Classic+'s groups (VSync and latency, ReBAR, Smooth Motion, and Power, G-Sync and FPS).
+  - Neural Rendering has a card for each method, with the setup underneath.
+  - Extras is grouped into Loaders and upscalers, MFG unlocks and API upgrades, with a description for each component. When something can't be installed, the row says why (for example, DLSS Enabler is already provided by OptiScaler).
+  - Management is a row of large buttons: Change install folder, Reset Overrides, Copy Report, Reset install folder and Remove from RHI.
+- **Sidebar:** All, Installed, Favourites and Hidden as one switch, with the engine and mod filters (and your saved search filters) behind a Filters button.
+- The tabs are always in the same order (Overview, Game Overrides, Extras, DLSS / Streamline, Driver Settings, Neural Rendering, Management), and RHI remembers which tab you were on.
+- A component's ⚙ settings open right under it on the page instead of in a pop-up. Click ⚙ again, or ✕, to close them.
+
+**Spotlight layout**
+- A third layout on the top bar switch, built around the game you've picked.
+- **Hero banner:** the game's Steam artwork across the top (for any store, when the game is also on Steam), with the same name, tags, path, links, Launch button and HDR / Resolution toggles as Tabs.
+- **Cover shelf:** your games as a row of cover tiles instead of the sidebar list, with the search box, the All / Installed / Favourites / Hidden switch and Filters above it. Scroll it with the mouse wheel; right-click a cover for the usual game menu. A game with an update shows a purple Update label and outline on its cover.
+- **What's installed:** a tile for ReShade, RenoDX or Luma, RE Framework, DOF Fix and the frame limiter showing what's installed, plus Manage components, which opens the component cards.
+- **Tune this game:** a tile for every section with its summary. Click one and that section slides in from the right, laid out as in Tabs; click outside it or ✕ to close.
+- A component's ⚙ settings open in the side panel, with a back button to the section you came from.
+- Artwork is downloaded from Steam only while Spotlight is in use, and saved so it's downloaded once.
+- **Your own artwork:** right-click a cover or the banner and choose Artwork › Set custom cover or Set custom banner to use any image. Use Steam cover / Use Steam banner puts Steam's back. Handy for games that aren't on Steam.
+
+**Controller support (Spotlight)**
+- Use an Xbox or PlayStation controller in the Spotlight layout. D-pad or left stick moves around, A selects, B goes back (closes a menu, the side panel or Settings), Y launches the game, X opens the game menu, LB / RB switch to the previous / next game, LT / RT skip 10 games back / on (hold them to keep going), View opens and closes Filters, Menu opens and closes Settings and the right stick scrolls. Click the left stick to switch between All, Installed and Favourites, and the right stick to go straight back to the game's cover from anywhere.
+- Up and Down move a row at a time (top bar, filters, covers, the game's buttons, each line of tiles) and Left and Right stay in the row; Up and Down go to whatever is straight above or below. From the cover shelf, Down goes to Launch; left and right on the shelf pick the next game, and the row scrolls to keep the selected cover in the middle (it moves towards the edge only near the start or end of the list). Up goes to the All / Installed / Favourites / Hidden switch and search box, then to Available Mods, Shaders & Addons and the rest of the top bar; Down comes back to the selected game. A tile opens its section in the side panel with the first setting selected; LB / RB move to the previous / next section, and B returns to the tile. On Settings, LB / RB jump between sections, and opening Settings with the controller starts on the section list on the left.
+- Dropdowns open on the current choice; A picks, B closes without changing the setting. Menus and submenus open and close with the D-pad, A and B, and B closes dialogs. In What's New, the D-pad moves through the versions (each one shows as you reach it) and the right stick scrolls the notes.
+- Y shows a "Launching …" message and ignores a second press for the same game for a few seconds. When you come back to RHI afterwards, the game's cover is selected again.
+- When a game you started from RHI closes, RHI comes back to the front on its own, so the controller works straight away without clicking the window. It stays in the tray if you'd put it there.
+- The focused button or tile gets a blue outline, like the selected cover. A bar of button hints shows only what each button does where you are; it appears once you use the controller and hides when you move or click the mouse. While you use the controller, a mouse pointer resting on the window no longer highlights buttons or pops up tooltips as things move under it; move the mouse to use it again.
+- The controller only works while RHI is the active window, so it never does anything in RHI while you're playing. Buttons held when you switch back to RHI are ignored until you let go.
+- PlayStation controllers work too, with nothing extra to install: DualShock 4, DualSense and DualSense Edge, over USB or Bluetooth. The button hints then show PlayStation buttons (✕ ○ □ △, L1 / R1, Options). If DS4Windows or Steam also shows the controller as an Xbox pad, RHI uses that one, so presses never count twice.
+- Turn it off in Settings › General › Windows and Admin Mode › Controller support.
+
+**Remove a game from RHI**
+- Management has a new Remove from RHI button. Unlike Hide, the game is gone from every list, including Hidden, and doesn't come back when RHI scans your games. You can uninstall its components at the same time.
+- Changed your mind? Settings › Tools & Maintenance › Troubleshooting › Removed games lists every game you've removed, with Restore to put it back. A game you added yourself is deleted instead; add it again to get it back.
+- In Management, Reset install folder is now its own button next to Remove from RHI.
+
+**Custom game folders**
+- Settings › Tools & Maintenance › Custom game folders: add folders where you keep DRM-free or other non-store games. Each folder inside one is treated as a game (or add a single game's folder).
+- RHI checks them when it starts, on Refresh and when you click Scan now. Games it finds are never added on their own: a "new games found in your custom folders" link appears in the status bar, and Review lets you pick which to add.
+- For each game you can fix the name and choose the exe. RHI picks the most likely one (skipping installers, redistributables and crash reporters, and ranking launchers lower) and says "Check the exe" when two look alike. The chosen exe is used to launch the game and decides where components are installed.
+- Ignore selected stops a game being offered again, and so does removing a game you added this way. Forget ignored games in the same card undoes that.
+
+### Changes
+
+**Top bar**
+- A new top bar, the same in all three layouts (the usual RHI window is now called Classic+): Available Mods and Shaders & Addons, when RHI last checked for updates, refresh, Update All with how many games have updates (or All up to date), the layout switch, a Help menu (Quick Start, Guide, Discord, wiki and GitHub links, patch notes, message of the day, update log, About and Donate) and Settings.
+- The Settings button stays lit while Settings is open; click it again, or the RHI logo, to go back to your games.
+- The game list in Classic+ is the same as in Tabs: dark navy colours, All / Installed / Favourites / Hidden under the search box, and a Filters button next to the counts for the engine and mod filters and your saved search filters.
+- Tooltips everywhere use the same dark navy look.
+- Patch notes, Message from RHI, Support the Mod Authors and Multi Frame Generation are restyled to match; mod authors are shown as cards, two across.
+- Every other pop-up (Update Inclusion, ReShade presets, confirmations and the rest) uses the same dark navy look.
+- Patch notes list every version down the left; click one to read its notes. A search box finds a word across every version and shows each matching line.
+
+**Component settings (⚙)**
+- Restyled to match the new layouts: settings are grouped into cards, in the same dark navy colours.
+
+**DLSS / Streamline**
+- Removed the Deploy DLL button and the ✕ next to it under Neural Rendering. The Neural Rendering section installs the DLL when you pick a method; the version dropdown still changes the DLL a game already has, and its Default choice puts the game's own DLL back.
+
+**Driver Settings**
+- The Driver Settings summary (the collapsed header, and the Driver Settings tile in Tabs and Spotlight) now shows G-Sync Off when G-Sync is disabled for the game. It updates as soon as you change it.
+
+**OptiScaler**
+- New Default version setting (Settings → Components → OptiScaler): Stable, Nightly, DLSS NR or F5 DLSSNR. It's used when OptiScaler is installed in a game you haven't picked a version for in its ⚙. Games that already have OptiScaler keep the version they have.
+- New DXGI Spoofing setting in OptiScaler's ⚙ on every version: Auto, True or False. True makes the game see an NVIDIA GPU so it offers DLSS options. Auto turns it on for AMD and Intel and off for NVIDIA. Set it to False if a game crashes or misbehaves with spoofing on. Presets save it too.
+
+**Interface size**
+- New Interface size setting (Settings → General → Windows and Admin Mode), from 50% to 150%. It makes RHI's window smaller or larger without changing Windows' scaling, for TVs and high-DPI screens set to 200% or more. Pop-ups, dropdown lists and tooltips keep the Windows size.
+- Hold Ctrl and turn the mouse wheel anywhere in RHI to change the interface size, like zooming in a browser. The new size shows in the status bar and is remembered.
+
+**Adding games**
+- A game you add yourself (Add Game, or dropping its exe on RHI) now opens straight away, so you don't have to find it in the list. If your search or filter would hide it, they're cleared.
+
+**Message of the day**
+- Links in the message can now be clicked.
+
+**GitHub**
+- The Sign in with GitHub option has been removed. A token (Settings → Accounts & Data → GitHub token) is the way to raise the GitHub limit. If you're already signed in, it keeps working until you sign out.
+
+**RTX Encore**
+- Intel's XeSS files are now installed the way RTX Encore Hub installs them. If the game already has its own copies (Unreal games often keep them under Engine\Plugins), RHI replaces them where they are with the version RTX Encore needs, and puts the game's copies back when you remove RTX Encore. Files the game doesn't have, and Intel's licence, go in RTX Encore's own folder. Games that already have RTX Encore are updated on the next launch.
+- The ⚙ tooltips have been brought up to date with RTX Encore 1.6.0, and XeSS on Tensor Cores is greyed out unless Upscaler is XeSS.
+
+**ASI Loader**
+- When ASI Loader is installed in a game, the DLL name lists for 20/30 FG Unlock, Universal MFG Unlocker, RTX Encore and DLSS Enabler offer a Hooked version of ASI Loader's name (for example versionHooked.dll when ASI Loader is version.dll). ASI Loader loads that file as the real DLL, so the extra runs alongside it. If ASI Loader is later removed, RHI renames the extra back to the normal name so it keeps working.
+
+### Bug Fixes
+
+**Launching games**
+- Fixed Epic games failing to start from RHI unless the Epic Games Launcher was already running. Games launched right after RHI opens now go through Epic like they should. When RHI has to start the game's exe directly (launch arguments set, or a chosen launch exe), it starts the Epic Games Launcher in the background first and waits for it.
+- Fixed Steam and Game Pass games launched in the first moments after RHI opens (or from the tray, jump list or a desktop shortcut) skipping Steam or failing to start. RHI now remembers each game's store launch details between sessions.
+
+**Installer**
+- Fixed the installer downloading and installing the Windows App Runtime 2.5.1 on every update for some people, even when it was already installed. The installer no longer installs it. If RHI can't start because the runtime is missing, it now says so and offers to open the download.
+- Fixed every RHI update leaving about 160 MB of old files in your Temp folder (`%TEMP%\.net\RHI`). RHI now removes the old copies a short while after it starts.
+
+**ASI Loader**
+- Fixed the DLL name lists for 20/30 FG Unlock, Universal MFG Unlocker and DLSS Enabler letting you pick the name ASI Loader or another extra was already using, which replaced it. Those names are now greyed out with what's using them.
+- Fixed installing ASI Loader over the name an extra was using: the extra was renamed so ASI Loader loads it, but RHI kept looking for it under the old name, so removing the extra later could delete ASI Loader. RHI now follows the rename and says which extra was moved.
+- Fixed reinstalling ASI Loader under the same name renaming its own old copy to a Hooked file, so it was loaded twice.
+- Fixed installing ASI Loader replacing a Hooked file that was already there (for example versionHooked.dll). RHI now stops and says so instead.
+
+**Antivirus**
+- Fixed RHI downloading DXVK and Universal MFG Unlocker even when no game uses them (and again on every launch when an antivirus deleted them). Antivirus programs often flag these as false positives, so many people saw warnings for files they never installed. They now download only when a game uses them, or when you install them.
+- When an antivirus deletes one of these files straight after RHI downloads it, RHI now says so and explains how to add an exclusion, instead of downloading it again on every launch.
+- Fixed DXVK installs failing with "try clearing the DXVK cache" when an antivirus had removed only its 32-bit files. RHI now checks every DXVK file and downloads it again when one is missing.
+
+**Display**
+- Fixed Output colour settings saying RHI needs to run as administrator when the monitor doesn't support the chosen colour depth (for example 12 bpc on a 10-bit monitor). It now says the monitor doesn't support it, and only mentions admin when that's the actual problem.
+
+**RTX Encore**
+- Fixed the XeSS upscaler not working: RHI didn't install Intel's libxess.dll, which it needs.
+- Fixed games breaking when RTX Encore was installed as binkw64.dll or bink2w64.dll. The game's own Bink file is now kept beside it as binkw64Hooked.dll (or bink2w64Hooked.dll), as RTX Encore requires.
+- Fixed the rtx-encore.asi option installing the wrong file. It now uses the separate ASI build in RTX Encore's release.
+- Fixed Neural Rendering not finding its DLL when RTX Encore was installed as rtx-encore.asi. The DLL now goes in the plugins folder beside it; existing installs are moved on the next launch.
+- Fixed the FAQ still calling RTX Encore a beta.
+
+**Admin Mode**
+- Fixed the hand cursor over links and badges switching back to the normal pointer after a moment when Drop Helper is on.
+- Fixed desktop shortcuts and jump list entries only opening RHI, without starting the game (or switching HDR on), when RHI wasn't already running.
+
+**Game page**
+- Fixed some Steam games showing their install path with a lowercase drive letter (c:\steam\...).
+
+**Game Pass and moved games**
+- Fixed installing or updating a component opening a folder browser when the game had been updated or moved since RHI last scanned it. Game Pass games get a new folder with every update. RHI now explains what happened and offers to refresh the game list to find the new folder, with the folder browser still available as an option.
+
+### Manifest Updates
+- Support the Mod Authors now includes Kronir and Vaxis from the Ultra+ team, and Patreon links for Lazorr and SammiLucia.
+- Baldur's Gate 3: ReShade now installs as the Vulkan layer, since the game's default exe (bg3.exe) uses Vulkan. Before, it was installed as dxgi.dll, which bg3.exe never loads. ReShade's Info explains how to switch to DX11 for bg3_dx11.exe, and to reinstall ReShade if an older install is still there.
+- New addon in Shaders & Addons: BFI Presenter by artzox, black frame insertion without the usual brightness loss for clearer motion on 120 Hz+ OLEDs and other fixed-refresh displays (DX9, DX11, DX12 and OpenGL games). Its description lists what it needs (G-Sync off, no frame limiter) and links to the setup guide.
+- Support the Mod Authors now includes the ultrawide fix authors RHI links to (Lyall, p1xel8ted and RoseTheFlower) and the Ultra+ team (Lazorr, SammiLucia and mmike0913). Authors who use Patreon get a Patreon button.
+- Mafia: The Old Country: DLSS and Streamline are now found in the game's plugins folder, so the DLSS / Streamline section is no longer empty.
+- DLSS Neural Rendering presets A and B are now in the NR preset list.
+- Lords of the Fallen: engine (Unreal Engine 5.1.1), graphics API (DX12) and 64-bit are now set, so the right mods and options are offered.
+- Wuthering Waves: Unreal Engine version set to 4.26.2.
+- Silly Polly Beast is now detected as 64-bit.
+- Control Ultimate Edition: the Nexus Mods link now opens the game's Nexus page.
+- Warframe is no longer shown in the game list.
+
+## v2.8.9
+
+### New
+
+**OptiScaler presets**
+- OptiScaler's ⚙ now opens with a Presets panel, on every OptiScaler version including Stable. Pick a recommended preset in one click:
+  - **Real DLSS FG**: NVIDIA's own DLSS frame generation, with Reflex forced on.
+  - **DLSS Enabler FG**: DLSS frame generation through DLSS Enabler, for cards without it.
+  - **UMFG XeFG**: XeSS frame generation with Universal MFG Unlocker (installed for you if the game doesn't have it yet).
+- Each preset turns frame generation on and installs the latest Streamline and DLSS Enabler. The preset that matches the game's current settings is ticked, and hovering one explains what it does.
+- New recommended presets can arrive without an app update.
+- Your own four preset slots are now one dropdown with Apply, Save current (Overwrite for a slot that's in use) and a ... button to rename or clear a slot.
+- "Deploy OptiScaler.ini" is now "Replace with a fresh copy..." at the bottom of the ⚙, and asks before replacing the file.
+
+**Stop the NVIDIA App resetting your DLSS settings**
+- The NVIDIA App resets the DLSS presets and versions you set with RHI on any game NVIDIA hasn't approved for overrides. Settings › Driver Settings › Profiles has a new **Remove NVIDIA App override limits...** button that turns this off.
+- It asks first and keeps a backup of the NVIDIA App's files. It restarts two NVIDIA services, so Windows asks for admin permission and the screen may go black for a second or two.
+- Driver and NVIDIA App updates can bring the limit back, so run it again after updating. Based on JPersson77's nVAppAppApp script.
+
+**Per-game FPS limit**
+- Driver Settings on each game's page has a new FPS Limit option, so you can cap one game without capping them all. Global follows the limit in Settings, Off turns the driver limit off for that game, and Custom... takes any value from 20 to 1000.
+- Restore Defaults has moved to the bottom row of Driver Settings to make room.
+
+**Find a setting**
+- Settings has a search box. Type part of a setting's name or description to see every match, then click one to jump straight to it. It's briefly outlined in blue so you can spot it.
+
+**Status bar**
+- The bottom-left of the window shows what RHI is doing in the background, such as checking for new games, checking for updates or updating DLSS. When it's idle, it shows when RHI last checked for updates and when the next check is due.
+
+**Load ReShade as ASI**
+- ReShade's ⚙ has a new Load ReShade as ASI option, for use with an ASI loader. It renames ReShade to `ReShade64.asi` (`ReShade32.asi` for 32-bit games), and installs and updates keep that name. Turn it off to go back to the normal DLL name.
+- RHI doesn't install an ASI loader for you: use ASI Loader in Extras or your own. Not available for Vulkan games.
+
+### Changes
+
+**Settings page**
+- Settings is now organised into 8 sections: General, Accounts & Data, ReShade & RenoDX, Display & HDR, DLSS / Streamline, Driver Settings, Components, and Tools & Maintenance. Related settings sit together (for example every update setting is in General › Updates). Nothing was removed.
+- A list of the sections stays on the left as you scroll. Click one to jump to it. Settings reopens where you left it.
+- Every setting has the same layout: its name on the left, its option on the right, short help underneath where it's needed, and the full explanation when you hover it.
+- General › Updates shows when RHI last checked for updates and counts down to the next check. Pressing "Check for updates" restarts the countdown.
+- Clearer names:
+  - Update Inclusion is now Components to check › Choose.
+  - Cache All Shaders is now Download all shaders.
+  - HDR Auto-Toggle is now Windows HDR, and Resolution Auto-Toggle is now Change resolution.
+  - Mass Preset Install is now ReShade preset.
+  - "Subfolders" is now "Folder per game".
+  - The folder buttons are RHI data, Downloads, Custom and Logs.
+  - The "DC.ini" button is now "DisplayCommander.ini".
+  - The GitHub sign-in button is now "Sign in with GitHub instead", because a token is the recommended option.
+- The "Apply to All Games" buttons now say what they write, such as "Write peak brightness to all games" and "Write to all ReLimiter games".
+- Buttons that delete or reset things are now red, and their confirmation windows default to Cancel. Changing Shaders, Create missing profiles and applying a DLDSR state now ask first too.
+- Digital vibrance has moved to Display & HDR › Output colour, next to the other screen colour settings.
+- The DLSS On-Screen Indicator and Drop Helper are marked as needing Admin Mode, like ReBAR.
+
+**Component settings (⚙)**
+- Every component's ⚙ window now looks the same: setting names on the left with the option beside them, a short explanation under each setting, and a scroll bar when there's a lot to show. OptiScaler and RenoDX's compatibility settings keep their compact two-per-row layout; hover a setting for its explanation.
+- Messages such as "Deployed ReShade.ini" or an error now appear inside the ⚙ window, instead of on the game page behind it.
+- Settings save as soon as you change them, including dgVoodoo2, RTX Encore and ShortFuse DLSS Tool, which used to need an Apply or Save button. RTX HDR and Auto HDR keep their Apply button because they use sliders.
+- New buttons to open relimiter.ini, DisplayCommander.ini and OptiScaler.ini.
+- Components with nothing to set (DOF Fix, ASI Loader, DLSS Enabler, and Luma on non-Unreal games) now say so, instead of showing an empty window.
+
+**Display Commander**
+- Its ⚙ now has Display Commander's main settings, so you can set them before you play: FPS Limit (VRR presets or your own value), FPS Limiter Mode, Inject Reflex, Window Mode, the four Reflex options and Win+Up grace time. They use the same names as Display Commander's in-game menu.
+
+**RTX Encore**
+- RTX Encore is no longer labelled Beta.
+- Its ⚙ now has RTX Encore's settings, so you can set them before you play: frame generation, the XeFG engine, generated frame quality, HUD and UI, upscaling, Smooth Motion, Neural Rendering and compatibility. Changes go straight into the game's `rtx-encore.jsonc` and keep the file's comments. The overlay, shortcuts and diagnostics stay in RTX Encore's in-game menu (Insert). There's also an Open rtx-encore.jsonc button.
+- Installing RTX Encore now also installs the Intel XeSS files its XeFG engine needs, in RTX Encore's own folder, so the game's own files are never touched. Games that already have RTX Encore get them on the next launch.
+- The Neural Rendering DLL RHI installs for RTX Encore is now 310.9.16. Games with RHI's older 310.8.0 copy are moved over on the next launch.
+
+**20/30 FG Unlock**
+- Its ⚙ now has the mod's main settings. Each one is a dropdown, so you can't enter a value that would switch frame generation off:
+  - Frame Generation on/off
+  - Engine: DLSS or Intel XeSS
+  - Max Frames: 2X up to 6X
+  - Preset, including C, FG Lite (much cheaper to run)
+  - Speed Tier
+  - Super Resolution: DLSS preset M or L, using the mod's faster kernels on RTX 20 and 30 cards
+- Your settings are kept when the mod updates, and there are buttons to open the mod's ini and its log.
+- The GPU generation setting is gone: the mod now detects RTX 20 and 30 cards by itself.
+
+**MFG Ada Unlock**
+- Its ⚙ has a Frame generation method setting: NVIDIA DLSS-G, Intel XeMFG (CUDA) or XeMFG via DLSS-G (XMX). It's the same setting as in the mod's ReShade panel. With XeMFG (CUDA) you can also turn on DLSS-SR input (experimental), for games that have DLSS Super Resolution but no DLSS frame generation. There's also an Open MFGAdaUnlock.ini button.
+- Installing it now also installs the Intel XeSS files its XeMFG modes need, so you no longer have to click "Install / update files" in the mod's panel. If the game ships its own older copies (for example Of Ash and Steel), RHI backs them up and puts them back when you remove the mod. Games that already have the mod get the files on the next launch, and the ⚙ shows whether the right files are there.
+- The ⚙ warns when a game can't use it: as of the mod's version 1.8.0 it works in DirectX 12 games, experimentally in Vulkan games, and not in DirectX 11 or older.
+
+**Universal MFG Unlocker (formerly RTX 40 MFG)**
+- Renamed to match the mod. It now also supports RTX 30 cards (RTX 20 is experimental) and XeSS frame generation on any GPU. Its links point to the mod's new GitHub page. Existing installs keep working, with nothing to reinstall.
+- RHI now installs the two Intel files the mod's "XeMFG standalone" mode needs, which the mod used to report as missing. Games that already have the mod get them on the next launch. If you put your own copies there, RHI leaves them alone.
+- With OptiScaler nightly, F5 or DLSS NR in the same game, the mod is now installed as an OptiScaler plugin, as its author recommends. Games that already have both are moved over on the next launch, and removing OptiScaler moves the mod back. Choose DLSS multi frame generation or XeMFG with FG Output in OptiScaler's ⚙. Stable OptiScaler isn't supported by the mod, so nothing changes there.
+- Installing it in a game that has ReShade now warns that XeMFG standalone doesn't start while ReShade is loaded, and points to OptiScaler as the way to use XeMFG with ReShade. DLSS multi frame generation isn't affected. Tick "Don't show this again" to stop the warning.
+- The ⚙ explains XeMFG and shows whether its files are installed. It also warns when ReShade is installed as dxgi.dll, which can stop some frames at 5x and 6x from reaching the screen.
+
+**Updates**
+- Automatic update checks now run at least every 4 hours, even if you restart RHI. Before, a restart could push the next check out to nearly 8 hours.
+- Refresh now always fetches the latest Ultra+ and ultrawide fix lists, and RHI checks them every 4 hours instead of once a day, so new mods show up much sooner.
+
+**Game list and game page**
+- Clicking the store badge at the top of a game's page (Steam, Epic, GOG and so on) opens the game's Steam Community page. This works for games from any store, as long as the game is also on Steam.
+- Greyed-out game names in the list now mean ReShade isn't installed for that game. Before, a game was only greyed out when nothing at all was installed.
+- The mod author badge now says which mod it's for, for example "RenoDX: Marat".
+- Hovering the HDR and RES buttons now tells you whether they're on for that game, and whether that's set for the game itself or comes from Settings.
+- The Favourite button is quieter once a game is favourited: it reads "Favourited" in amber, without the bright outline.
+- The Driver Settings heading now matches the other sections, and the driver version is the first item in its summary when the section is collapsed.
+- Game Overrides tidy-up:
+  - Each reset button says what it resets: Reset name, Reset DLL names and Reset launch options. Reset launch options now clears the launch arguments as well as the executable.
+  - The wiki dropdown reads "Use wiki" / "Ignore wiki" instead of "Included" / "Excluded".
+  - The Update inclusion button says "Choose components...", and "Game name (editable)" is now just "Game name".
+- Deleting a shader profile and clearing the update history now ask you to confirm first.
+- The Info window for generic Unreal Engine games no longer shows the outdated "Common Unreal Engine mod warnings" block. Game-specific notes are still shown.
+
+**Quick Start**
+- The Quick Start guide has been rewritten to match the current app. It now covers Neural Rendering, the Extras section, OptiScaler's versions, RTX HDR and Auto HDR, the HDR and RES buttons, and adding a GitHub token.
+
+**Tooltips**
+- Many more things now explain themselves when you hover them, including the game list filters, store icons and update dots, the Components version numbers, section headings and drag handles, the graphics API and 32/64-bit badges, and the shader, addon, Available Mods and DLSS windows.
+- Greyed-out settings now say why they're unavailable. For example: Low Latency while Smooth Motion is on, ReBAR Mode until ReBAR is enabled, and OptiScaler on 32-bit games.
+- The summaries on collapsed sections explain their abbreviations, such as SR, RR and FG in DLSS / Streamline.
+- The FPS Limit tooltip in Settings explains that choosing a cap turns off the per-game FPS limit in ReLimiter and Display Commander games.
+
+### Bug Fixes
+
+**20/30 FG Unlock**
+- Fixed 20/30 FG Unlock not working since the mod's 0.4.0 release. The mod now comes as a package, but RHI was only copying part of it, so frame generation never started. RHI now installs the whole package, and games that already have it are repaired automatically.
+- Fixed choosing a DLL name other than version.dll installing the wrong file. Each name now uses the mod's matching build, listed in the mod's recommended order. winhttp.dll is no longer offered, and games using it are moved to version.dll.
+
+**OptiScaler**
+- Fixed OptiPatcher never loading with the nightly, F5 and DLSS NR builds of OptiScaler. RHI put it in a folder only the stable build reads. It's now in the right place, and games that already have it are fixed on the next launch.
+- Fixed OptiScaler updates deleting its plugins folder, including OptiPatcher and the DXVK files RHI keeps there so DXVK and OptiScaler can work together.
+- Fixed automatic OptiScaler updates still showing the old version afterwards (for example 0.1.34 after updating to 0.1.35.1). The new files were installed. On games that still show the old number, reinstall OptiScaler once.
+- Fixed replacing a game's OptiScaler.ini (and the mass OptiScaler.ini deploy) always using the NVIDIA template. It now uses the same one as a fresh install: the one for your GPU, your DLSS Inputs setting and the game's OptiScaler version.
+- Fixed applying an OptiScaler preset saved on F5 DLSSNR not switching the game to F5.
+- Fixed changing OptiScaler's Upscaler API also changing the game's upscaler choice.
+- Fixed resetting the OptiScaler DLL name on a Vulkan game renaming it to dxgi.dll, which doesn't load there. It now goes back to winmm.dll.
+
+**Unreal Engine games**
+- Fixed the Config button missing, and UE-Extended's Engine.ini settings not being written, for games where PCGamingWiki lists more than one config location (such as Phantom Blade Zero and A Way Out).
+
+**RenoDX**
+- Fixed RenoDX mods hosted on a modder's own site (such as UE-Extended) failing to install when that site can't be reached from your network. RHI now falls back to the same file on the modder's GitHub.
+
+**Installer**
+- Fixed the installer downloading and reinstalling the Windows App Runtime on some PCs that already have it, which made every update slow.
+
+**Launch**
+- Fixed the Launch button starting the wrong game after you right-clicked another game in the list. It now always starts the game shown on the right.
+
+**Shader packs**
+- Fixed shader packs never updating when "Download all shaders" is off and none of your ReShade games use them. Packs you've downloaded are now checked for updates on every launch; packs you haven't used are still only downloaded when needed.
+- Fixed shaders that a pack has removed or renamed staying behind after the pack updates (such as the old RenoFXHAnS.fx after the RenoFX overhaul).
+
+**Hidden games**
+- Fixed hidden games still being changed in the background. Update All already skipped them, and now automatic DLSS / Streamline and component updates and the "apply to all" settings buttons skip them too. To update a hidden game, show it again or use its own buttons.
+
+**Settings**
+- Fixed the ReShade overlay key, screenshot key and ReLimiter OSD key being lost if you left Settings without pressing Apply. They now save as soon as you press the key.
+- Fixed a typed screenshot folder, addon watch folder or peak brightness being lost unless you pressed Enter. They now also save when you click away. If a typed addon watch folder doesn't exist, RHI tells you and doesn't save it.
+- Fixed opening Settings for the first time redeploying shaders to every game.
+- Fixed out-of-date text in Settings, such as the Nexus Mods description.
+
+**DLSS / Streamline auto-update**
+- Fixed a game that had just been auto-updated being skipped by the next auto-update until RHI rescanned it.
+- Fixed the auto-update log only counting Super Resolution updates. It now also counts games where only Ray Reconstruction or Frame Generation was updated.
+
+**ReLimiter**
+- Fixed the ReLimiter ⚙ Target FPS and DLSS Hooks settings staying greyed out (or not applying) in games that keep ReShade addons in a separate folder.
+- Fixed an invalid ReLimiter custom FPS being ignored without a message.
+
+**Luma**
+- Fixed some Luma mods being listed twice in Available Mods, such as "Metro Redux" and "Metro Redux (2033 and Last Light)".
+
+**Other components**
+- Fixed a ⚙ setting that failed to save still showing the new value. It now goes back to the saved value and shows why.
+- Fixed "Deploy dxvk.conf" reporting success when the copy failed.
+- Fixed Addon Manager switching an addon back off with no message when its download failed. It now says the download failed.
+- Fixed RTX Encore staying set to deploy the Neural Rendering DLL after the DLL failed to download.
+- Fixed the RE Framework "Delete _storage_ folder" button getting stuck on "Deleting...".
+- Fixed applying a ReShade hotkey saying "Applied!" when the game had no reshade.ini to change.
+
+**Game page**
+- Fixed the Update inclusion line in Game Overrides showing a component as "On" when that component is switched off in Settings. Its heading is now "Update inclusion" instead of "Global update inclusion", because it only affects that game.
+- Fixed the ReShade version looking like a link but doing nothing when clicked, when an update was available or on Vulkan games. It now opens reshade.me.
+- Fixed two RenoDX compatibility settings both being called "Proxy Revert State". The second one is now "Advanced Settings".
+- Fixed out-of-date tooltips on Update All, the Neural Rendering "Deploy DLL" button and Universal MFG Unlocker.
+- Fixed small layout issues: the Hide button's tooltip, missing hand cursors and off-centre dividers in Extras, the Components section being slightly out of line, and a section's ≡ handle staying highlighted after dragging.
+
+### Manifest Updates
+- Added dgVoodoo2 v2.87.6, now the default version for new installs.
+- Added the Zenteon+ Shaders pack by Zenteon (free on Patreon): screen-space reflections, ZenRT path tracing, TurboGI, two bloom shaders, ZXpose and more. It includes everything in ZenteonFX, so choose one or the other.
+- Added BadassBaboon's updated fork of REST (ReshadeEffectShaderToggler) to the Addon Manager. It adds auto scene colour for DLSS and dynamic resolution games, Vulkan shader hunting, technique routing, HUD suppression and controller shortcuts, and needs ReShade 6.8 or newer. Choose it or the original REST, not both.
+- Fixed the Unreal Engine version not showing for FINAL FANTASY RESONANCE (5.6) and Kaku Ancient Seal (4.27).
+- Installing RenoDX on Cyberpunk 2077 now warns that the GitHub version is out of date for game version 2.5, and points to the pinned messages in the Cyberpunk channel on the RenoDX Discord.
+
+## v2.8.8
+
+### Changes
+
+**Available Mods**
+- "Available HDR Mods" is now "Available Mods" and also lists Ultra+ mods, in a new Ultra+ column.
+- Source engine games supported by RenoDX's Source addon are now listed. Installing the Source addon from RHI will come in a future update.
+- The Download column is gone: click any tick to open that mod's page.
+- The top of the window shows how many RenoDX, Luma and Ultra+ mods are available.
+- Type RenoDX, Luma or Ultra+ in the search box to show only games with that mod. Add a game name after it to narrow it down, e.g. "luma dead".
+
+**Other changes**
+- Epic games are now detected if you use the new Epic Games Launcher (preview). Before, they disappeared from RHI after switching to it.
+- Faster startup. Games on engines RHI has no special handling for (such as Frostbite, RAGE or Northlight) are no longer fully scanned on every launch. RHI uses the engine listed on PCGamingWiki, and otherwise only scans a game again when its folder changes (for example after a game update) or when you use Full Refresh.
+- Update checks use far less data. RHI used to download every installed RenoDX addon in full on each check just to see whether it had changed (several hundred MB with the generic Unity or UE-Extended addons installed). Now only addons that have actually changed are downloaded.
+
+### Bug Fixes
+
+**NVIDIA profile**
+- Fixed DLSS presets and other driver settings going to the wrong NVIDIA profile for some games (for example Metro 2033 Redux going to the Metro: Last Light Redux profile). Profile fixes now take effect straight away, with no Full Refresh needed.
+
+**Shaders**
+- Fixed RHI deleting and re-copying every ReShade game's shaders on each launch and Refresh, even when nothing had changed. Only new or changed shaders are copied now, so running games keep their shaders.
+
+**Downloads and GitHub requests**
+- Fixed the ReShade nightly build being downloaded again on every launch even when it hadn't changed.
+- Fixed RHI using far more GitHub requests than needed, which made it easy to hit GitHub's hourly limit (when that happens, downloads and update checks stop working for a while). RHI now remembers what it has already checked, even after a restart, and the addon update check no longer runs twice at startup.
+- Fixed a slow GitHub request being able to hold up the startup update checks for minutes. Requests now give up after 30 seconds.
+- Fixed hitting GitHub's request limit also stopping RHI's game database from updating.
+
+**DLSS / Streamline**
+- Fixed swapping to an older DLSS or Streamline version still showing the newer version number. RHI now always shows the version that's actually in the game folder.
+- Fixed the version dropdown sometimes showing the wrong version when two versions start the same way (for example 310.9.1 shown as 310.9.16).
+- Fixed a crash report appearing when a DLSS or Streamline version couldn't be changed (for example on a Game Pass game after it updated, while the game is running, or when Windows blocks access to the folder). RHI now explains what went wrong and sets the dropdown back to the installed version.
+- Fixed a failed DLSS swap sometimes leaving the game without its DLSS file. The original file is now put back.
+- Fixed Batch Deploy stopping when one game failed. It now carries on and lists any failed games, with the reason, in the summary.
+
+**OptiScaler F5 DLSSNR**
+- Fixed F5 updates failing on the first attempt with a "Could not find a part of the path" error.
+- Fixed F5 games showing the old version number after updating, which also stopped the update badge appearing for later releases.
+- Fixed updating an F5 or DLSS NR install forgetting which OptiScaler variant the game uses.
+
+**RTX 40 MFG Unlock**
+- Fixed RTX 40 MFG updates showing the new version in RHI while games kept the old file. Since v1.5 the mod's file is called `MFGUnlocker.dll`, which RHI wasn't picking up. Every game with RTX 40 MFG installed is now updated automatically, with no reinstall needed.
+- Games that miss an update (for example because the game was running) are now updated the next time RHI starts.
+
+**MFG Ada Unlock and other addons**
+- Fixed addon updates (such as MFG Ada Unlock) not reaching a game that was running when the update downloaded. Outdated copies are now refreshed every time RHI starts.
+- Fixed MFG Ada Unlock installed from the Extras section sometimes not receiving updates.
+- Fixed MFG Ada Unlock coming back into a game after you removed it, the next time it updated.
+- Fixed some addons (such as ReShade Screenshot Discord Fix) being copied into games again on every launch even when they hadn't changed.
+- Fixed addons going into the game folder when the game's `reshade.ini` has an `AddonPath` set, so ReShade didn't load them (or kept loading an older copy). RHI now installs them into the `AddonPath` folder and removes the copy it had put in the game folder.
+
+**Luma**
+- Fixed Luma mods that are now only on Nexus Mods (such as Mass Effect: Andromeda) showing an update that Update All couldn't install, leaving the buttons purple. These mods are now checked against Nexus Mods, and the Update button opens the Nexus download page.
+
+**Update History**
+- Fixed Luma updates not appearing in Update History.
+- Fixed OptiScaler Stable, DLSS NR and F5 DLSSNR updates not appearing in Update History (only Nightly was shown).
+
+**NR Cost Scaler / DLSS FG 20/30**
+- Fixed updates to NR Cost Scaler and DLSS FG for RTX 20/30 not being copied into game folders when found at startup.
+
+**Automatic Updates and Update All**
+- Fixed Automatic Updates repeating the same work once for every game with an update, and reinstalling ReShade into every game instead of only the outdated ones.
+- Fixed Automatic Updates updating games that were running, which could fail and show a crash report. Running games are now updated once they close.
+- Fixed Update All showing a crash report for a game on the Custom ReShade channel whose ReShade DLL had been removed from the Custom folder. The game is now skipped and its card shows why.
+
+**Ultimate ASI Loader**
+- Fixed ASI Loader updates never reaching games: RHI downloaded new versions but didn't copy them into game folders. Games with the ASI Loader are now brought up to date automatically at startup.
+- Fixed the 64-bit ASI Loader being downloaded again on every launch, and the 32-bit copy never updating.
+
+**Settings and install records**
+- Fixed all settings being reset (and the first-time setup shown again) if the settings file was damaged, for example by a crash or power cut while saving. RHI now keeps a backup and restores it automatically. The damaged file is kept as `settings.json.corrupt-…`.
+- Fixed settings sometimes being lost when saved at the same moment as a shader pack update, or while a setting was being changed.
+- Fixed RHI losing track of installed mods (no update badges, and uninstall unable to restore original files) if an install record file was damaged. Records for RenoDX, ReShade and other addons, Luma, RE Framework and DXVK now keep a backup and recover from it.
+- Fixed two installs or uninstalls finishing at the same time sometimes forgetting one of them.
+- Fixed renaming a game losing its Luma TAA setting.
+- Fixed a cleared OptiScaler Streamline version, OptiScaler NR runtime or ASI Loader install name coming back the next time RHI started.
+
+**Security**
+- Fixed your GitHub token being sent with downloads from other sites (such as ReShade, Nexus Mods and PCGamingWiki). It is now only ever sent to GitHub. Tokens made the recommended way (no scopes ticked) can't access your account, so no action is needed. If you pasted a token with extra permissions, consider replacing it with a new one.
+- Fixed some shader packs failing to download or update ("Not Found") when a GitHub token or sign-in was set up.
+- Fixed a specially made Luma, shader pack or shader profile archive being able to place files outside the game or shader folder. Luma uninstall also no longer deletes anything outside the game folder.
 
 ### Maintenance
-- Installer script no longer has hardcoded user paths — build output and icon locations are now derived automatically from the repo root.
+
+- Fixed many errors being silently ignored instead of written to the log, so problems are easier to diagnose from session logs.
+- Fixed some unexpected errors in buttons and settings showing a crash report instead of being logged and recovered from.
+- Fixed session logs filling up with a "UI responsive" line every second.
+- Fixed the automatic restart after a UI freeze being able to open more than one copy of RHI.
+- Removed about 3,000 lines of unused code.
+
+### Manifest Updates
+
+- Added DLSS SR / RR / FG / NR 310.9.16.
+- Added Streamline 2.14.16.0 (NVIDIA's updated v2 build).
+- Added ShortFuse DLSS Tool 26.1016.1304.
+- Added DLSS FG Preset C.
+- Added the Depth3D Cursor Add-on to the addon list.
+- Added SD Shaders by Starodubysko to the shader packs (Extra): colour grading shaders for SDR and HDR.
+- Added engine versions for Valor Mortis (Unreal Engine 5.7.3), DAEMON X MACHINA (Unreal Engine 4.20.3) and Phantom Blade Zero (Unreal Engine 5.7.4).
+- Fixed Metro 2033 Redux not matching its NVIDIA driver profile (Metro Redux).
+- Fixed Portal installing mods to the wrong folder. They now go into the game's `bin` folder.
+
+---
+
+## v2.8.7
+
+### New
+
+**OptiScaler F5 DLSSNR**
+- Added F5 DLSSNR as a new OptiScaler variant, available in the OptiScaler ⚙ cog version selector alongside Stable, Nightly, and DLSS NR.
+- Based on janblade's fork with multi-pass Neural Rendering support and a bundled NR forwarder (`nvngx.dll_dlssnr.dll`). Requires a separately staged `nvngx_dlssnr.dll` runtime (same as the DLSS NR variant).
+- Auto-updates alongside other OptiScaler variants and appears in the update history.
+
+### Changes
+
+**OptiScaler Settings**
+- Added a note in the OptiScaler ⚙ cog above the Deploy OptiScaler.ini button clarifying that settings in the cog apply in real time and the deploy button is only for seeding a fresh ini — it does not write the configured settings.
+
+### Bug Fixes
+
+**OptiScaler Nightly**
+- Fixed nightly builds not auto-updating to newer builds when the update check cooldown was active. The available builds list is now checked at startup and on every refresh, and update detection no longer depends on the update check running first.
+- Fixed clicking Update on a nightly game installing the old build instead of downloading the new one. The install flow now always downloads the latest nightly when an update is flagged, and re-resolves the staging directory after download.
+- The Info button and version number on the OptiScaler row now link to the nightly GitHub page and releases when the Nightly variant is active.
+
+**RTX Encore**
+- Fixed RTX Encore not auto-updating when a new beta release was available. The update check is now wired into the standard component update flow and the update appears in the update history.
+
+**ReShade Screenshot Discord Fix**
+- Fixed the 32-bit addon not being deployed to 32-bit games. When downloading from GitHub releases, RHI now stages both the `.addon32` and `.addon64` files when both are available as release assets.
+
+**OptiScaler Detection**
+- Fixed tools that reference OptiScaler internally (e.g. SCSKiller) being incorrectly detected as an OptiScaler installation. The binary signature scan now only runs when the file has no version resource — if the file clearly identifies itself as a different tool, it is no longer flagged as OptiScaler.
+
+---
+
+## v2.8.6
+
+### Important
+- **Windows App Runtime 2.5.1 is required for this update.** The installer downloads and installs it automatically if not already present. The runtime update includes reliability fixes for WinUI 3 that may reduce the frequency of the UI freeze.
+
+### New
+
+**DLDSR Control**
+- Enable or disable DLDSR (Deep Learning Dynamic Super Resolution) factors directly from RHI without opening NVIDIA Control Panel.
+- **DSR Smoothness slider** — adjust smoothness (0–100%) without recapturing. 100 = no sharpening, lower values add sharpening. Recommended range for DLDSR is 55–80 (DLDSR is naturally much sharper than standard DSR, so it needs higher values than you'd expect). Applying smoothness causes the same ~15 second display blackout as applying a full state.
+- **Info button** — click ⓘ next to the header for step-by-step instructions on capturing and applying DLDSR states.
+- **How to use:**
+  1. Open **NVIDIA Control Panel → Manage 3D Settings → DSR – Factors**
+  2. Enable the DLDSR factors you want (e.g. 1.78x DL, 2.25x DL)
+  3. In RHI Settings, scroll to **DLDSR Control** and click **Capture Current** — give it a name like "1.78x + 2.25x"
+  4. Now you can disable DLDSR in NVIDIA Control Panel
+  5. Whenever you want those factors back, select your saved state and click **Apply** — the screen goes black for ~15 seconds while the GPU restarts, then DLDSR is active
+  6. Use the **DSR Smoothness** slider and click **Set** to adjust sharpness/smoothness. This also causes a brief blackout — set it before clicking Apply if you want to apply both in one restart.
+- Useful for toggling DLDSR on/off without navigating NVIDIA Control Panel each time
+- Multiple configurations can be saved (e.g. "Off", "1.78x only", "1.78x + 2.25x")
+- Requires Admin Mode or running RHI as Administrator to read/write the driver registry keys
+
+**Auto HDR (per-game)**
+- Force Windows Auto HDR on a per-game basis from the RenoDX ⚙ cog, directly below the RTX HDR section.
+- Works on any GPU — no NVIDIA App required. Does not require the global Auto HDR toggle in Windows Settings — the per-exe registry entry is sufficient on its own.
+- Writes to two registry locations: a `D3DBehaviors` subkey under `HKCU\Software\Microsoft\Direct3D` to force the game into the Auto HDR pipeline, and `AutoHDRStrength` under `HKCU\Software\Microsoft\DirectX\UserGpuPreferences` to control brightness — exactly the same mechanism as ledoge's autohdr_force tool.
+- Click **Configure Auto HDR** on the RenoDX row to open the settings dialog and adjust brightness (0–100). 0 = no boost, 50 = default, 100 = maximum (~1000 nits peak).
+- Mutual exclusivity with RTX HDR — enabling one disables the other, and enabling either uninstalls any active RenoDX mod.
+- Changes take effect on the next game launch.
+
+**OptiScaler Nightly Build Selection**
+- You can now pin a game to a specific nightly build instead of always using the latest. Open the OptiScaler ⚙ cog and use the new "Nightly Build" dropdown — it lists the last 30 daily builds (about 2 months of history).
+- "Latest (auto-update)" is unchanged — the game tracks the newest nightly and auto-updates as normal.
+- Pinning a build freezes that game at that version and excludes it from auto-updates. Useful when a newer nightly breaks something.
+- Pinned builds download on demand the first time and cache locally for future installs.
+
+**Desktop Shortcuts** *(WIP)*
+- Right-click any game in your library and choose **Create Desktop Shortcut** to place a shortcut on your Desktop.
+- Launching the game through the shortcut goes via RHI — HDR Auto-Toggle and Resolution Auto-Toggle fire exactly as they would from clicking Launch inside the app.
+- Shortcut icons use the game's own icon: pulled from the game executable for Steam, GOG, EA, Epic, and manually added games. Xbox/Game Pass games pull cover art from the Steam or Microsoft Store since the game executables are not directly accessible — icon quality and visibility for Xbox games is a work in progress and will be improved in a future update.
+- The context menu also includes **Favourite** and **Hide/Show** alongside the existing Open Folder and View Notes items.
+
+**RTX Encore**
+- RTX Encore (SilyNoMeta) is now available as a new Extras row, between OptiScaler and DLSS Enabler.
+- Provides frame generation X2–X6, Smooth Motion on RTX 30, and Neural Rendering for RTX 20/30/40, in games that support DLSS Frame Generation.
+- Click Install to choose a proxy DLL name (version.dll, dinput8.dll, winmm.dll, dxgi.dll, d3d9/10/11/12.dll, and more — or rtx-encore.asi for ASI-loader games). Names in use by other RHI components are disabled. Names with an existing file on disk are shown in amber — RTX Encore backs them up and restores them on uninstall.
+- The ⚙ cog lets you deploy `nvngx_dlssnr.dll` version 310.8.0 for Neural Rendering — RTX Encore requires exactly this version and refuses any other. The file is shared with other NR components and only removed when no other component still needs it.
+- Auto-updates alongside other components.
+
+**RE Framework**
+- Added a ⚙ cog button to the RE Framework row with a "Delete _storage_ folder" button — RE Framework uses this folder as a cache and rebuilds it on each launch, so deleting it is always safe.
+
+### Changes
+
+**Control Ultimate Edition — OptiScaler FG**
+- When installing OptiScaler FG via the Control install dialog, RHI now automatically pins the game to OptiScaler nightly build 2026-10-04. Newer nightly builds break DLSS Frame Generation compatibility with Control — this ensures it works correctly out of the box.
+
+**GitHub Personal Access Token**
+- Added a PAT input field in Settings → GitHub API as an alternative to the OAuth sign-in flow.
+- Paste any classic PAT (no scopes needed — RHI only reads public repos). The token is saved locally and never expires unless you revoke it on GitHub.
+- Useful if you prefer not to use OAuth, or if your OAuth session keeps expiring.
+
+### Bug Fixes
+
+**UI Freeze**
+- RHI now detects and recovers from the UI freeze in about 5 seconds, down from up to 60 seconds.
+- Fixed the auto-restart incorrectly firing after waking from sleep. A 30-second grace period now suppresses the restart check after a system resume.
+- Fixed the auto-restart firing while an install was in progress. The restart is now deferred up to 30 seconds if any component is mid-install.
+- Fixed a recurring freeze after switching between games quickly. Rapid navigation could queue two back-to-back panel rebuilds, causing the UI thread to hang.
+- Fixed a freeze that could occur when opening the Settings panel while a game was selected. Changing certain global driver settings (VSync, ReBAR) was triggering a panel rebuild that conflicted with the Settings page opening.
+- Fixed RHI silently swallowing internal framework messages (WM_APP/0x8000) that were intended for WinUI rather than the system tray icon. These are now forwarded correctly.
+- Fixed several places where NVIDIA driver settings were read on the UI thread before opening a dialog. Opening Configure RTX HDR, Multi Frame Gen, or DXVK settings could block the UI for up to 25 seconds if NVAPI was slow. Values are now fetched in the background first.
+- Fixed DLSS version information refreshing on the UI thread after swapping a DLSS DLL, which could stall the UI on slow disks or with antivirus active.
+- Fixed settings, game library, and addon records being left corrupt if RHI was killed mid-write. These files are now written atomically.
+- After an auto-restart, RHI reselects the game that was open before the freeze and shows a brief status bar notice.
+
+**DLSS/Streamline Detection**
+- Added `dlssPathOverrides` and `streamlinePathOverrides` manifest fields — allows RHI to find DLSS and Streamline DLLs in games that store them in non-standard deep subdirectories that the recursive scanner doesn't reach. The Sinking City 2 is the first game to use this.
+
+**DLSS/Streamline — The Sinking City 2**
+- Fixed the DLSS/Streamline section showing empty for The Sinking City 2. The game stores its DLLs 8 levels deep inside the Engine plugins folder rather than alongside the executable.
+
+**Output Colour Settings**
+- Fixed the Colour Depth and Dynamic Range dropdowns being empty and unclickable. The NVAPI display enumeration was returning "device not found" for all monitors.
+
+**OptiScaler Detection**
+- Fixed RTX Encore's `winmm.dll` being incorrectly detected as an OptiScaler installation. The binary signature scan used the generic string "OptiScaler" which RTX Encore also contains as a reference. Detection now uses file description metadata (`FileDescription = "OptiScaler"`, `CompanyName = "nitec"`) as the primary check, with a secondary binary scan using more specific internal strings.
+
+**Cyberpunk 2077**
+- Fixed the install button showing "Download from Discord" instead of using the normal wiki/database mod download. The game now installs RenoDX like any other mod.
+
+**Start with Windows**
+- Fixed "Start with Windows" disabling itself on every launch. The settings panel was removing the startup entry during initialisation.
+
+**GitHub API**
+- Fixed RenoDX mods not appearing for users whose GitHub session had expired. Previously RHI would keep using a stale login token without realising it had stopped working, causing mods, updates, and downloads to silently fail while the settings page still showed "Connected". RHI now checks the token is valid at startup and clears it immediately if not, showing a notice in the status bar so you know to sign in again.
+
+**Process Doesn't Close**
+- Fixed RHI staying open and using CPU after closing the window. Background tasks now stop on close, with a hard exit fallback to ensure the process always terminates.
+
+**Appearance**
+- Fixed all dialogs rendering in light theme on systems with Windows set to light mode. RHI now forces dark theme on every dialog.
+
+**DLDSR Control**
+- The Current State display now shows your monitor's friendly name (e.g. "LG ULTRAGEAR", "MSI MPG343CQR") instead of a raw hex identifier.
+
+**Refresh**
+- Fixed the game detail panel going blank after pressing Refresh.
+
+**RenoDX**
+- Fixed the installed mod version not appearing after a fresh install until you navigate away and back to the game. The detail panel now updates immediately.
+- Fixed game-specific notes from the RHI database not appearing in the RenoDX info dialog for UE-Extended games.
+
+**MFG Ada Unlock**
+- Fixed the update check skipping MFG Ada Unlock for users whose staging file was deleted or missing.
+
+**Drag-Drop RenoDX Mods**
+- Fixed RHI incorrectly offering to delete an existing RenoDX mod when a `.addon64` file with a non-standard name was dropped onto a game.
+
+**Engine.ini**
+- Fixed Engine.ini not being written on install for games that have never been launched when the config path comes from the PCGW database.
+
+**DLSS Fix**
+- Fixed DLSS Fix downloading as an update multiple times per day. A transient network failure during the version check was returning an unknown result, which RHI was incorrectly treating as a new version. The update is now skipped when the version check can't be resolved.
+
+### Manifest Updates
+- Added `installPathOverrides` for Baldur's Gate 3 (`bin` subfolder)
+- Added `dlssPathOverrides` for The Sinking City 2 — DLSS DLLs are in a non-standard deep subdirectory that the recursive scanner doesn't reach
+- STAR WARS: Galactic Racer — Engine.ini path added for UE-Extended HDR support.
+- The Witcher 3: Wild Hunt - Game of the Year Edition now installs the same RenoDX mod as the standard edition.
+- Mirror's Edge Catalyst — wiki-unlinked.
+
+---
+
+## v2.8.5
+
+*Thanks to Lazorr for researching and contributing the fixes in this release.*
+
+### Bug Fixes
+
+**Available HDR Mods**
+- Fixed column headers and ✗ marks being too faint to read.
+
+**Crashes & Freezes on Close**
+- Fixed an incomplete shutdown sequence — timers and panel scans are now stopped, pending UI requests cancelled, the update log window closed, OLE drag-drop cleaned up, and settings flushed in the correct order.
+- Fixed progress dialogs sometimes getting permanently stuck. Dialogs now retain ownership of their modal slot until WinUI fully finishes closing them, including on error paths. Startup dialogs (patch notes, MOTD, update check) now run one at a time instead of racing each other.
+- Fixed the app not exiting cleanly when closed to tray during an installer handoff — it now exits explicitly rather than relying on "close to tray" behaviour.
+
+**Library & Refresh**
+- Fixed a race condition where starting a Refresh while the initial scan was still running could corrupt the game library. Initialisation and Refresh are now serialised, the previous library is retained while the new one is being built, and the UI merge waits for the background scan to finish before proceeding.
+
+**Single Instance & Admin Mode**
+- Hardened single-instance ownership and made the admin task query async with a timeout. The shutdown signal file is now cleaned up so a freshly launched instance doesn't accidentally consume it.
+
+**Installer**
+- Removed the use of `AttachThreadInput` for bringing RHI to the foreground after an update — this could tie RHI's responsiveness to the installer or any other foreground app. Replaced with a safe message-based handoff.
+
+**Downloads**
+- Added cancellation and a 10-minute timeout to installer downloads, plus partial file cleanup if the download fails or is cancelled.
 
 ---
 

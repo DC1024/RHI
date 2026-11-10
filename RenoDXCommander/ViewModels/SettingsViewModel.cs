@@ -11,11 +11,6 @@ namespace RenoDXCommander.ViewModels;
 /// </summary>
 public partial class SettingsViewModel : ObservableObject
 {
-    // Settings stored as JSON — ApplicationData.Current throws in unpackaged WinUI 3
-    private static readonly string _settingsFilePath = System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "RHI", "settings.json");
-
     [ObservableProperty] private bool _skipUpdateCheck;
     [ObservableProperty] private bool _betaOptIn;
     [ObservableProperty] private bool _verboseLogging;
@@ -33,6 +28,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private int _ulTargetFps; // 0 = off/disabled
     [ObservableProperty] private string _osHotkey = "Insert";
     [ObservableProperty] private string _osGpuType = "NVIDIA";
+    /// <summary>OptiScaler version for games that don't have one chosen: "Stable", "Nightly", "DlssNr" or "F5".</summary>
+    [ObservableProperty] private string _osDefaultVariant = "Stable";
+    /// <summary>Delete old OptiScaler Nightly builds when a new one is downloaded (keeps the newest and pinned builds).</summary>
+    [ObservableProperty] private bool _osNightlyCleanup;
+    /// <summary>RHI's own interface size in percent (on top of Windows scaling). 100 = normal.</summary>
+    [ObservableProperty] private int _uiScale = 100;
     [ObservableProperty] private bool _osDlssInputs = true;
     [ObservableProperty] private bool _osFirstTimeWarningDismissed;
     [ObservableProperty] private bool _ueExtendedWarningDismissed;
@@ -42,6 +43,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _dxvkWarningDismissed;
     [ObservableProperty] private bool _mfgWarningDismissed;
     [ObservableProperty] private bool _engineBadgeWarningDismissed;
+    [ObservableProperty] private bool _umfgReShadeWarningDismissed;
     [ObservableProperty] private bool _lumaRenodxCombinedWarningDismissed;
     [ObservableProperty] private List<string> _enabledGlobalAddons = new();
     [ObservableProperty] private bool _firstLaunchSetupDone;
@@ -53,6 +55,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _globalSkipRefUpdates;
     [ObservableProperty] private bool _cacheAllShaders = true;
     [ObservableProperty] private string _lastUpdateCheckUtc = "";
+    /// <summary>Key of the Settings page section last used (jump list / scroll position), e.g. "General", "Dlss".</summary>
+    [ObservableProperty] private string _settingsLastSection = "General";
+    /// <summary>Game page layout: "Classic" or "Tabs" (DetailLayoutHost / MainLayout).</summary>
+    [ObservableProperty] private string _mainLayout = "Classic";
+    /// <summary>Key of the tab last shown in the Tabs layout: "Overview" or a section key.</summary>
+    [ObservableProperty] private string _detailSelectedTab = "Overview";
     [ObservableProperty] private string _dxvkVariant = "LiliumHdr";
     [ObservableProperty] private string _reShadeChannel = "Stable";
     [ObservableProperty] private int _peakNits;
@@ -83,6 +91,21 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>Controls which data source feeds mod info. Values: "WikiOnly", "DbOnly", "Hybrid".</summary>
     [ObservableProperty] private string _renoDxDbSource = "DbOnly";
     [ObservableProperty] private bool _dropHelperEnabled = true;
+    /// <summary>Controller support in the Spotlight layout (MainWindow.Controller.cs).</summary>
+    [ObservableProperty] private bool _controllerSupport = true;
+    /// <summary>Spotlight: show the selected Steam game's achievements (opt-in, Settings › Achievements).</summary>
+    [ObservableProperty] private bool _steamAchievements;
+    /// <summary>Spotlight: show the selected Xbox game's achievements (opt-in, Settings › Achievements).</summary>
+    [ObservableProperty] private bool _xboxAchievements;
+    /// <summary>Spotlight: search, filters and the cover shelf below the game page instead of above it.</summary>
+    [ObservableProperty] private bool _spotlightShelfAtBottom;
+    /// <summary>Spotlight banner height set by dragging its bottom edge; 0 = automatic (follows the window width).</summary>
+    [ObservableProperty] private double _spotlightHeroHeight;
+    /// <summary>Spotlight cover size set by dragging the cover strip's edge (1 = 120 x 180).</summary>
+    [ObservableProperty] private double _spotlightCoverScale = 1.0;
+    /// <summary>What's New: text size (+ / - buttons) and whether the version list + search are hidden.</summary>
+    [ObservableProperty] private double _patchNotesFontSize = 12;
+    [ObservableProperty] private bool _patchNotesNavHidden;
     [ObservableProperty] private bool _closeToTray;
     [ObservableProperty] private bool _recentGamesMenu;
     [ObservableProperty] private bool _startWithWindows;
@@ -170,24 +193,15 @@ public partial class SettingsViewModel : ObservableObject
 
     // ── Settings file I/O ─────────────────────────────────────────────────────────
 
-    public static Dictionary<string, string> LoadSettingsFile()
-    {
-        try
-        {
-            if (!System.IO.File.Exists(_settingsFilePath)) return new(StringComparer.OrdinalIgnoreCase);
-            var json = System.IO.File.ReadAllText(_settingsFilePath);
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
-                   ?? new(StringComparer.OrdinalIgnoreCase);
-        }
-        catch (Exception ex) { CrashReporter.Log($"[SettingsViewModel.LoadSettingsFile] Failed to load settings — {ex.Message}"); return new(StringComparer.OrdinalIgnoreCase); }
-    }
+    // All settings.json access goes through SettingsFile (shared lock, .bak, corrupt-file recovery).
+    public static Dictionary<string, string> LoadSettingsFile() => SettingsFile.Load();
 
-    public static void SaveSettingsFile(Dictionary<string, string> settings)
-    {
-        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(_settingsFilePath)!);
-        var json = JsonSerializer.Serialize(settings);
-        FileHelper.WriteAllTextWithRetry(_settingsFilePath, json, "SettingsViewModel.SaveSettingsFile");
-    }
+    public static Dictionary<string, string> LoadSettingsFile(out SafeJsonFile.LoadStatus status) =>
+        SettingsFile.Load(out status);
+
+    /// <summary>Read-modify-write of settings.json under the shared lock.</summary>
+    public static bool UpdateSettingsFile(Action<Dictionary<string, string>> mutate, string callerTag) =>
+        SettingsFile.Update(mutate, callerTag);
 
     /// <summary>
     /// Loads settings-specific values (SkipUpdateCheck, VerboseLogging,
@@ -274,6 +288,13 @@ public partial class SettingsViewModel : ObservableObject
 
         if (s.TryGetValue("OsGpuType", out var ogtVal))
             OsGpuType = ogtVal ?? "NVIDIA";
+        // Forks are only known once the manifest loads: keep the saved value (GetOsVariant falls back if it's gone)
+        if (s.TryGetValue("OsDefaultVariant", out var odvVal)
+            && (OsVariants.IsKnown(odvVal) || OsVariants.IsFork(odvVal) || OsVariants.IsCustom(odvVal)))
+            OsDefaultVariant = odvVal;
+        if (s.TryGetValue("OsNightlyCleanup", out var oncVal)) OsNightlyCleanup = oncVal == "true"; // default false
+        if (s.TryGetValue("UiScale", out var uisVal) && int.TryParse(uisVal, out var uis))
+            UiScale = Math.Clamp(uis, 50, 200);
 
         if (s.TryGetValue("OsDlssInputs", out var odiVal))
             OsDlssInputs = odiVal == "true";
@@ -301,6 +322,9 @@ public partial class SettingsViewModel : ObservableObject
 
         if (s.TryGetValue("EngineBadgeWarningDismissed", out var ebwdVal))
             EngineBadgeWarningDismissed = ebwdVal == "true";
+
+        if (s.TryGetValue("UmfgReShadeWarningDismissed", out var urwdVal))
+            UmfgReShadeWarningDismissed = urwdVal == "true";
 
         if (s.TryGetValue("EnabledGlobalAddons", out var egaVal))
         {
@@ -331,6 +355,9 @@ public partial class SettingsViewModel : ObservableObject
         if (s.TryGetValue("GlobalSkipRefUpdates", out var gsrefVal)) GlobalSkipRefUpdates = gsrefVal == "true";
         if (s.TryGetValue("CacheAllShaders", out var casVal)) CacheAllShaders = casVal != "false"; // default true
         if (s.TryGetValue("LastUpdateCheckUtc", out var luc)) LastUpdateCheckUtc = luc;
+        if (s.TryGetValue("SettingsLastSection", out var slsVal) && !string.IsNullOrWhiteSpace(slsVal)) SettingsLastSection = slsVal;
+        if (s.TryGetValue("MainLayout", out var mlVal) && !string.IsNullOrWhiteSpace(mlVal)) MainLayout = mlVal;
+        if (s.TryGetValue("DetailSelectedTab", out var dstVal) && !string.IsNullOrWhiteSpace(dstVal)) DetailSelectedTab = dstVal;
         if (s.TryGetValue("DxvkVariant", out var dvVal)) DxvkVariant = dvVal ?? "LiliumHdr";
         if (s.TryGetValue("ReShadeChannel", out var rscVal)) ReShadeChannel = rscVal ?? "Stable";
         if (s.TryGetValue("PeakNits", out var pnVal) && int.TryParse(pnVal, out var pnInt)) PeakNits = pnInt;
@@ -373,6 +400,14 @@ public partial class SettingsViewModel : ObservableObject
             // SaveSettingsFile will persist the marker and the new source on the next save
         }
         if (s.TryGetValue("DropHelperEnabled", out var dheVal)) DropHelperEnabled = dheVal != "false"; // default true
+        if (s.TryGetValue("ControllerSupport", out var csVal)) ControllerSupport = csVal != "false"; // default true
+        if (s.TryGetValue("SteamAchievements", out var saVal)) SteamAchievements = saVal == "true"; // default false (opt-in)
+        if (s.TryGetValue("XboxAchievements", out var xaVal)) XboxAchievements = xaVal == "true"; // default false (opt-in)
+        if (s.TryGetValue("SpotlightShelfAtBottom", out var ssbVal)) SpotlightShelfAtBottom = ssbVal == "true"; // default false (top)
+        if (s.TryGetValue("SpotlightHeroHeight", out var shhVal) && double.TryParse(shhVal, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var shh)) SpotlightHeroHeight = shh;
+        if (s.TryGetValue("PatchNotesFontSize", out var pnfVal) && double.TryParse(pnfVal, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var pnf) && pnf > 0) PatchNotesFontSize = pnf;
+        if (s.TryGetValue("PatchNotesNavHidden", out var pnhVal)) PatchNotesNavHidden = pnhVal == "true";
+        if (s.TryGetValue("SpotlightCoverScale", out var scsVal) && double.TryParse(scsVal, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var scs) && scs > 0) SpotlightCoverScale = scs;
         if (s.TryGetValue("CloseToTray", out var cttVal)) CloseToTray = cttVal == "true";
         if (s.TryGetValue("RecentGamesMenu", out var rgmVal)) RecentGamesMenu = rgmVal == "true";
         if (s.TryGetValue("StartWithWindows", out var swwVal)) StartWithWindows = swwVal == "true";
@@ -492,6 +527,9 @@ public partial class SettingsViewModel : ObservableObject
         else s.Remove("UlTargetFps"); // 0 = off — remove stale value
         s["OsHotkey"] = OsHotkey;
         s["OsGpuType"] = OsGpuType;
+        s["OsDefaultVariant"] = OsDefaultVariant;
+        s["OsNightlyCleanup"] = OsNightlyCleanup ? "true" : "false";
+        s["UiScale"] = UiScale.ToString(System.Globalization.CultureInfo.InvariantCulture);
         s["OsDlssInputs"] = OsDlssInputs ? "true" : "false";
         s["OsFirstTimeWarningDismissed"] = OsFirstTimeWarningDismissed ? "true" : "false";
         s["UeExtendedWarningDismissed"] = UeExtendedWarningDismissed ? "true" : "false";
@@ -501,6 +539,7 @@ public partial class SettingsViewModel : ObservableObject
         s["DxvkWarningDismissed"] = DxvkWarningDismissed ? "true" : "false";
         s["MfgWarningDismissed"] = MfgWarningDismissed ? "true" : "false";
         s["EngineBadgeWarningDismissed"] = EngineBadgeWarningDismissed ? "true" : "false";
+        s["UmfgReShadeWarningDismissed"] = UmfgReShadeWarningDismissed ? "true" : "false";
         s["EnabledGlobalAddons"] = JsonSerializer.Serialize(EnabledGlobalAddons);
         s["FirstLaunchSetupDone"] = FirstLaunchSetupDone ? "true" : "false";
         s["GlobalSkipRdxUpdates"] = GlobalSkipRdxUpdates ? "true" : "false";
@@ -511,6 +550,9 @@ public partial class SettingsViewModel : ObservableObject
         s["GlobalSkipRefUpdates"] = GlobalSkipRefUpdates ? "true" : "false";
         s["CacheAllShaders"] = CacheAllShaders ? "true" : "false";
         s["LastUpdateCheckUtc"] = LastUpdateCheckUtc;
+        s["SettingsLastSection"] = SettingsLastSection;
+        s["MainLayout"] = MainLayout;
+        s["DetailSelectedTab"] = DetailSelectedTab;
         s["DxvkVariant"] = DxvkVariant;
         s["ReShadeChannel"] = ReShadeChannel;
         if (PeakNits > 0) s["PeakNits"] = PeakNits.ToString();
@@ -535,6 +577,14 @@ public partial class SettingsViewModel : ObservableObject
         s["DbSourceMigrated"] = "1"; // persists the one-time migration marker
         if (!DropHelperEnabled) s["DropHelperEnabled"] = "false";
         else s["DropHelperEnabled"] = "true";
+        s["ControllerSupport"] = ControllerSupport ? "true" : "false";
+        s["SteamAchievements"] = SteamAchievements ? "true" : "false";
+        s["XboxAchievements"] = XboxAchievements ? "true" : "false";
+        s["SpotlightShelfAtBottom"] = SpotlightShelfAtBottom ? "true" : "false";
+        s["SpotlightHeroHeight"] = SpotlightHeroHeight.ToString("0", System.Globalization.CultureInfo.InvariantCulture);
+        s["PatchNotesFontSize"] = PatchNotesFontSize.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+        s["PatchNotesNavHidden"] = PatchNotesNavHidden ? "true" : "false";
+        s["SpotlightCoverScale"] = SpotlightCoverScale.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
         s["CloseToTray"] = CloseToTray ? "true" : "false";
         s["RecentGamesMenu"] = RecentGamesMenu ? "true" : "false";
         s["StartWithWindows"] = StartWithWindows ? "true" : "false";

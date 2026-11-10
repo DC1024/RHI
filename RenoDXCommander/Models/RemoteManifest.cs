@@ -65,6 +65,15 @@ public class RemoteManifest
     [JsonPropertyName("installPathOverrides")]
     public Dictionary<string, string>? InstallPathOverrides { get; set; }
 
+    /// <summary>
+    /// Same format as <see cref="InstallPathOverrides"/> (game → subpath, pipe-separated candidates),
+    /// for games whose install folder RHI moves: an entry here wins over installPathOverrides, and RHI
+    /// moves the game's existing installs from the old folder to the new one. Older app versions
+    /// ignore this field, so they keep using the old folder instead of switching without moving.
+    /// </summary>
+    [JsonPropertyName("installPathMigrations")]
+    public Dictionary<string, string>? InstallPathMigrations { get; set; }
+
     [JsonPropertyName("wikiStatusOverrides")]
     public Dictionary<string, string>? WikiStatusOverrides { get; set; }
 
@@ -76,12 +85,6 @@ public class RemoteManifest
     [JsonPropertyName("snapshotOverrides")]
     public Dictionary<string, string>? SnapshotOverrides { get; set; }
 
-    /// <summary>
-    /// Games that should default to Luma mode when first detected.
-    /// If the user has never toggled Luma for the game, it will be auto-enabled.
-    /// </summary>
-    [JsonPropertyName("lumaDefaultGames")]
-    public List<string>? LumaDefaultGames { get; set; }
 
     /// <summary>
     /// Games that require dgVoodoo2 for Luma installation (DX9 games needing a DX11 translation layer).
@@ -139,15 +142,6 @@ public class RemoteManifest
     public Dictionary<string, ManifestDllNames>? DllNameOverrides { get; set; }
 
     /// <summary>
-    /// Per-game OptiScaler DLL filename overrides. When a game requires a specific
-    /// proxy DLL name for OptiScaler (e.g. games where dxgi.dll conflicts with
-    /// another tool), this provides a direct mapping.
-    /// Key = game name, Value = DLL filename string (e.g. "winmm.dll").
-    /// </summary>
-    [JsonPropertyName("optiScalerDllOverrides")]
-    public Dictionary<string, string>? OptiScalerDllOverrides { get; set; }
-
-    /// <summary>
     /// Per-game graphics API overrides. Allows the manifest to force a specific
     /// graphics API badge for games where auto-detection fails (e.g. games that
     /// load DirectX entirely at runtime with no static PE imports).
@@ -160,12 +154,36 @@ public class RemoteManifest
     public Dictionary<string, string>? GraphicsApiOverrides { get; set; }
 
     /// <summary>
+    /// Maps game name → relative path (from game root) containing DLSS/Streamline DLLs.
+    /// Used when DLLs are buried in a non-standard location that the recursive scan
+    /// would either miss or be too slow to reach.
+    /// Example: "The Sinking City 2": "Engine\\Plugins\\FrogwaresPlugins\\...\\Win64"
+    /// The path is combined with game.InstallPath to get the absolute search folder.
+    /// </summary>
+    [JsonPropertyName("dlssPathOverrides")]
+    public Dictionary<string, string>? DlssPathOverrides { get; set; }
+
+    /// <summary>
+    /// Maps game name → relative path (from game root) containing Streamline DLLs (sl.common.dll etc.).
+    /// Companion to <see cref="DlssPathOverrides"/> for games where Streamline lives in a separate deep path.
+    /// </summary>
+    [JsonPropertyName("streamlinePathOverrides")]
+    public Dictionary<string, string>? StreamlinePathOverrides { get; set; }
+
+    /// <summary>
     /// Author donation URLs keyed by display name.
     /// Merged into the hardcoded dictionary at startup — manifest entries
     /// take priority so links can be added/updated without a new build.
     /// </summary>
     [JsonPropertyName("donationUrls")]
     public Dictionary<string, string>? DonationUrls { get; set; }
+
+    /// <summary>
+    /// Author Patreon URLs keyed by display name, shown beside the Ko-fi link from
+    /// <see cref="DonationUrls"/> (a separate field so older versions still read donationUrls).
+    /// </summary>
+    [JsonPropertyName("patreonUrls")]
+    public Dictionary<string, string>? PatreonUrls { get; set; }
 
     /// <summary>
     /// What each author is known for, keyed by display name.
@@ -442,6 +460,13 @@ public class RemoteManifest
     public Dictionary<string, ManifestAddonPack>? AddonPacks { get; set; }
 
     /// <summary>
+    /// Recommended OptiScaler forks, keyed by id (lower-case letters, digits, dashes). Each appears as an
+    /// OptiScaler version ("Fork:&lt;id&gt;") with update checks from its GitHub releases (OsForkService).
+    /// </summary>
+    [JsonPropertyName("osForks")]
+    public Dictionary<string, ManifestOsFork>? OsForks { get; set; }
+
+    /// <summary>
     /// Component URL overrides — allows changing base download URLs for components
     /// without an app update (e.g. if a repo moves or a maintainer changes hosting).
     /// </summary>
@@ -560,6 +585,26 @@ public class ManifestShaderPack
     [JsonPropertyName("disabled")]
     public bool? Disabled { get; set; }
 }
+
+/// <summary>A recommended OptiScaler fork (manifest <c>osForks</c>). See OsForkService.</summary>
+public class ManifestOsFork
+{
+    /// <summary>Name shown in the version lists, e.g. "Venom".</summary>
+    [JsonPropertyName("label")] public string? Label { get; set; }
+    /// <summary>GitHub "owner/name".</summary>
+    [JsonPropertyName("repo")] public string? Repo { get; set; }
+    /// <summary>Optional regex for the release asset to use. Default: the best .7z / .zip with "optiscaler" in its name.</summary>
+    [JsonPropertyName("assetPattern")] public string? AssetPattern { get; set; }
+    /// <summary>Use prereleases too (most forks only publish prereleases). Default true.</summary>
+    [JsonPropertyName("includePrereleases")] public bool? IncludePrereleases { get; set; }
+    /// <summary>Install NVIDIA's nvngx_dlssnr.dll with it (Neural Rendering forks). Default false.</summary>
+    [JsonPropertyName("needsNrDll")] public bool? NeedsNrDll { get; set; }
+    /// <summary>One line for the version tooltip.</summary>
+    [JsonPropertyName("description")] public string? Description { get; set; }
+    /// <summary>Hide it from the lists (installed games keep working). Default false.</summary>
+    [JsonPropertyName("disabled")] public bool? Disabled { get; set; }
+}
+
 
 /// <summary>
 /// Manifest-driven addon pack override entry. Allows adding, modifying, or disabling

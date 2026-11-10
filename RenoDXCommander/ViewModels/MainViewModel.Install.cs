@@ -399,6 +399,9 @@ public partial class MainViewModel
         if (!card.IsManuallyAdded)
             return;
 
+        // A game from a custom game folder isn't offered again by the folder scan
+        IgnoreCustomFolderGameOnRemove(card);
+
         // Remove manual entries and the corresponding card
         _manualGames.RemoveAll(g => g.Name.Equals(card.GameName, StringComparison.OrdinalIgnoreCase));
         _allCards.RemoveAll(c => c.IsManuallyAdded && c.GameName.Equals(card.GameName, StringComparison.OrdinalIgnoreCase));
@@ -407,6 +410,9 @@ public partial class MainViewModel
         _filterViewModel.ApplyFilter();
         _filterViewModel.UpdateCounts();
     }
+
+    /// <summary>Raised on the UI thread after a manually added game's card is in the list.</summary>
+    public event Action<GameCardViewModel>? ManualGameAdded;
 
     [RelayCommand]
     public void AddManualGame(DetectedGame game)
@@ -800,6 +806,7 @@ public partial class MainViewModel
         _filterViewModel.SetAllCards(_allCards);
         _filterViewModel.ApplyFilter();
         _filterViewModel.UpdateCounts();
+        ManualGameAdded?.Invoke(card); // the window opens the new game's page
 
         // Background scan for components not detected synchronously (DC, OptiScaler, DXVK, DLSS/Streamline)
         _ = Task.Run(() => ScanManualGameComponentsAsync(card));
@@ -1043,6 +1050,10 @@ public partial class MainViewModel
                 // Recalculate counts only — do NOT call ApplyFilter() which
                 // would Clear() + re-add every card and flash the whole UI.
                 _filterViewModel.UpdateCounts();
+                // Rebuild the detail panel directly — the game is already selected so
+                // SelectionChanged won't fire, and NotifyAll() doesn't re-run the
+                // imperative panel builders.
+                RequestCardRebuild?.Invoke(card);
             });
         }
         catch (Exception ex)
@@ -1060,16 +1071,6 @@ public partial class MainViewModel
                     card.Mod.SnapshotUrl = originalSnapshotUrl;
             });
         }
-    }
-
-    [RelayCommand]
-    public async Task InstallMod32Async(GameCardViewModel? card)
-    {
-        if (card?.Mod?.SnapshotUrl32 == null) return;
-        var orig = card.Mod.SnapshotUrl;
-        card.Mod.SnapshotUrl = card.Mod.SnapshotUrl32;
-        await InstallModAsync(card);
-        card.Mod.SnapshotUrl = orig;
     }
 
     [RelayCommand]
@@ -1130,6 +1131,7 @@ public partial class MainViewModel
 
         SaveLibrary();
         _filterViewModel.UpdateCounts();
+        RequestCardRebuild?.Invoke(card);
     }
 
     // ── ReLimiter commands ────────────────────────────────────────────────────

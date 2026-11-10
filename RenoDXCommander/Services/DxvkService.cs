@@ -15,11 +15,6 @@ public partial class DxvkService : IDxvkService
 {
     // ── Constants ──────────────────────────────────────────────────────
 
-    // Legacy staging folder (used for migration detection)
-    private static readonly string LegacyStagingDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "RHI", "dxvk");
-
     // Separate staging directories for each variant (coexist simultaneously)
     private static readonly string StagingDirDevelopment = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -38,9 +33,6 @@ public partial class DxvkService : IDxvkService
     /// All staging operations use this property.
     /// </summary>
     private string StagingDir => GetStagingDirForVariant(_selectedVariant);
-
-    private static readonly string VersionFilePath =
-        Path.Combine(LegacyStagingDir, "version.txt");
 
     private static readonly string DbPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -200,8 +192,26 @@ public partial class DxvkService : IDxvkService
         var dir = GetStagingDirForVariant(variant);
         var vf = GetVersionFileForVariant(variant);
         var dllCheck = Path.Combine(dir, "x64", "d3d9.dll");
-        return CheckStagingReady(dir, vf, dllCheck);
+        // Every DLL in both architectures: antivirus often deletes only the 32-bit ones,
+        // which used to leave staging "ready" and installs failing later.
+        return CheckStagingReady(dir, vf, dllCheck)
+            && GetExpectedStagedFiles(variant).All(File.Exists);
     }
+
+    /// <summary>DLLs every DXVK variant ships for both x64 and x32.</summary>
+    internal static readonly string[] StagedDllNames = { "d3d8.dll", "d3d9.dll", "d3d10core.dll", "d3d11.dll", "dxgi.dll" };
+
+    /// <summary>Full paths of the DLLs a complete staging folder for <paramref name="variant"/> holds.</summary>
+    internal static IEnumerable<string> GetExpectedStagedFiles(DxvkVariant variant)
+    {
+        var dir = GetStagingDirForVariant(variant);
+        foreach (var arch in new[] { "x64", "x32" })
+            foreach (var dll in StagedDllNames)
+                yield return Path.Combine(dir, arch, dll);
+    }
+
+    /// <summary>Name used for DXVK in <see cref="AntivirusGuard"/>.</summary>
+    internal const string AntivirusComponentName = "DXVK";
 
     /// <summary>
     /// Lilium HDR DX9 dxvk.conf presets — 6 tiers from safest to experimental.
@@ -320,17 +330,6 @@ public partial class DxvkService : IDxvkService
             presetIndex = 0;
         return LiliumD3d9Presets[presetIndex].Content;
     }
-
-    private const string LiliumHdrConfContent_D3d11 =
-        """
-
-        # Lilium HDR
-        dxvk.enableAsync                              = true
-        dxvk.gplAsyncCache                            = true
-        d3d11.enableSwapChainUpgrade                  = true
-        d3d11.upgradeSwapChainFormatTo                = rgba16_sfloat
-        d3d11.upgradeSwapChainColorSpaceTo            = scRGB
-        """;
 
     /// <summary>
     /// Lilium HDR DX10/DX11 dxvk.conf presets — 7 tiers from safest to fully experimental.

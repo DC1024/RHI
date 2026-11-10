@@ -248,7 +248,7 @@ public class PcgwService : IPcgwService
             if (!string.IsNullOrEmpty(storedETag))
                 req.Headers.TryAddWithoutValidation("If-None-Match", storedETag);
 
-            var resp = await _http.SendAsync(req).ConfigureAwait(false);
+            using var resp = await _http.SendAsync(req).ConfigureAwait(false);
 
             if (resp.StatusCode == System.Net.HttpStatusCode.NotModified)
             {
@@ -276,11 +276,11 @@ public class PcgwService : IPcgwService
             LoadFromJson(json);
 
             // Persist JSON + ETag to disk for future 304 responses
-            try { await File.WriteAllTextAsync(CentralCachePath, json).ConfigureAwait(false); } catch { }
+            try { await File.WriteAllTextAsync(CentralCachePath, json).ConfigureAwait(false); } catch (Exception ex) { CrashReporter.Log($"[PcgwService.LoadCentralDataAsync] Failed to write disk cache — {ex.Message}"); }
             var newETag = resp.Headers.ETag?.Tag;
             if (!string.IsNullOrEmpty(newETag))
             {
-                try { File.WriteAllText(CentralETagPath, newETag); } catch { }
+                try { File.WriteAllText(CentralETagPath, newETag); } catch (Exception ex) { CrashReporter.Log($"[PcgwService.LoadCentralDataAsync] Failed to write ETag — {ex.Message}"); }
             }
 
             CrashReporter.Log($"[PcgwService.LoadCentralDataAsync] Downloaded and loaded {_centralData?.Games.Count ?? 0:N0} games, {_centralData?.NameOverrides.Count ?? 0} name overrides");
@@ -297,7 +297,7 @@ public class PcgwService : IPcgwService
                     LoadFromJson(cachedJson);
                     CrashReporter.Log($"[PcgwService.LoadCentralDataAsync] Loaded {_centralData?.Games.Count ?? 0:N0} games from disk cache (after error)");
                 }
-                catch { }
+                catch (Exception ex2) { CrashReporter.Log($"[PcgwService.LoadCentralDataAsync] Disk cache fallback failed — {ex2.Message}"); }
             }
         }
     }
@@ -334,6 +334,50 @@ public class PcgwService : IPcgwService
         if (_centralData == null) return false;
         var (title, _) = _centralData.TryLookup(gameName, steamAppId);
         return title != null;
+    }
+
+    private PcgwCentralData? _titleIndexFor;
+    private Dictionary<string, string>? _normalizedTitleIndex;
+    private readonly object _titleIndexLock = new();
+
+    /// <inheritdoc />
+    public string? FindCentralTitle(string gameName)
+    {
+        var data = _centralData;
+        if (data == null || string.IsNullOrWhiteSpace(gameName)) return null;
+        var (title, _) = data.TryLookup(gameName, steamAppId: null);
+        if (title != null) return title;
+
+        var norm = _gameDetection.NormalizeName(gameName);
+        if (norm.Length == 0) return null;
+        Dictionary<string, string> index;
+        lock (_titleIndexLock)
+        {
+            if (_normalizedTitleIndex == null || !ReferenceEquals(_titleIndexFor, data))
+            {
+                // Built once per data load. Titles that normalize the same are ambiguous: dropped.
+                var built = new Dictionary<string, string>(StringComparer.Ordinal);
+                var clash = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var t in data.Games.Keys)
+                {
+                    var n = _gameDetection.NormalizeName(t);
+                    if (n.Length == 0 || clash.Contains(n)) continue;
+                    if (!built.TryAdd(n, t)) { built.Remove(n); clash.Add(n); }
+                }
+                _normalizedTitleIndex = built;
+                _titleIndexFor = data;
+            }
+            index = _normalizedTitleIndex;
+        }
+        return index.TryGetValue(norm, out var found) ? found : null;
+    }
+
+    public int? GetSteamAppIdFromCentralData(string gameName)
+    {
+        if (_centralData == null) return null;
+        var (_, entry) = _centralData.TryLookup(gameName, steamAppId: null);
+        if (entry == null || entry.SteamAppId <= 0) return null;
+        return entry.SteamAppId;
     }
 
     /// <inheritdoc />
@@ -575,7 +619,7 @@ public class PcgwService : IPcgwService
             var url = $"https://www.pcgamingwiki.com/w/api.php?action=opensearch&search={encodedName}&limit=5&format=json";
 
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var response = await _http.GetAsync(url, cts.Token).ConfigureAwait(false);
+            using var response = await _http.GetAsync(url, cts.Token).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -735,25 +779,6 @@ public class PcgwService : IPcgwService
             {
                 _saveDebounceTimer = new Timer(_ => WriteCacheToDisk(), null, 500, Timeout.Infinite);
             }
-        }
-
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    public Task FlushCacheAsync()
-    {
-        Timer? timer;
-        lock (_saveLock)
-        {
-            timer = _saveDebounceTimer;
-            _saveDebounceTimer = null;
-        }
-
-        if (timer != null)
-        {
-            timer.Dispose();
-            WriteCacheToDisk();
         }
 
         return Task.CompletedTask;
@@ -950,7 +975,7 @@ public class PcgwService : IPcgwService
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
 
-            var response = await _http.GetAsync(wikiUrl, cts.Token).ConfigureAwait(false);
+            using var response = await _http.GetAsync(wikiUrl, cts.Token).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 if ((int)response.StatusCode == 429)
@@ -1163,16 +1188,6 @@ public class PcgwService : IPcgwService
         {
             return null;
         }
-    }
-
-    private static bool IsPlatformExcluded(string text)
-    {
-        var n = text.ToLowerInvariant();
-        if (n.Contains("os x") || n.Contains("macos") || n.Contains("mac os")) return true;
-        if (System.Text.RegularExpressions.Regex.IsMatch(n, @"\blinux\b.*\bonly\b")) return true;
-        if (System.Text.RegularExpressions.Regex.IsMatch(n, @"\bonly\b.*\blinux\b")) return true;
-        if (n.Contains("linux default") || n.Contains("linux only")) return true;
-        return false;
     }
 
     /// <summary>

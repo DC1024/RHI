@@ -1,1 +1,3 @@
-Hi everyone, I will be away on holiday from the 12th to the 26th of October so will not be providing support or updates in that time. If you have any issues there are still plenty of knowledgeable people on Discord willing to help though so don't be shy. Thank you, RankFTW
+Hi everyone. OK shameless plug, if everyone could please download RHI from Nexus just once that would be a great help to me. I need like 15k downloads for the next reward. Thank you in advance, Rank
+
+https://www.nexusmods.com/site/mods/1710

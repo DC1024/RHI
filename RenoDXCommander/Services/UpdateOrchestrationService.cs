@@ -44,7 +44,20 @@ public class UpdateOrchestrationService : IUpdateOrchestrationService
     public IEnumerable<GameCardViewModel> UpdateAllEligible(IReadOnlyList<GameCardViewModel> allCards) =>
         allCards.Where(c => !c.IsHidden
                           && !string.IsNullOrEmpty(c.InstallPath)
-                          && Directory.Exists(c.InstallPath));
+                          && FolderExistsOrLog(c));
+
+    // Paths already reported, so a missing folder is logged once per session, not on every pass.
+    private static readonly HashSet<string> _missingFolderLogged = new(StringComparer.OrdinalIgnoreCase);
+
+    private static bool FolderExistsOrLog(GameCardViewModel card)
+    {
+        if (Directory.Exists(card.InstallPath)) return true;
+        bool firstTime;
+        lock (_missingFolderLogged) firstTime = _missingFolderLogged.Add(card.InstallPath);
+        if (firstTime)
+            CrashReporter.Log($"[UpdateOrchestrationService.UpdateAllEligible] Skipping '{card.GameName}' ({card.Source}): game folder not found, game was probably updated or moved (Refresh finds it) — '{card.InstallPath}'");
+        return false;
+    }
 
     public async Task UpdateAllRenoDxAsync(
         IReadOnlyList<GameCardViewModel> allCards,
@@ -255,6 +268,12 @@ public class UpdateOrchestrationService : IUpdateOrchestrationService
                     card.NotifyAll();
                     card.FadeMessage(m => card.RsActionMessage = m, card.RsActionMessage);
                 });
+            }
+            catch (FileNotFoundException ex)
+            {
+                // Expected when the game uses the Custom channel and its DLL was removed from the Custom folder.
+                dispatcherQueue?.TryEnqueue(() => card.RsActionMessage = "❌ ReShade DLL not found — see Custom ReShade folder");
+                _crashReporter.Log($"[UpdateOrchestrationService.UpdateAllReShade] Skipped '{card.GameName}' — {ex.Message.Replace('\n', ' ')}");
             }
             catch (Exception ex)
             {
@@ -712,7 +731,20 @@ public class UpdateOrchestrationService : IUpdateOrchestrationService
         {
             var lumaInstalled = cards
                 .Where(c => c.LumaRecord != null && c.LumaRecord.InstalledBuildNumber > 0)
+                // The GitHub build number only applies to mods RHI can download from GitHub.
+                // Mods the wiki lists as Nexus-only are checked against Nexus instead (MainViewModel.CheckLumaNexusUpdatesAsync).
+                .Where(c => !(c.LumaMod?.DownloadUrl == null && c.LumaMod?.NexusUrl != null))
                 .ToList();
+
+            // Clear a purple badge an earlier GitHub check left on mods that are now Nexus-only;
+            // the Nexus check that runs after this sets it again if Nexus has a newer file.
+            foreach (var card in cards.Where(c => c.LumaStatus == GameStatus.UpdateAvailable
+                && c.LumaRecord?.InstalledBuildNumber > 0 && c.LumaRecord.NexusFileId == null
+                && c.LumaMod?.DownloadUrl == null && c.LumaMod?.NexusUrl != null))
+            {
+                var stale = card;
+                dispatcherQueue?.TryEnqueue(() => { stale.LumaStatus = GameStatus.Installed; });
+            }
 
             if (lumaInstalled.Count > 0)
             {

@@ -98,14 +98,14 @@ public class ModInstallService : IModInstallService
 
         // Capture the previously-installed version before overwriting — used for update log
         string? previousVersion = null;
-        try { previousVersion = AuxInstallService.ReadInstalledVersion(GetAddonDeployPath(gameInstallPath), fileName); } catch { }
+        try { previousVersion = AuxInstallService.ReadInstalledVersion(GetAddonDeployPath(gameInstallPath), fileName); } catch (Exception ex) { CrashReporter.Log($"[ModInstallService.InstallAsync] Could not read previous addon version — {ex.Message}"); }
 
         // ── Step 1: get remote Content-Length (single HEAD) ───────────────────────
         long? remoteSize = null;
         try
         {
             using var headCts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var headResp = await _http.SendAsync(
+            using var headResp = await _http.SendAsync(
                 new HttpRequestMessage(HttpMethod.Head, resolvedUrl), headCts.Token);
             if (headResp.IsSuccessStatusCode)
                 remoteSize = headResp.Content.Headers.ContentLength;
@@ -171,12 +171,20 @@ public class ModInstallService : IModInstallService
                     candidates.Add($"https://clshortfuse.github.io/renodx/{fn}");
                 }
 
-                // Generic fallback for any github.io URL: try GitHub Releases
-                if (uri.Host.EndsWith("github.io", StringComparison.OrdinalIgnoreCase))
+                // Generic fallback for any github.io URL: try GitHub Releases.
+                // <owner>.github.io/<repo>/<file> → the owner's own snapshot release first
+                // (e.g. marat569's UE-Extended), for users whose network blocks github.io.
+                if (uri.Host.EndsWith(".github.io", StringComparison.OrdinalIgnoreCase))
                 {
                     var fn2 = Path.GetFileName(uri.LocalPath);
                     if (!string.IsNullOrEmpty(fn2))
+                    {
+                        var owner    = uri.Host[..^".github.io".Length];
+                        var segments = uri.AbsolutePath.Trim('/').Split('/');
+                        if (owner.Length > 0 && segments.Length == 2)
+                            candidates.Add($"https://github.com/{owner}/{segments[0]}/releases/download/snapshot/{fn2}");
                         candidates.Add($"https://github.com/clshortfuse/renodx/releases/download/snapshot/{fn2}");
+                    }
                 }
             }
             catch (Exception ex) { CrashReporter.Log($"[ModInstallService.InstallAsync] Failed to build fallback URL candidates — {ex.Message}"); }
@@ -186,6 +194,7 @@ public class ModInstallService : IModInstallService
                 tried.Add(url);
                 try
                 {
+                    response?.Dispose();
                     response = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                     if (response.IsSuccessStatusCode) break;
                 }
@@ -193,8 +202,12 @@ public class ModInstallService : IModInstallService
             }
 
             if (response == null || !response.IsSuccessStatusCode)
+            {
+                response?.Dispose();
                 throw new HttpRequestException(
                     $"Failed to download snapshot. Tried: {string.Join(", ", tried)}");
+            }
+            using var downloadResponse = response;
 
             // Capture size from actual download response if HEAD didn't return one
             if (!remoteSize.HasValue)
@@ -298,7 +311,7 @@ public class ModInstallService : IModInstallService
         try
         {
             var req  = new HttpRequestMessage(HttpMethod.Head, checkUrl);
-            var resp = await _http.SendAsync(req);
+            using var resp = await _http.SendAsync(req);
 
             if (resp.IsSuccessStatusCode)
             {
@@ -408,10 +421,33 @@ public class ModInstallService : IModInstallService
             // Download the remote file to a temp path.
             // Use Cache-Control: no-cache to bypass CDN caches (GitHub Pages can serve
             // stale content for up to 10 minutes after a push, preventing update detection).
-            var req = new HttpRequestMessage(HttpMethod.Get, url);
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue { NoCache = true };
-            var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+
+            // Conditional request: if the last check of this URL saw the exact build that's
+            // installed, send its ETag. An unchanged file then answers 304 with no body instead
+            // of a full download (the generic Unity addons alone are ~100 MB each).
+            var known = SnapshotETags.Get(url);
+            bool conditional = false;
+            if (known != null
+                && !string.IsNullOrEmpty(record.FileHash)
+                && known.Hash.Equals(record.FileHash, StringComparison.OrdinalIgnoreCase)
+                && System.Net.Http.Headers.EntityTagHeaderValue.TryParse(known.ETag, out var knownTag))
+            {
+                req.Headers.IfNoneMatch.Add(knownTag);
+                conditional = true;
+            }
+
+            using var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+            if (resp.StatusCode == System.Net.HttpStatusCode.NotModified)
+            {
+                CrashReporter.Log($"[ModInstallService.CheckForUpdateByDownloadAsync] '{Path.GetFileName(localFile)}' unchanged (304)");
+                return false;
+            }
             if (!resp.IsSuccessStatusCode) return false;
+            var responseETag = resp.Headers.ETag?.ToString();
+            if (conditional)
+                CrashReporter.Log($"[ModInstallService.CheckForUpdateByDownloadAsync] '{Path.GetFileName(localFile)}' changed or server ignored ETag — downloading");
 
             // Reject HTML responses — GitHub Pages may return a 200 with an HTML error
             // page instead of the actual binary file.
@@ -443,6 +479,10 @@ public class ModInstallService : IModInstallService
             }
 
             var remoteHash = await ComputeHashAsync(tempFile);
+
+            // Remember which build this ETag describes, for the next conditional check.
+            if (!string.IsNullOrEmpty(responseETag))
+                SnapshotETags.Set(url, responseETag, remoteHash);
 
             // Compare against the stored install-time hash first — this is the most
             // reliable reference because it was computed from the exact bytes we
@@ -501,6 +541,34 @@ public class ModInstallService : IModInstallService
         }
     }
 
+    /// <summary>
+    /// Snapshot URL → (ETag, SHA-256 of the build that ETag described). Lets the update check
+    /// send If-None-Match so unchanged rolling-tag addons aren't re-downloaded every launch.
+    /// </summary>
+    private static class SnapshotETags
+    {
+        public sealed class Entry
+        {
+            public string ETag { get; set; } = "";
+            public string Hash { get; set; } = "";
+        }
+
+        private static readonly string FilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "RHI", "renodx_snapshot_etags.json");
+
+        public static Entry? Get(string url)
+        {
+            var all = SafeJsonFile.Read<Dictionary<string, Entry>>(FilePath, out _);
+            return all != null && all.TryGetValue(url, out var e) && !string.IsNullOrEmpty(e.ETag) ? e : null;
+        }
+
+        public static void Set(string url, string etag, string hash) =>
+            SafeJsonFile.Update<Dictionary<string, Entry>>(FilePath,
+                all => all[url] = new Entry { ETag = etag, Hash = hash },
+                "ModInstallService.SnapshotETags", SafeJsonFile.Indented);
+    }
+
     // ── Uninstall ─────────────────────────────────────────────────────────────────
 
     public void Uninstall(InstalledModRecord record)
@@ -518,9 +586,12 @@ public class ModInstallService : IModInstallService
         }
         // Cache copy intentionally kept for future reinstalls.
 
-        var db = LoadDb();
-        db.RemoveAll(r => r.GameName == record.GameName && r.InstallPath == record.InstallPath);
-        SaveDb(db);
+        lock (SafeJsonFile.LockFor(DbPath))
+        {
+            var db = LoadDb();
+            db.RemoveAll(r => r.GameName == record.GameName && r.InstallPath == record.InstallPath);
+            SaveDb(db);
+        }
     }
 
     // ── Database ──────────────────────────────────────────────────────────────────
@@ -540,39 +611,53 @@ public class ModInstallService : IModInstallService
     /// <summary>Removes the install record from the DB without touching any files on disk.</summary>
     public void RemoveRecord(InstalledModRecord record)
     {
-        var db = LoadDb();
-        db.RemoveAll(r => r.GameName == record.GameName && r.InstallPath == record.InstallPath);
-        SaveDb(db);
+        lock (SafeJsonFile.LockFor(DbPath))
+        {
+            var db = LoadDb();
+            db.RemoveAll(r => r.GameName == record.GameName && r.InstallPath == record.InstallPath);
+            SaveDb(db);
+        }
     }
 
     private void SaveRecord(InstalledModRecord record)
     {
-        var db = LoadDb();
-        var i  = db.FindIndex(r =>
-            r.GameName == record.GameName &&
-            r.InstallPath.Equals(record.InstallPath, StringComparison.OrdinalIgnoreCase));
-        if (i >= 0) db[i] = record; else db.Add(record);
-        SaveDb(db);
-    }
-
-    private List<InstalledModRecord> LoadDb()
-    {
-        try
+        lock (SafeJsonFile.LockFor(DbPath))
         {
-            if (!File.Exists(DbPath)) return new();
-            return JsonSerializer.Deserialize<List<InstalledModRecord>>(File.ReadAllText(DbPath)) ?? new();
+            var db = LoadDb();
+            var i  = db.FindIndex(r =>
+                r.GameName == record.GameName &&
+                r.InstallPath.Equals(record.InstallPath, StringComparison.OrdinalIgnoreCase));
+            if (i >= 0) db[i] = record; else db.Add(record);
+            SaveDb(db);
         }
-        catch (Exception ex) { CrashReporter.Log($"[ModInstallService.LoadDb] Failed to load DB from '{DbPath}' — {ex.Message}"); return new(); }
     }
 
-    private void SaveDb(List<InstalledModRecord> db)
+    /// <inheritdoc/>
+    public int RepointRecords(string gameName, string oldPath, string newPath)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(DbPath)!);
-        var json = JsonSerializer.Serialize(db,
-            new JsonSerializerOptions { WriteIndented = true });
-
-        FileHelper.WriteAllTextWithRetry(DbPath, json, "ModInstallService.SaveDb");
+        lock (SafeJsonFile.LockFor(DbPath))
+        {
+            var db = LoadDb();
+            int changed = 0;
+            foreach (var r in db.Where(r => r.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase)
+                                         && r.InstallPath.Equals(oldPath, StringComparison.OrdinalIgnoreCase)
+                                         ).ToList())
+            {
+                bool newExists = db.Any(o => o != r && o.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase) && o.InstallPath.Equals(newPath, StringComparison.OrdinalIgnoreCase));
+                if (newExists) db.Remove(r); else r.InstallPath = newPath;
+                changed++;
+                CrashReporter.Log($"[ModInstallService.RepointRecords] '{gameName}': {(newExists ? "dropped old record (new folder has one)" : "moved")} '{oldPath}' → '{newPath}'");
+            }
+            if (changed > 0) SaveDb(db);
+            return changed;
+        }
     }
+
+    // SafeJsonFile: atomic write + .bak, corrupt-file recovery, no save over an unreadable file.
+    private List<InstalledModRecord> LoadDb() => SafeJsonFile.ReadList<InstalledModRecord>(DbPath);
+
+    private void SaveDb(List<InstalledModRecord> db) =>
+        SafeJsonFile.Write(DbPath, db, "ModInstallService.SaveDb", SafeJsonFile.Indented);
 
     private static async Task<string> ComputeHashAsync(string path)
     {
@@ -597,9 +682,6 @@ public class ModInstallService : IModInstallService
         }
         catch { return false; }
     }
-
-    public static bool IsValidGameFolder(string path) =>
-        Directory.Exists(path) && Directory.GetFiles(path, "*.exe").Length > 0;
 
     // ── Addon search path resolution ──────────────────────────────────────────────
 

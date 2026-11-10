@@ -39,6 +39,12 @@ public interface IDlssStreamlineService
     /// </summary>
     DlssDetectionResult Detect(string installPath);
 
+    /// <summary>
+    /// Reads DLSS/Streamline DLL versions directly from a known exact folder — no recursive scan.
+    /// Used with <c>dlssPathOverrides</c> manifest entries.
+    /// </summary>
+    DlssDetectionResult DetectFromExactPath(string exactFolderPath, string? streamlineFolderPath = null);
+
     // ── Swap ──────────────────────────────────────────────────────────────────
 
     /// <summary>
@@ -109,11 +115,6 @@ public interface IDlssStreamlineService
     bool HasBackup(string dllPath);
 
     /// <summary>
-    /// Returns the newest DLSS SR version from the manifest (for OptiScaler integration).
-    /// </summary>
-    string? GetNewestDlssVersion();
-
-    /// <summary>
     /// Returns true if this game has been scanned 3+ times with no DLSS found.
     /// </summary>
     bool ShouldSkipScan(string gameName);
@@ -141,8 +142,10 @@ public interface IDlssStreamlineService
 
     /// <summary>
     /// Attempts fast detection using trusted cached paths. Returns null if full scan needed.
+    /// <paramref name="anyConfirmCount"/>: also use saved paths not yet confirmed enough times to be trusted
+    /// (every file is still checked).
     /// </summary>
-    DlssDetectionResult? TryFastDetect(string gameName, string installPath);
+    DlssDetectionResult? TryFastDetect(string gameName, string installPath, bool anyConfirmCount = false);
 
     /// <summary>
     /// Records a successful detection for trusted path confirmation.
@@ -175,12 +178,6 @@ public interface IDlssStreamlineService
     /// Returns null if the version is not in the manifest or download fails.
     /// </summary>
     Task<string?> EnsureSpecificDlssnrCachedAsync(string version);
-
-    /// <summary>
-    /// Returns the path to the newest cached DLSS NR DLL if already on disk, without downloading.
-    /// Returns null if not yet cached.
-    /// </summary>
-    string? GetCachedNrDllPath();
 
     /// <summary>
     /// Returns the cached directory path for the newest Streamline version, downloading if needed.

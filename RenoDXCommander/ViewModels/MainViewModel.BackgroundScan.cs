@@ -23,6 +23,7 @@ public partial class MainViewModel
     {
         IsBackgroundScanning = true;
         BackgroundScanStatusText = "Scanning for changes...";
+        using var activity = BeginActivity("Checking for new games and mod info...");
         _crashReporter.Log("[MainViewModel.RunBackgroundScanAndMergeAsync] Starting background scan...");
 
         try
@@ -63,7 +64,7 @@ public partial class MainViewModel
             var manifestTask    = _manifestService.FetchAsync();
             var dbTask = !string.Equals(_settingsViewModel.RenoDxDbSource, "WikiOnly", StringComparison.OrdinalIgnoreCase)
                 ? _renoDxDbService.FetchAllAsync()
-                : Task.FromResult(new DbFetchResult(new(), new(StringComparer.OrdinalIgnoreCase), new(StringComparer.OrdinalIgnoreCase)));
+                : Task.FromResult(new DbFetchResult(new(), new(StringComparer.OrdinalIgnoreCase), new(StringComparer.OrdinalIgnoreCase), new(StringComparer.OrdinalIgnoreCase)));
             var detectTask   = DetectAllGamesDedupedAsync();
             var osWikiTask   = Task.Run(async () => {
                 try { await _optiScalerWikiService.FetchAsync(); }
@@ -108,7 +109,18 @@ public partial class MainViewModel
                 try
                 {
                     if (_allCards.Any(c => GetOsVariant(c.GameName, c.Source ?? "") == "Nightly"))
+                    {
                         await _optiScalerService.EnsureNightlyStagingAsync();
+                        // Fetch available builds list so the cog build selector is populated immediately
+                        await _optiScalerService.FetchAvailableNightlyBuildsAsync();
+                    }
+                    else
+                    {
+                        // Fetch the list even when no nightly game is installed — user may switch variant
+                        _ = _optiScalerService.FetchAvailableNightlyBuildsAsync();
+                    }
+                    // Settings › OptiScaler › Remove old Nightly builds (no-op when off)
+                    CleanUpOldNightlyBuilds();
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler nightly staging task failed — {ex.Message}"); }
             });
@@ -120,6 +132,15 @@ public partial class MainViewModel
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler DLSS NR staging task failed — {ex.Message}"); }
             });
+            // F5 DLSSNR: stage it at startup too when a game uses it (was only staged on demand)
+            var osF5Task = Task.Run(async () => {
+                try
+                {
+                    if (_allCards.Any(c => GetOsVariant(c.GameName, c.Source ?? "") == "F5"))
+                        await _optiScalerService.EnsureF5StagingAsync();
+                }
+                catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler F5 staging task failed — {ex.Message}"); }
+            });
             dlssTask         = Task.Run(async () => {
                 try { await _optiScalerService.EnsureDlssStagingAsync(); }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DLSS staging task failed — {ex.Message}"); }
@@ -127,13 +148,15 @@ public partial class MainViewModel
             var dlssManifestTask2 = Task.Run(async () => {
                 try { await _dlssStreamlineService.FetchManifestAsync(); }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DLSS manifest fetch failed — {ex.Message}"); }
+                await OsPresetService.FetchManifestAsync(_http);
             });
             var dxvkTask     = Task.Run(async () => {
                 try
                 {
-                    // Only download the globally selected variant.
-                    // Other variants are downloaded on-demand when a per-game override needs them.
-                    await _dxvkService.EnsureStagingAsync();
+                    // Only download the globally selected variant, and only when a game uses DXVK.
+                    // Other variants, and first installs, download on demand.
+                    if (ShouldAutoStageDxvk("RunBackgroundScanAndMergeAsync"))
+                        await _dxvkService.EnsureStagingAsync();
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DXVK staging task failed — {ex.Message}"); }
             });
@@ -141,21 +164,33 @@ public partial class MainViewModel
                 try { await _dofFixService.EnsureStagingAsync(); }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DOF Fix staging task failed — {ex.Message}"); }
             });
+            // EnsureStagingAsync clears HasUpdate, so remember whether an update was staged
+            // for the deploy step after the scan (it used to check HasUpdate and never fired).
+            bool nrCostScalerUpdated = false;
             var nrCostScalerTask = Task.Run(async () => {
                 try
                 {
                     await _nrCostScalerService.CheckForUpdateAsync(forceRefresh: true);
                     if (!_nrCostScalerService.IsStagingReady || _nrCostScalerService.HasUpdate)
+                    {
+                        bool hadUpdate = _nrCostScalerService.HasUpdate;
                         await _nrCostScalerService.EnsureStagingAsync();
+                        nrCostScalerUpdated = hadUpdate && _nrCostScalerService.IsStagingReady;
+                    }
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] NR Cost Scaler staging failed — {ex.Message}"); }
             });
             var rtx40MfgTask = Task.Run(async () => {
                 try
                 {
-                    await _rtx40MfgService.CheckForUpdateAsync(forceRefresh: true);
-                    if (!_rtx40MfgService.IsStagingReady || _rtx40MfgService.HasUpdate)
-                        await _rtx40MfgService.EnsureStagingAsync();
+                    // Only kept up to date while a game uses it: installing downloads it.
+                    if (ShouldAutoStageRtx40Mfg("RunBackgroundScanAndMergeAsync"))
+                    {
+                        await _rtx40MfgService.CheckForUpdateAsync(forceRefresh: true);
+                        if ((!_rtx40MfgService.IsStagingReady || _rtx40MfgService.HasUpdate)
+                            && !AntivirusGuard.IsBlocked(Rtx40MfgService.AntivirusComponentName, _rtx40MfgService.LatestVersion))
+                            await _rtx40MfgService.EnsureStagingAsync();
+                    }
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] RTX40MFG staging failed — {ex.Message}"); }
             });
@@ -172,12 +207,12 @@ public partial class MainViewModel
                 try
                 {
                     await _ualService.CheckForUpdateAsync();
-                    if (_ualService.HasUpdate)
-                    {
-                        await _ualService.EnsureStagingAsync(is32Bit: false);
-                        await _ualService.EnsureStagingAsync(is32Bit: true);
-                        await _ualService.AutoUpdateInstalledGamesAsync(_allCards);
-                    }
+                    // Each call is a no-op unless that bitness is staged and outdated.
+                    if (_ualService.HasUpdate64) await _ualService.EnsureStagingAsync(is32Bit: false);
+                    if (_ualService.HasUpdate32) await _ualService.EnsureStagingAsync(is32Bit: true);
+                    // Always runs: copies the staged file into any game whose copy differs,
+                    // including games that were running during an earlier update.
+                    await _ualService.AutoUpdateInstalledGamesAsync(_allCards);
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] UAL task failed — {ex.Message}"); }
             });
@@ -200,11 +235,15 @@ public partial class MainViewModel
             {
                 var sel = SelectedGame;
                 if (sel != null)
+                {
+                    _crashReporter.Log($"[RefreshTrigger] NrCostScaler staging ready — dispatching RequestCardRebuild for '{sel.GameName}'");
                     DispatcherQueue?.TryEnqueue(() => RequestCardRebuild?.Invoke(sel));
+                }
             }
             try { await rtx40MfgTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] RTX40MFG staging await failed — {ex.Message}"); }
             try { await dlssg2030Task; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Dlssg2030 staging await failed — {ex.Message}"); }
             try { await osDlssNrTask; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler DLSS NR staging await failed — {ex.Message}"); }
+            try { await osF5Task; } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] OptiScaler F5 staging await failed — {ex.Message}"); }
 
             // Apply manifest-driven shader pack and addon pack overrides
             (_shaderPackService as ShaderPackService)?.ApplyManifestOverrides(_manifest);
@@ -216,6 +255,7 @@ public partial class MainViewModel
             catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Addon update check failed — {ex.Message}"); }
             _dlssPresetService.ApplyManifestProfileConfig(_manifest);
             FeatureFlags.ApplyManifest(_manifest?.FeatureFlags);
+            OsForkService.SetDefinitions(_manifest?.OsForks); // recommended OptiScaler forks
             _dofFixService.SetSkipGames(_manifest?.DofFixSkipGames);
             _dofFixService.SetForceGames(_manifest?.DofFixForceGames);
             if (_manifest?.ComponentUrls?.TryGetValue("ueDofFix", out var dofFixUrl2) == true)
@@ -234,12 +274,13 @@ public partial class MainViewModel
                 _dbMods = dbResult.Mods;
                 _dbUnrealEntries = dbResult.UnrealEntries;
                 _dbUnityEntries  = dbResult.UnityEntries;
-                _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DB fetch: {_dbMods.Count} mods, {_dbUnrealEntries.Count} UE entries, {_dbUnityEntries.Count} Unity entries");
+                _dbSourceEntries = dbResult.SourceEntries;
+                _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DB fetch: {_dbMods.Count} mods, {_dbUnrealEntries.Count} UE entries, {_dbUnityEntries.Count} Unity entries, {_dbSourceEntries.Count} Source entries");
             }
             catch (Exception ex)
             {
                 _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] DB fetch failed — {ex.Message}");
-                _dbMods = new(); _dbUnrealEntries = new(StringComparer.OrdinalIgnoreCase); _dbUnityEntries = new(StringComparer.OrdinalIgnoreCase);
+                _dbMods = new(); _dbUnrealEntries = new(StringComparer.OrdinalIgnoreCase); _dbUnityEntries = new(StringComparer.OrdinalIgnoreCase); _dbSourceEntries = new(StringComparer.OrdinalIgnoreCase);
             }
             MergeDbSources();
             try
@@ -360,13 +401,16 @@ public partial class MainViewModel
             }
 
             if (_manifest != null)
-                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames, _manifest.AuthorRoles);
+                GameCardViewModel.MergeManifestAuthorData(_manifest.DonationUrls, _manifest.AuthorDisplayNames, _manifest.AuthorRoles, _manifest.PatreonUrls);
             ApplyManifestStatusOverrides();
 
             // Remove manifest-blacklisted entries
             if (_manifestBlacklist.Count > 0 || _manifestBlacklistPrefixes.Count > 0)
                 allGames = allGames.Where(g => !_manifestBlacklist.Contains(g.Name)
                     && !_manifestBlacklistPrefixes.Any(p => g.Name.StartsWith(p, StringComparison.OrdinalIgnoreCase))).ToList();
+
+            // Move installs whose folder the manifest changed, before records are read (so they match)
+            await RunManifestFolderMigrationsAsync(allGames);
 
             _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Loading install records...");
             var records    = _installer.LoadAll();
@@ -409,6 +453,7 @@ public partial class MainViewModel
 
             // Merge fresh cards into displayed cards
             await MergeCardsAsync(freshCards);
+            PublishFolderMigrationNotices();
 
             // Save updated library
             _ = Task.Run(() => { try { SaveLibrary(); } catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Fire-and-forget SaveLibrary failed — {ex.Message}"); } });
@@ -417,6 +462,7 @@ public partial class MainViewModel
             _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Starting background update checks...");
             _ = Task.Run(async () =>
             {
+                if (_backgroundStopped) return;
                 try { await CheckForUpdatesAsync(_allCards, records, auxRecords); }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Background update check failed — {ex}"); }
 
@@ -432,26 +478,24 @@ public partial class MainViewModel
                 try
                 {
                     if (_nrCostScalerService.IsStagingReady)
-                        foreach (var c in _allCards.Where(c => !string.IsNullOrEmpty(c.InstallPath)
+                        foreach (var c in _allCards.Where(c => !c.IsHidden && !string.IsNullOrEmpty(c.InstallPath)
                             && DlssNrCostScalerService.IsInstalled(c.InstallPath)
-                            && _nrCostScalerService.HasUpdate))
+                            && nrCostScalerUpdated))
                             _nrCostScalerService.Install(c.InstallPath);
-                    if (_rtx40MfgService.IsStagingReady && _rtx40MfgService.HasUpdate)
-                        foreach (var c in _allCards.Where(c => !string.IsNullOrEmpty(c.InstallPath)))
-                        {
-                            var installedAs = GetRtx40MfgInstalledAs(c.GameName, c.Source ?? "");
-                            if (!string.IsNullOrEmpty(installedAs) && File.Exists(Path.Combine(c.InstallPath!, installedAs)))
-                                _rtx40MfgService.Install(c.InstallPath!, installedAs);
-                        }
-                    if (_dlssg2030Service.IsStagingReady && _dlssg2030Service.HasUpdate)
-                        foreach (var c in _allCards.Where(c => !string.IsNullOrEmpty(c.InstallPath)))
-                        {
-                            var installedAs = GetDlssg2030InstalledAs(c.GameName, c.Source ?? "");
-                            if (!string.IsNullOrEmpty(installedAs) && File.Exists(Path.Combine(c.InstallPath!, installedAs)))
-                                _dlssg2030Service.Update(c.InstallPath!, installedAs, GetDlssg2030GpuGen(c.GameName, c.Source ?? ""));
-                        }
+                    // Compare file contents rather than HasUpdate: EnsureStagingAsync clears HasUpdate
+                    // after downloading, so a flag check here never fired. This also catches up games
+                    // that missed an earlier update (e.g. game was running).
+                    _optiScalerService.MoveOptiPatcherForAllGames(); // one-off fix for nightly / F5 / DLSS NR installs
+                    ReconcileMfgPlacementForAllGames();              // mod as OptiScaler plugin where OptiScaler 10 is installed
+                    _rtx40MfgService.UpdateInstalledGames(GetRtx40MfgInstalls());
+                    ReconcileMfgAdaXessFiles();
+                    ReconcileRtxEncoreFiles();
+                    UpdateDlssg2030Installs();
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Cost Scaler/RTX40MFG auto-deploy failed — {ex.Message}"); }
+
+                // GITC Uplift: check for a new release and update the games that have it
+                await RefreshUpliftInstallsAsync("RunBackgroundScanAndMergeAsync");
 
                 // Start periodic update check timer (fires every 4h while app is running)
                 StartPeriodicUpdateCheckTimer();
@@ -492,6 +536,9 @@ public partial class MainViewModel
                 });
             });
 
+            // Custom game folders: offer games the store scan didn't find (background, only with folders set)
+            StartCustomFolderScan("BackgroundScan");
+
             // Update status text with final counts
             var offlineMode = wikiFetchFailed;
             DispatcherQueue?.TryEnqueue(() =>
@@ -521,7 +568,7 @@ public partial class MainViewModel
                         _ = Task.Delay(300).ContinueWith(_ =>
                             DispatcherQueue?.TryEnqueue(() =>
                             {
-                                _crashReporter.Log($"[BackgroundScan] Rebuilding panel for selected card '{cardToRebuild.GameName}'");
+                                _crashReporter.Log($"[RefreshTrigger] BackgroundScan deferred rebuild for '{cardToRebuild.GameName}' (300ms after merge)");
                                 SetLastUiAction($"BackgroundScan.PanelRebuild({cardToRebuild.GameName})");
                                 cardToRebuild.NotifyAll();
                                 RequestCardRebuild?.Invoke(cardToRebuild);
@@ -537,17 +584,19 @@ public partial class MainViewModel
             // ── Deferred background work: ReShade staging + OptiScaler staging + shader sync ──
             _ = Task.Run(async () =>
             {
+                if (_backgroundStopped) return;
                 try
                 {
                     await Task.WhenAll(rsTask, normalRsTask, osTask, dlssTask, dxvkTask);
                 }
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Deferred ReShade sync failed — {ex.Message}"); }
 
+                if (_backgroundStopped) return;
                 _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: Streamline redeploy starting");
                 // Redeploy Streamline to all games where it's enabled (after OptiScaler staging is ready)
                 try
                 {
-                    foreach (var card in _allCards.Where(c => c.IsOsInstalled && !string.IsNullOrEmpty(c.InstallPath)
+                    foreach (var card in _allCards.Where(c => c.IsOsInstalled && !c.IsHidden && !string.IsNullOrEmpty(c.InstallPath)
                         && GetOsDeployStreamline(c.GameName, c.Source ?? "")))
                     {
                         try { _optiScalerService.DeployStreamlineToGame(card.InstallPath!, GetOsStreamlineVersion(card.GameName, card.Source ?? "")); }
@@ -557,6 +606,7 @@ public partial class MainViewModel
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Streamline redeploy loop failed — {ex.Message}"); }
 
                 _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: ShaderPackReady await starting");
+                if (_backgroundStopped) return;
                 if (_shaderPackReadyTask != null)
                 {
                     try { await _shaderPackReadyTask; }
@@ -564,11 +614,12 @@ public partial class MainViewModel
                 }
 
                 _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: SyncShaders starting");
+                if (_backgroundStopped) return;
                 // Deploy shaders to all installed game locations
                 try
                 {
                     var rsCards = _allCards
-                        .Where(card => !string.IsNullOrEmpty(card.InstallPath))
+                        .Where(card => !card.IsHidden && !string.IsNullOrEmpty(card.InstallPath))
                         .Where(card => card.RequiresVulkanInstall
                             ? VulkanFootprintService.Exists(card.InstallPath)
                             : card.RsStatus == GameStatus.Installed || card.RsStatus == GameStatus.UpdateAvailable)
@@ -602,6 +653,7 @@ public partial class MainViewModel
                 catch (Exception ex) { _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] SyncShaders failed — {ex.Message}"); }
 
                 _crashReporter.Log("[RunBackgroundScanAndMergeAsync] Deferred: SyncAddons starting");
+                if (_backgroundStopped) return;
                 // Deploy managed addons to all installed game locations
                 try
                 {
@@ -642,6 +694,8 @@ public partial class MainViewModel
             _crashReporter.Log($"[RunBackgroundScanAndMergeAsync] Background scan failed — {ex.Message}");
             _crashReporter.WriteCrashReport("RunBackgroundScanAndMergeAsync", ex);
             // Leave cached cards in place — user sees stale data but app remains functional
+            // Still schedule the 4 h update checks if the scan failed before starting them (no-op if running).
+            if (isStartup) StartPeriodicUpdateCheckTimer();
         }
         finally
         {
@@ -780,7 +834,12 @@ public partial class MainViewModel
 
                     // ── DLSS / Streamline fields ─────────────────────────────
                     if (f.DlssDetection != null)
+                    {
                         e.ApplyDlssDetection(f.DlssDetection);
+                        // Re-read versions from disk so a user swap that happened during the scan
+                        // isn't overwritten by the stale pre-swap version captured in f.DlssDetection.
+                        e.RefreshDlssVersions(_dlssStreamlineService);
+                    }
                 });
             }
             else
@@ -789,6 +848,9 @@ public partial class MainViewModel
                 cardsToAdd.Add(fresh);
             }
         }
+
+        // Games removed from RHI stay out of the list (kept aside for Restore)
+        cardsToAdd = WithoutRemovedGames(cardsToAdd);
 
         // Remove stale games (not in fresh set AND not manually added)
         var cardsToRemove = _allCards
@@ -828,9 +890,15 @@ public partial class MainViewModel
             // Refresh the selected game's detail panel so merged data (LumaMod, wiki, etc.) is visible
             SelectedGame?.NotifyAll();
 
+            try { CardsMerged?.Invoke(); }
+            catch (Exception ex) { _crashReporter.Log($"[MergeCards] CardsMerged handler failed — {ex.Message}"); }
+
             return true;
         }, _backgroundLifetime.Token);
     }
+
+    /// <summary>Raised on the UI thread after the background scan has merged fresh data into the cards.</summary>
+    public event Action? CardsMerged;
 
     private static string FormatAge(DateTime utc)
     {
@@ -1017,7 +1085,7 @@ public partial class MainViewModel
                 File.Copy(legacyVersionFile, targetVersionFile, overwrite: true);
 
             // Clean up legacy folder
-            try { Directory.Delete(legacyDir, recursive: true); } catch { }
+            try { Directory.Delete(legacyDir, recursive: true); } catch (Exception ex) { CrashReporter.Log($"[MainViewModel.MigrateDxvkStagingFolder] Failed to delete legacy folder — {ex.Message}"); }
 
             _crashReporter.Log($"[MigrateDxvkStagingFolder] Migrated legacy DXVK staging to {targetDir} (variant={targetVariant})");
         }

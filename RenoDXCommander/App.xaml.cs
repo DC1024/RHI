@@ -18,6 +18,7 @@ public partial class App : Application
 
     public App()
     {
+        Program.XamlStarted = true; // WinUI loaded: later startup failures aren't a missing runtime
         InitializeComponent();
         // Register crash/error reporting before anything else runs.
         // This catches AppDomain, TaskScheduler, and WinUI exceptions.
@@ -49,13 +50,12 @@ public partial class App : Application
                 InitialHttp2StreamWindowSize = 1024 * 1024, // 1 MB
             };
 
-            var client = new HttpClient(handler);
+            // GitHub API token — raises rate limit from 60 to 5000 req/hour. Attached per request,
+            // for GitHub hosts only, by GitHubTokenHandler (never a default header: this client
+            // also talks to non-GitHub hosts and manifest URLs).
+            GitHubTokenHandler.SetToken(DevUnlockService.GitHubApiToken);
+            var client = new HttpClient(new GitHubTokenHandler(handler));
             client.DefaultRequestHeaders.Add("User-Agent", "RHI/2.0");
-            // GitHub API token — raises rate limit from 60 to 5000 req/hour for all services.
-            // Set as a default header so every service inherits it without per-request wiring.
-            var ghToken = DevUnlockService.GitHubApiToken;
-            if (!string.IsNullOrEmpty(ghToken))
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ghToken}");
             // Per-request timeout — generous enough for large files on slow connections.
             // Individual services can set per-request timeouts via CancellationTokenSource
             // if they need tighter control.
@@ -80,7 +80,6 @@ public partial class App : Application
         services.AddSingleton<IUpdateService, UpdateService>();
         services.AddSingleton<ILumaService, LumaService>();
         services.AddSingleton<IShaderPackService, ShaderPackService>();
-        services.AddSingleton<ILiliumShaderService, LiliumShaderService>();
         services.AddSingleton<IGameDetectionService, GameDetectionService>();
         services.AddSingleton<IPeHeaderService, PeHeaderService>();
         services.AddSingleton<ICrashReporter, CrashReporterService>();
@@ -91,6 +90,7 @@ public partial class App : Application
         services.AddSingleton<INexusUpdateService, NexusUpdateService>();
         services.AddSingleton<ISteamAppIdResolver, SteamAppIdResolver>();
         services.AddSingleton<IPcgwService, PcgwService>();
+        services.AddSingleton<ICustomFolderScanService, CustomFolderScanService>();
         services.AddSingleton<IUltrawideFixService, UltrawideFixService>();
         services.AddSingleton<IUltraPlusService, UltraPlusService>();
 
@@ -108,6 +108,7 @@ public partial class App : Application
         services.AddSingleton<IOptiScalerWikiService, OptiScalerWikiService>();
         services.AddSingleton<IHdrDatabaseService, HdrDatabaseService>();
         services.AddSingleton<IDxvkService, DxvkService>();
+        services.AddSingleton<IInstallFolderMigrationService, InstallFolderMigrationService>();
         // Lazy<IDxvkService> breaks the circular dependency between OptiScalerService ↔ DxvkService
         services.AddSingleton<Lazy<IDxvkService>>(sp => new Lazy<IDxvkService>(() => sp.GetRequiredService<IDxvkService>()));
         services.AddSingleton<IDlssStreamlineService, DlssStreamlineService>();
@@ -130,6 +131,10 @@ public partial class App : Application
         services.AddSingleton<NexusDownloadService>();
         services.AddSingleton<NexusSsoService>();
         services.AddSingleton<GitHubAuthService>();
+        services.AddSingleton<IDldsrService, DldsrService>();
+        services.AddSingleton<IAutoHdrService, AutoHdrService>();
+        services.AddSingleton<RtxEncoreService>();
+        services.AddSingleton<UpliftService>();
         // Lazy<IDlssStreamlineService> breaks the circular dependency between OptiScalerService ↔ DlssStreamlineService
         services.AddSingleton<Lazy<IDlssStreamlineService>>(sp => new Lazy<IDlssStreamlineService>(() => sp.GetRequiredService<IDlssStreamlineService>()));
 
@@ -139,6 +144,10 @@ public partial class App : Application
         services.AddTransient<MainWindow>();
 
         Services = services.BuildServiceProvider();
+
+        // GITC Uplift's shaders stay in a game's reshade-shaders folder while it's installed there
+        var uplift = Services.GetRequiredService<UpliftService>();
+        ShaderPackService.ExtraGameFiles = uplift.ShaderFilesFor;
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
@@ -188,10 +197,54 @@ public partial class App : Application
         if (File.Exists(minimizedSignalPath))
         {
             startMinimized = true;
-            try { File.Delete(minimizedSignalPath); } catch { }
+            try { File.Delete(minimizedSignalPath); } catch (Exception ex) { CrashReporter.Log($"[App.OnLaunched] Failed to delete start-minimized signal file — {ex.Message}"); }
+        }
+
+        // A game to launch handed over by the non-elevated instance (Admin Mode relaunch below):
+        // schtasks /Run can't pass arguments, so a desktop shortcut's --launch arrives this way
+        var pendingLaunchPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "RHI", "rhi_pending_launch");
+        if (File.Exists(pendingLaunchPath))
+        {
+            try
+            {
+                var lines = File.ReadAllLines(pendingLaunchPath);
+                File.Delete(pendingLaunchPath);
+                // Only a fresh hand-off counts, so a leftover file can't launch a game later
+                if (launchGameArg == null && lines.Length >= 2
+                    && DateTime.TryParse(lines[0], null, System.Globalization.DateTimeStyles.RoundtripKind, out var written)
+                    && DateTime.UtcNow - written.ToUniversalTime() < TimeSpan.FromMinutes(2)
+                    && !string.IsNullOrWhiteSpace(lines[1]))
+                {
+                    launchGameArg = lines[1].Trim();
+                    CrashReporter.Log($"[App.OnLaunched] Launch request handed over from the non-elevated instance: '{launchGameArg}'");
+                }
+            }
+            catch (IOException ex) { CrashReporter.Log($"[App.OnLaunched] Couldn't read the pending launch file — {ex.Message}"); }
+            catch (UnauthorizedAccessException ex) { CrashReporter.Log($"[App.OnLaunched] Couldn't read the pending launch file — {ex.Message}"); }
         }
 
         CrashReporter.Log($"[App.OnLaunched] Args: [{string.Join(", ", cmdArgs)}], startMinimized={startMinimized}");
+        CrashReporter.Log($"[App.OnLaunched] Windows App SDK build target: 2.5.1 | Runtime: {GetWindowsAppRuntimeVersion()}");
+        CrashReporter.Log($"[App.OnLaunched] OS: {System.Environment.OSVersion} | Build: {GetWindowsBuildNumber()}");
+        _ = System.Threading.Tasks.Task.Run(() =>
+        {
+            try
+            {
+                var gpuDriver = System.Diagnostics.Process.GetCurrentProcess().Modules
+                    .Cast<System.Diagnostics.ProcessModule>()
+                    .FirstOrDefault(m => m.ModuleName?.StartsWith("nvwgf2", StringComparison.OrdinalIgnoreCase) == true
+                                      || m.ModuleName?.StartsWith("atig", StringComparison.OrdinalIgnoreCase) == true
+                                      || m.ModuleName?.StartsWith("atio", StringComparison.OrdinalIgnoreCase) == true);
+                if (gpuDriver?.FileName != null)
+                {
+                    var fi = System.Diagnostics.FileVersionInfo.GetVersionInfo(gpuDriver.FileName);
+                    CrashReporter.Log($"[App.OnLaunched] GPU driver: {gpuDriver.ModuleName} v{fi.FileVersion} ({System.IO.File.GetLastWriteTime(gpuDriver.FileName):yyyy-MM-dd})");
+                }
+            }
+            catch (Exception ex) { CrashReporter.Log($"[App.OnLaunched] GPU driver version detection failed — {ex.Message}"); }
+        });
 
         if (!SingleInstanceService.TryAcquire())
         {
@@ -204,7 +257,7 @@ public partial class App : Application
                 SingleInstanceService.SendToRunningInstance(addonArg);
             else
                 SingleInstanceService.SendToRunningInstance("--activate");
-            try { File.Delete(CrashReporter.CurrentSessionLogPath); } catch { }
+            try { File.Delete(CrashReporter.CurrentSessionLogPath); } catch (Exception) { /* Safe to ignore: deleting this instance's session log right before exit; logging here would recreate the file. */ }
             Environment.Exit(0);
             return;
         }
@@ -232,6 +285,14 @@ public partial class App : Application
                     Directory.CreateDirectory(signalDir);
                     File.WriteAllText(Path.Combine(signalDir, "rhi_start_minimized"), "");
                 }
+                // Same for a desktop shortcut / jump list launch: hand the game over to the elevated instance
+                if (launchGameArg != null)
+                {
+                    var signalDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RHI");
+                    Directory.CreateDirectory(signalDir);
+                    File.WriteAllLines(Path.Combine(signalDir, "rhi_pending_launch"),
+                        new[] { DateTime.UtcNow.ToString("O"), launchGameArg });
+                }
 
                 var psi = new System.Diagnostics.ProcessStartInfo("schtasks.exe", "/Run /TN \"RHI Admin Mode\"")
                 {
@@ -242,7 +303,7 @@ public partial class App : Application
                 // this exiting process for an active instance and exit itself.
                 SingleInstanceService.Stop();
                 System.Diagnostics.Process.Start(psi);
-                try { File.Delete(CrashReporter.CurrentSessionLogPath); } catch { }
+                try { File.Delete(CrashReporter.CurrentSessionLogPath); } catch (Exception) { /* Safe to ignore: deleting this instance's session log right before exit; logging here would recreate the file. */ }
                 Environment.Exit(0);
                 return;
             }
@@ -262,16 +323,22 @@ public partial class App : Application
         MainViewModel.LoadGameApiCache();
 
         // Apply any stored GitHub OAuth token to the shared HttpClient before the window loads.
-        // The HttpClient singleton was built before settings were loaded — patch it here.
-        // Fire-and-forget: validates the token first (auto-clears if expired/revoked).
-        _ = ApplyStoredGitHubTokenAsync();
+        // Await it so startup network requests (manifest, wiki, shader packs) go out with a
+        // validated token — or no token at all if it's expired. Fire-and-forget caused a 401
+        // storm: token was applied, all startup requests fired, validation came back 401 and
+        // stripped the token, but by then all requests were already in-flight with a bad header.
+        await ApplyStoredGitHubTokenAsync();
 
-        // Check if first-launch setup is needed
         // Check if first-launch setup is needed.
-        // Skip if settings.json already exists with content — that's an existing user.
-        var rawSettings = SettingsViewModel.LoadSettingsFile();
+        // Only a missing settings file means a first launch. A corrupt or locked file is an
+        // existing user (SettingsFile restores corrupt files from .bak) — showing setup there
+        // would overwrite their settings.
+        var rawSettings = SettingsViewModel.LoadSettingsFile(out var settingsStatus);
         bool setupDone = rawSettings.Count > 0
+            || settingsStatus != SafeJsonFile.LoadStatus.Missing
             || (rawSettings.TryGetValue("FirstLaunchSetupDone", out var fls) && fls == "true");
+        if (settingsStatus != SafeJsonFile.LoadStatus.Ok && settingsStatus != SafeJsonFile.LoadStatus.Missing)
+            CrashReporter.Log($"[App.OnLaunched] Settings load status: {settingsStatus}");
 
         if (!setupDone)
         {
@@ -279,14 +346,16 @@ public partial class App : Application
             var setupWindow = new SetupWindow();
             setupWindow.OnComplete = (manageReShade) =>
             {
-                rawSettings["FirstLaunchSetupDone"] = "true";
-                if (!manageReShade)
+                SettingsViewModel.UpdateSettingsFile(s =>
                 {
-                    rawSettings["GlobalSkipRsUpdates"] = "true";
-                    rawSettings["CacheAllShaders"] = "false";
-                    rawSettings["GlobalShadersOff"] = "true";
-                }
-                SettingsViewModel.SaveSettingsFile(rawSettings);
+                    s["FirstLaunchSetupDone"] = "true";
+                    if (!manageReShade)
+                    {
+                        s["GlobalSkipRsUpdates"] = "true";
+                        s["CacheAllShaders"] = "false";
+                        s["GlobalShadersOff"] = "true";
+                    }
+                }, "App.OnLaunched.SetupComplete");
                 CrashReporter.Log($"[App.OnLaunched] Setup complete — manageReShade={manageReShade}");
 
                 setupWindow.AppWindow.Hide();
@@ -453,41 +522,88 @@ public partial class App : Application
 
             var http = Services.GetRequiredService<HttpClient>();
 
-            // Apply the token IMMEDIATELY so startup network requests are authenticated.
-            // Validation happens after — if the token turns out to be revoked, we clear it
-            // on the next launch. This avoids a race where all startup requests fire before
-            // the async validation returns, hitting the unauthenticated 60 req/hour limit.
-            DevUnlockService.UpdateToken(token);
-            GitHubAuthService.ApplyTokenToHttpClient(http, token);
-            CrashReporter.Log("[App.ApplyStoredGitHubToken] GitHub OAuth token applied from settings");
-
-            // Now validate in the background — clear if revoked so next launch is clean.
+            // Validate BEFORE applying — a bad token causes 401 storms on all startup requests.
+            // Use a 4s timeout so slow connections don't stall startup badly.
+            // On network failure, fall through and apply anyway (token may still be valid, just unreachable).
+            bool tokenValid = true;
             try
             {
+                using var valCts = new CancellationTokenSource(TimeSpan.FromSeconds(4));
                 var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, "https://api.github.com/user");
                 req.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
                 req.Headers.TryAddWithoutValidation("User-Agent", "RHI");
-                using var resp = await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+                using var resp = await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, valCts.Token);
                 if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    CrashReporter.Log("[App.ApplyStoredGitHubToken] Token is expired or revoked (401) — clearing from settings for next launch");
-                    // Remove from the default header so remaining requests in this session go unauthenticated
-                    // (better than sending a known-bad token that causes 401s everywhere)
-                    http.DefaultRequestHeaders.Remove("Authorization");
-                    DevUnlockService.UpdateToken(null);
-                    settings.Remove("GitHubOAuthToken");
-                    SettingsViewModel.SaveSettingsFile(settings);
+                    tokenValid = false;
+                    CrashReporter.Log("[App.ApplyStoredGitHubToken] Token is expired or revoked (401) — clearing from settings");
+                    SettingsViewModel.UpdateSettingsFile(s =>
+                    {
+                        s.Remove("GitHubOAuthToken");
+                        s.Remove("GitHubUsername");
+                    }, "App.ApplyStoredGitHubToken");
+                    // Flag for the window to show a re-auth notice once it opens
+                    _gitHubTokenExpiredOnStartup = true;
                 }
             }
             catch (Exception valEx)
             {
-                CrashReporter.Log($"[App.ApplyStoredGitHubToken] Token validation failed (network?) — keeping token — {valEx.Message}");
+                // Network error — optimistically apply the token; may work once online
+                CrashReporter.Log($"[App.ApplyStoredGitHubToken] Token validation failed (network?) — applying anyway — {valEx.Message}");
             }
+
+            if (!tokenValid) return;
+
+            DevUnlockService.UpdateToken(token);
+            GitHubAuthService.ApplyTokenToHttpClient(http, token);
+            CrashReporter.Log("[App.ApplyStoredGitHubToken] GitHub OAuth token validated and applied from settings");
         }
         catch (Exception ex)
         {
             CrashReporter.Log($"[App.ApplyStoredGitHubToken] Failed — {ex.Message}");
         }
+    }
+
+    /// <summary>Set when the stored OAuth token was found to be expired/revoked at startup.</summary>
+    internal static bool _gitHubTokenExpiredOnStartup;
+
+    internal static string GetWindowsBuildNumber()
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+            var build = key?.GetValue("CurrentBuild")?.ToString() ?? "?";
+            var ubr = key?.GetValue("UBR")?.ToString() ?? "0";
+            return $"{System.Environment.OSVersion.Version.Major}.{System.Environment.OSVersion.Version.Minor}.{build}.{ubr}";
+        }
+        catch { return System.Environment.OSVersion.Version.ToString(); }
+    }
+
+    internal static string GetWindowsAppRuntimeVersion()    {
+        try
+        {
+            var windowsApps = @"C:\Program Files\WindowsApps";
+            if (!System.IO.Directory.Exists(windowsApps)) return "unknown";
+            var dirs = System.IO.Directory.GetDirectories(windowsApps, "Microsoft.WindowsAppRuntime.*_x64__*");
+            Version? best = null;
+            string bestStr = "";
+            foreach (var dir in dirs)
+            {
+                var folderName = System.IO.Path.GetFileName(dir);
+                // Skip experimental/preview builds
+                if (folderName.Contains("experimental", StringComparison.OrdinalIgnoreCase) ||
+                    folderName.Contains("preview", StringComparison.OrdinalIgnoreCase)) continue;
+                var parts = folderName.Split('_');
+                if (parts.Length >= 2 && Version.TryParse(parts[1], out var v) && (best == null || v > best))
+                {
+                    best = v;
+                    bestStr = parts[1];
+                    if (bestStr.EndsWith(".0")) bestStr = bestStr[..^2];
+                }
+            }
+            return bestStr.Length > 0 ? bestStr : "unknown";
+        }
+        catch (Exception ex) { return $"error: {ex.Message}"; }
     }
 
     private static async Task<bool> IsAdminTaskRegisteredAsync()
@@ -504,7 +620,7 @@ public partial class App : Application
             try { await proc.WaitForExitAsync(timeout.Token); }
             catch (OperationCanceledException)
             {
-                try { proc.Kill(); } catch { }
+                try { proc.Kill(); } catch (Exception ex) { CrashReporter.Log($"[App.IsAdminTaskRegisteredAsync] Failed to kill timed-out schtasks process — {ex.Message}"); }
                 CrashReporter.Log("[App] Admin task query timed out — continuing normal startup");
                 return false;
             }

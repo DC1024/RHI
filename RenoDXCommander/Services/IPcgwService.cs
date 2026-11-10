@@ -38,12 +38,6 @@ public interface IPcgwService
     string? TryResolveUrlFromCache(string gameName, RemoteManifest? manifest);
 
     /// <summary>
-    /// Forces an immediate write of the AppID cache to disk.
-    /// Call during app shutdown to ensure pending debounced writes are flushed.
-    /// </summary>
-    Task FlushCacheAsync();
-
-    /// <summary>
     /// Removes all negative sentinel (-1) entries from the cache so games that
     /// previously had no Steam AppID or PCGW page are retried on the next launch.
     /// Called on Full Refresh.
@@ -76,4 +70,16 @@ public interface IPcgwService
     /// Caches results in memory and disk.
     /// </summary>
     Task<PcgwApiInfo?> FetchApiInfoAsync(string gameName, string wikiUrl);
+
+    /// <summary>
+    /// Returns the Steam AppID for a game from the centralized pcgw_data.json, or null if not found.
+    /// Used to source cover art from Steam CDN for non-Steam games (e.g. Xbox/Game Pass).
+    /// </summary>
+    int? GetSteamAppIdFromCentralData(string gameName);
+
+    /// <summary>
+    /// The PCGW page title for a game name from the centralized data: exact lookup, then an exact
+    /// normalized-name match (letters and digits only). No fuzzy matching. Null when not found.
+    /// </summary>
+    string? FindCentralTitle(string gameName);
 }

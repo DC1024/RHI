@@ -172,7 +172,7 @@ public class RhiInstallManifest
             if (manifest != null && manifest.Components.TryGetValue(component, out var rec))
                 return rec.Files.AsReadOnly();
         }
-        catch { }
+        catch (Exception) { /* unreadable rhi_install.txt = no record; called per game in update loops */ }
         return Array.Empty<string>();
     }
 
@@ -275,6 +275,22 @@ public class RhiInstallManifest
         {
             CrashReporter.Log($"[RhiInstallManifest.AddSharedFileOwner] Failed — {ex.Message}");
         }
+    }
+
+    /// <summary>The components that own <paramref name="fileName"/> (empty when untracked).</summary>
+    public static IReadOnlyList<string> GetSharedFileOwners(string gameDir, string fileName)
+    {
+        try
+        {
+            var manifest = Read(gameDir);
+            if (manifest != null && manifest.SharedFiles.TryGetValue(fileName, out var owners))
+                return owners.ToList();
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Log($"[RhiInstallManifest.GetSharedFileOwners] Failed — {ex.Message}");
+        }
+        return Array.Empty<string>();
     }
 
     /// <summary>

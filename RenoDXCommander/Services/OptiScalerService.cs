@@ -1,4 +1,5 @@
 using System.Text;
+using RenoDXCommander.ViewModels;
 
 namespace RenoDXCommander.Services;
 
@@ -13,6 +14,28 @@ public partial class OptiScalerService : IOptiScalerService
     public const string IniFileName = "OptiScaler.ini";
     public const string ReShadeCoexistName = "ReShade64.dll";
     public const string AddonType = "OptiScaler";
+
+    // ── Hooks for components that live in OptiScaler\plugins (set by MainViewModel) ──
+
+    /// <summary>
+    /// Called during an OptiScaler 10 install (nightly, F5, DLSS NR), just before OptiScaler's files
+    /// are copied, so a component installed as a proxy DLL can move into OptiScaler\plugins first
+    /// (and OptiScaler's own DLL can never overwrite it).
+    /// </summary>
+    public static Action<GameCardViewModel>? BeforeV10DeployHook { get; set; }
+
+    /// <summary>Called when an install that ran <see cref="BeforeV10DeployHook"/> fails, to move things back out.</summary>
+    public static Action<GameCardViewModel>? V10InstallFailedHook { get; set; }
+
+    /// <summary>Called during uninstall just before the OptiScaler\ folder (and its plugins) is deleted.</summary>
+    public static Action<GameCardViewModel>? BeforeOptiScalerFolderRemovedHook { get; set; }
+
+    /// <summary>
+    /// Default OptiScaler DLL name for a game with no override: winmm.dll for Vulkan games
+    /// (dxgi.dll doesn't load there), dxgi.dll otherwise.
+    /// </summary>
+    public static string GetDefaultDllName(Models.GraphicsApiType api)
+        => api == Models.GraphicsApiType.Vulkan ? "winmm.dll" : DefaultDllName;
 
     public static readonly string[] SupportedDllNames =
     [
@@ -52,18 +75,30 @@ public partial class OptiScalerService : IOptiScalerService
         yield return Path.Combine(dir, "OptiScaler_dlssnr.nvidia.ini");
         yield return Path.Combine(dir, "OptiScaler_dlssnr.amd-dlss.ini");
         yield return Path.Combine(dir, "OptiScaler_dlssnr.amd-nodlss.ini");
+        yield return Path.Combine(dir, "OptiScaler_f5.nvidia.ini");
+        yield return Path.Combine(dir, "OptiScaler_f5.amd-dlss.ini");
+        yield return Path.Combine(dir, "OptiScaler_f5.amd-nodlss.ini");
     }
 
     /// <summary>
     /// Returns the user-editable INI path in the inis folder for the given GPU type, DLSS setting, and variant.
     /// </summary>
+    /// <summary>
+    /// INI template suffix for a version. Custom builds use the Nightly templates when they have the
+    /// OptiScaler 10 layout, else Stable's.
+    /// </summary>
+    internal static string IniSuffix(string? variant) => variant switch
+    {
+        "Nightly" => "_nightly",
+        "DlssNr"  => "_dlssnr",
+        "F5"      => "_f5",
+        _ when OsVariants.IsCustom(variant) || OsVariants.IsFork(variant) => OsVariants.IsOs10(variant) ? "_nightly" : "",
+        _         => ""
+    };
+
     public static string GetUserIniPath(string gpuType, bool dlssInputs, string variant = "Stable")
     {
-        var suffix = variant switch {
-            "Nightly" => "_nightly",
-            "DlssNr"  => "_dlssnr",
-            _         => ""
-        };
+        var suffix = IniSuffix(variant);
         var fileName = gpuType.Equals("NVIDIA", StringComparison.OrdinalIgnoreCase)
             ? $"OptiScaler{suffix}.nvidia.ini"
             : dlssInputs
@@ -75,12 +110,19 @@ public partial class OptiScalerService : IOptiScalerService
     private static readonly string GitHubReleasesApi =
         "https://api.github.com/repos/optiscaler/OptiScaler/releases/latest";
 
-    private static readonly string NightlyStagingDir = Path.Combine(
+    private static readonly string NightlyStagingRoot = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "RHI", "optiscaler-nightly");
-    private static readonly string NightlyVersionFilePath = Path.Combine(NightlyStagingDir, "version.txt");
+    // Legacy flat staging dir (pre-versioned) — used only for migration detection
+    private static readonly string NightlyStagingDir = NightlyStagingRoot;
+    private static readonly string NightlyVersionFilePath = Path.Combine(NightlyStagingRoot, "version.txt");
+    private static readonly string NightlyAvailableBuildsPath = Path.Combine(NightlyStagingRoot, "available_builds.json");
     private const string NightlyReleasesApi =
-        "https://api.github.com/repos/optiscaler/OptiScaler-nightly/releases";
+        "https://api.github.com/repos/optiscaler/OptiScaler-nightly/releases?per_page=30";
+
+    /// <summary>Returns the versioned staging folder for a specific nightly build date (e.g. "20261008").</summary>
+    private static string GetNightlyBuildDir(string buildDate) =>
+        Path.Combine(NightlyStagingRoot, buildDate);
 
     // ── OptiPatcher constants ─────────────────────────────────────────────────
     private static readonly string OptiPatcherReleasesApi =
@@ -102,8 +144,6 @@ public partial class OptiScalerService : IOptiScalerService
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "RHI", "dlss");
     private static readonly string DlssVersionPath = Path.Combine(DlssStagingDir, "version.txt");
-    private static readonly string DlssdVersionPath = Path.Combine(DlssStagingDir, "version_dlssd.txt");
-    private static readonly string DlssgVersionPath = Path.Combine(DlssStagingDir, "version_dlssg.txt");
     private const string DlssDllFileName = "nvngx_dlss.dll";
     private const string DlssdDllFileName = "nvngx_dlssd.dll";
     private const string DlssgDllFileName = "nvngx_dlssg.dll";
@@ -146,10 +186,24 @@ public partial class OptiScalerService : IOptiScalerService
 
     // ── Binary signature markers ──────────────────────────────────────────────
     // Unique strings embedded in OptiScaler.dll that distinguish it from ReShade
-    // and other proxy DLLs. Checked via binary scan of the first ~2 MB.
+    // and other proxy DLLs. Checked via binary scan of the full DLL (capped at 32 MB).
+    //
+    // IMPORTANT: OptiScaler's string data lives near the END of its ~24 MB binary
+    // (PE .rdata section offset ~24 MB). The old 8 MB scan cap missed all unique
+    // strings and only matched the generic "OptiScaler" reference, which is also
+    // present in unrelated tools like RTX Encore. The cap is raised to 32 MB so
+    // the scan always reaches the string section.
+    //
+    // Signatures confirmed unique to OptiScaler's own binary (not present in RTX Encore,
+    // ReShade, or other proxy DLLs):
+    //   "optiscaler/OptiScaler" — GitHub URL embedded in the binary (wiki links etc.)
+    //   "OptiScaler_DontLoad"   — OptiScaler-specific registry escape-hatch key
+    //   "optiscaler.dll"        — OptiScaler's internal self-reference
     private static readonly byte[][] OptiScalerSignatures =
     [
-        Encoding.ASCII.GetBytes("OptiScaler"),
+        Encoding.ASCII.GetBytes("optiscaler/OptiScaler"),
+        Encoding.ASCII.GetBytes("OptiScaler_DontLoad"),
+        Encoding.ASCII.GetBytes("optiscaler.dll"),
     ];
 
     // ── Dependencies (injected via DI) ────────────────────────────────────────
@@ -179,6 +233,9 @@ public partial class OptiScalerService : IOptiScalerService
         _etagCache = etagCache;
         _dxvkServiceLazy = dxvkServiceLazy;
         _dlssStreamlineServiceLazy = dlssStreamlineServiceLazy;
+        // Pre-populate the available builds list from the on-disk cache so the cog
+        // dialog shows real entries immediately, before FetchAvailableNightlyBuildsAsync runs.
+        TryLoadAvailableBuildsCache();
     }
 
     // ── Properties ────────────────────────────────────────────────────────────
@@ -223,10 +280,17 @@ public partial class OptiScalerService : IOptiScalerService
     }
 
     /// <inheritdoc />
-    public bool IsStagingReadyNightly =>
-        Directory.Exists(NightlyStagingDir)
-        && File.Exists(NightlyVersionFilePath)
-        && File.Exists(Path.Combine(NightlyStagingDir, "OptiScaler.dll"));
+    public bool IsStagingReadyNightly
+    {
+        get
+        {
+            // Check if ANY versioned subfolder has a valid staging (latest build available)
+            var latestBuild = GetLatestStagedNightlyBuild();
+            if (latestBuild == null) return false;
+            var dir = GetNightlyBuildDir(latestBuild);
+            return Directory.Exists(dir) && File.Exists(Path.Combine(dir, "OptiScaler.dll"));
+        }
+    }
 
     /// <inheritdoc />
     public bool HasUpdateNightly
@@ -240,9 +304,33 @@ public partial class OptiScalerService : IOptiScalerService
     {
         get
         {
-            try { return File.Exists(NightlyVersionFilePath) ? File.ReadAllText(NightlyVersionFilePath).Trim() : null; }
+            try
+            {
+                var latestBuild = GetLatestStagedNightlyBuild();
+                return latestBuild;
+            }
             catch { return null; }
         }
+    }
+
+    /// <summary>Returns the most recently staged nightly build date string, or null if no versioned builds exist.</summary>
+    public string? GetLatestStagedNightlyBuild()
+    {
+        if (!Directory.Exists(NightlyStagingRoot)) return null;
+        // Look for dated subdirs (8-digit date strings like "20261008")
+        var builds = Directory.GetDirectories(NightlyStagingRoot)
+            .Select(Path.GetFileName)
+            .Where(d => d != null && d.Length == 8 && d.All(char.IsDigit))
+            .OrderByDescending(d => d)
+            .ToList();
+        return builds.FirstOrDefault();
+    }
+
+    /// <summary>Returns whether a specific nightly build date is already staged and valid.</summary>
+    public bool IsNightlyBuildStaged(string buildDate)
+    {
+        var dir = GetNightlyBuildDir(buildDate);
+        return Directory.Exists(dir) && File.Exists(Path.Combine(dir, "OptiScaler.dll"));
     }
 
     // ── DLSS NR variant ───────────────────────────────────────────────────────
@@ -280,6 +368,42 @@ public partial class OptiScalerService : IOptiScalerService
         get
         {
             try { return File.Exists(DlssNrVersionFilePath) ? File.ReadAllText(DlssNrVersionFilePath).Trim() : null; }
+            catch { return null; }
+        }
+    }
+
+    // ── F5 DLSSNR variant ─────────────────────────────────────────────────────
+
+    private static readonly string F5StagingDir = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "RHI", "optiscaler-f5");
+    private static readonly string F5VersionFilePath = Path.Combine(F5StagingDir, "version.txt");
+
+    /// <summary>GitHub releases API URL for the F5 DLSSNR OptiScaler fork.</summary>
+    private const string F5ReleasesApi =
+        "https://api.github.com/repos/janblade/OptiScaler-F5-DLSSNR-Multipass/releases/latest";
+
+    /// <inheritdoc />
+    public bool IsStagingReadyF5 =>
+        Directory.Exists(F5StagingDir)
+        && File.Exists(F5VersionFilePath)
+        && File.Exists(Path.Combine(F5StagingDir, "OptiScaler.dll"));
+
+    private bool _hasUpdateF5;
+
+    /// <inheritdoc />
+    public bool HasUpdateF5
+    {
+        get => _hasUpdateF5;
+        private set => _hasUpdateF5 = value;
+    }
+
+    /// <inheritdoc />
+    public string? StagedVersionF5
+    {
+        get
+        {
+            try { return File.Exists(F5VersionFilePath) ? File.ReadAllText(F5VersionFilePath).Trim() : null; }
             catch { return null; }
         }
     }

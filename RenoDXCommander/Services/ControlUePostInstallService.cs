@@ -83,6 +83,26 @@ public static class ControlUePostInstallService
 
             content.Children.Add(new Microsoft.UI.Xaml.Controls.TextBlock
             {
+                Text = "Required in-game settings:",
+                FontSize = 12,
+                FontWeight = new Windows.UI.Text.FontWeight(600),
+                Foreground = UIFactory.Brush(ResourceKeys.TextPrimaryBrush),
+                Margin = new Microsoft.UI.Xaml.Thickness(0, 4, 0, 0),
+            });
+
+            content.Children.Add(new Microsoft.UI.Xaml.Controls.TextBlock
+            {
+                Text = "  •  DLSS ON  •  SSAO ON  •  Post-processing HIGH\n"
+                     + "  •  Screen-space reflections HIGH (temporarily turn off RT to change, or set render preset to High/Ultra)\n"
+                     + "  •  RT Reflections ON  •  RT Indirect Diffuse ON\n"
+                     + "  •  Render resolution must use even integers (can be set in renderer.ini)",
+                TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                FontSize = 12,
+                Foreground = UIFactory.Brush(ResourceKeys.InlineDescriptionBrush),
+            });
+
+            content.Children.Add(new Microsoft.UI.Xaml.Controls.TextBlock
+            {
                 Text = "Clicking Install will also:",
                 FontSize = 13,
                 FontWeight = new Windows.UI.Text.FontWeight(600),
@@ -96,7 +116,7 @@ public static class ControlUePostInstallService
                      + "  •  Deploy nvngx_dlssd.dll (DLSS Ray Reconstruction runtime)\n"
                      + "  •  Set renderer.ini HDR preset to the correct value\n"
                      + "  •  Clear the DLSS SR preset set in the NVIDIA driver profile for this game\n"
-                     + "  •  If OptiScaler FG = Yes: installs OptiScaler Nightly with Frame Generation pre-configured, deploys Streamline and nvngx_dlssg.dll, renames OptiScaler to winmm.dll and ReShade to dxgi.dll, and applies all required FG INI settings",
+                     + "  •  If OptiScaler FG = Yes: installs OptiScaler Nightly build 2026-10-04 with Frame Generation pre-configured, deploys Streamline and nvngx_dlssg.dll, renames OptiScaler to winmm.dll and ReShade to dxgi.dll, and applies all required FG INI settings",
                 TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
                 FontSize = 13,
                 Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
@@ -399,6 +419,17 @@ public static class ControlUePostInstallService
             vm.SetOsFgOutput(gameName, "dlssg", store);
             vm.SetOsFgNvngxReplacement(gameName, "None", store);
 
+            // Pin to the known-good nightly build for Control UE FG
+            const string ControlUeRequiredNightlyBuild = "20261004";
+            vm.SetOsNightlyBuild(gameName, ControlUeRequiredNightlyBuild, store);
+
+            // ── Ensure the pinned build is staged ─────────────────────────────
+            if (!optiSvc.IsNightlyBuildStaged(ControlUeRequiredNightlyBuild))
+            {
+                CrashReporter.Log($"[ControlUePostInstall] Step 6 — staging nightly build {ControlUeRequiredNightlyBuild}...");
+                await optiSvc.EnsureNightlyBuildStagingAsync(ControlUeRequiredNightlyBuild).ConfigureAwait(false);
+            }
+
             // ── Run the install ────────────────────────────────────────────────
             var gpuType    = vm.Settings.OsGpuType;
             var dlssInputs = vm.Settings.OsDlssInputs;
@@ -410,13 +441,18 @@ public static class ControlUePostInstallService
                 gpuType: gpuType,
                 dlssInputs: dlssInputs,
                 hotkey: hotkey,
-                variant: "Nightly").ConfigureAwait(false);
+                variant: "Nightly",
+                nightlyBuildHint: ControlUeRequiredNightlyBuild).ConfigureAwait(false);
 
             if (record == null)
             {
                 CrashReporter.Log("[ControlUePostInstall] Step 6 — OptiScaler install returned null (staging not ready?)");
                 return;
             }
+
+            // Update the card's displayed version immediately
+            if (!string.IsNullOrEmpty(record.OsNightlyBuild))
+                card.OsInstalledVersion = record.OsNightlyBuild;
 
             // Clear DLSS skip cache so next scan detects the deployed DLLs
             var dlssSvc = App.Services.GetRequiredService<IDlssStreamlineService>();

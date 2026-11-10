@@ -169,6 +169,11 @@ public partial class DetailPanelBuilder
             FontSize = 11,
             Foreground = UIFactory.Brush(ResourceKeys.TextSecondaryBrush),
         };
+        // The Addons combo is disabled under the "No Addons" ReShade channel and WinUI
+        // doesn't show tooltips on disabled controls, so the reason goes on the label.
+        if (card.UseNormalReShade)
+            ToolTipService.SetToolTip(addonLabel,
+                "Addons need the addon build of ReShade. Change the ReShade channel to enable this.");
         Grid.SetRow(addonLabel, 0); Grid.SetColumn(addonLabel, 1);
         shaderAddonGrid.Children.Add(addonLabel);
         Grid.SetRow(addonModeCombo, 1); Grid.SetColumn(addonModeCombo, 1);
@@ -284,6 +289,8 @@ public partial class DetailPanelBuilder
             TextWrapping = TextWrapping.NoWrap,
             TextTrimming = TextTrimming.CharacterEllipsis,
         };
+        ToolTipService.SetToolTip(exeHeaderText,
+            "The program RHI starts when you click Launch. Detected automatically unless you set one below.");
         launchExeHeaderPanel.Children.Add(exeHeaderText);
 
         // Async exe scan — updates the label without blocking the UI thread
@@ -301,7 +308,7 @@ public partial class DetailPanelBuilder
                             .Select(Path.GetFileName)
                             .FirstOrDefault();
                 }
-                catch { }
+                catch (Exception ex) { CrashReporter.Log($"[DetailPanelBuilder.BuildShadersAddonsSection] Exe scan failed for '{card.InstallPath}' — {ex.Message}"); }
                 if (scannedExe != null)
                     _window.DispatcherQueue?.TryEnqueue(() =>
                     {
@@ -420,24 +427,22 @@ public partial class DetailPanelBuilder
 
         var resetLaunchBtn = new Button
         {
-            Content = "Reset",
+            Content = "Reset launch options",
             FontSize = 12,
             Height = 32,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            Background = UIFactory.Brush(ResourceKeys.AccentBlueBgBrush),
-            Foreground = UIFactory.Brush(ResourceKeys.AccentBlueBrush),
-            BorderBrush = UIFactory.Brush(ResourceKeys.AccentBlueBorderBrush),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
         };
+        ApplyResetButtonStyle(resetLaunchBtn);
         resetLaunchBtn.Click += (s, ev) =>
         {
             launchExeBox.Text = "";
+            launchArgsBox.Text = "";
             _gameNameService.LaunchExeOverrides.Remove(ctx.CapturedName);
+            _gameNameService.LaunchArgsOverrides.Remove(ctx.CapturedName);
             _window.ViewModel.SaveSettingsPublic();
         };
         Grid.SetColumn(resetLaunchBtn, 1);
-        ToolTipService.SetToolTip(resetLaunchBtn, "Clear the launch executable override and revert to auto-detection.");
+        ToolTipService.SetToolTip(resetLaunchBtn, "Clear the launch executable and launch arguments for this game. The executable goes back to auto-detection.");
         launchBtnRow.Children.Add(resetLaunchBtn);
         Grid.SetRow(launchBtnRow, 2);
         shadersAddonsRightColumn.Children.Add(launchBtnRow);
@@ -459,6 +464,7 @@ public partial class DetailPanelBuilder
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
         };
+        ToolTipService.SetToolTip(resetOverridesBtn, "Reset all per-game overrides back to defaults (DLL names, channels, shaders, addons, launch settings, update inclusion).");
         ctx.ResetOverridesBtn = resetOverridesBtn;
         Action resetAction = () =>
         {
@@ -485,7 +491,7 @@ public partial class DetailPanelBuilder
             if (_window.ViewModel.IsUpdateAllExcludedOs(ctx.CapturedName, card.Source))
                 _window.ViewModel.ToggleUpdateAllExclusionOs(ctx.CapturedName, card.Source);
             UpdateInclusionHelper.RefreshSummary(ctx.UpdateSummaryText, _window.ViewModel, ctx.CapturedName, card.IsREEngineGame, card.DxvkEnabled, card.Source ?? "");
-            ctx.WikiExcludeCombo.SelectedItem = "Included";
+            ctx.WikiExcludeCombo.SelectedItem = WikiIncludedItem;
 
             // Persist all reset values immediately
             var resetName = (ctx.OriginalStoreName ?? gameName).Trim();

@@ -54,6 +54,12 @@ public interface IOptiScalerService
     Task<bool> CheckOptiPatcherUpdateAsync();
 
     /// <summary>
+    /// Moves OptiPatcher.asi from &lt;game&gt;\plugins into OptiScaler\plugins for every game with an
+    /// OptiScaler 10 build (nightly, F5, DLSS NR), where older RHI versions put it in the wrong place.
+    /// </summary>
+    void MoveOptiPatcherForAllGames();
+
+    /// <summary>
     /// Checks the GitHub releases API for a newer version than the staged one.
     /// Sets <see cref="HasUpdate"/> accordingly.
     /// </summary>
@@ -73,6 +79,36 @@ public interface IOptiScalerService
     /// <summary>Removes the nightly staging folder contents.</summary>
     void ClearNightlyStaging();
 
+    /// <summary>Returns the most recently staged nightly build date string (e.g. "20261008"), or null if none staged.</summary>
+    string? GetLatestStagedNightlyBuild();
+
+    /// <summary>Whether a specific nightly build date is already staged and valid.</summary>
+    bool IsNightlyBuildStaged(string buildDate);
+
+    /// <summary>
+    /// Deletes staged nightly builds except the newest complete one and those in <paramref name="keep"/>
+    /// (builds games are pinned to). Returns how many were removed and the bytes freed.
+    /// </summary>
+    (int Removed, long Bytes) RemoveOldNightlyBuilds(IReadOnlyCollection<string> keep);
+
+    /// <summary>
+    /// Called after a new nightly build is staged: the builds to keep when old ones should be removed,
+    /// or null to keep everything (setting off).
+    /// </summary>
+    Func<IReadOnlyCollection<string>?>? NightlyCleanupKeepProvider { get; set; }
+
+    /// <summary>
+    /// Returns the list of available nightly builds (up to 30) fetched from GitHub.
+    /// Cached in available_builds.json. Returns cached list immediately; call FetchAvailableNightlyBuildsAsync to refresh.
+    /// </summary>
+    IReadOnlyList<string> AvailableNightlyBuilds { get; }
+
+    /// <summary>Fetches the list of available nightly builds from GitHub and caches to available_builds.json.</summary>
+    Task FetchAvailableNightlyBuildsAsync();
+
+    /// <summary>Ensures the staging folder for a specific nightly build date is downloaded and ready.</summary>
+    Task EnsureNightlyBuildStagingAsync(string buildDate, IProgress<(string message, double percent)>? progress = null);
+
     /// <summary>Whether the DLSS NR staging folder contains a valid OptiScaler DLSS NR release.</summary>
     bool IsStagingReadyDlssNr { get; }
 
@@ -90,6 +126,24 @@ public interface IOptiScalerService
 
     /// <summary>Removes the DLSS NR staging folder contents.</summary>
     void ClearDlssNrStaging();
+
+    /// <summary>Whether the F5 DLSSNR staging folder contains a valid release.</summary>
+    bool IsStagingReadyF5 { get; }
+
+    /// <summary>Whether a newer F5 DLSSNR release is available on GitHub.</summary>
+    bool HasUpdateF5 { get; }
+
+    /// <summary>The currently staged F5 DLSSNR version, or null.</summary>
+    string? StagedVersionF5 { get; }
+
+    /// <summary>Downloads and extracts the latest F5 DLSSNR release to the F5 staging folder.</summary>
+    Task EnsureF5StagingAsync(IProgress<(string message, double percent)>? progress = null);
+
+    /// <summary>Checks the F5 DLSSNR GitHub releases API for a newer version. Sets <see cref="HasUpdateF5"/>.</summary>
+    Task CheckForF5UpdateAsync();
+
+    /// <summary>Removes the F5 staging folder contents.</summary>
+    void ClearF5Staging();
 
     // ── DLSS DLL staging ──────────────────────────────────────────────────────
 
@@ -112,7 +166,8 @@ public interface IOptiScalerService
         string gpuType = "NVIDIA",
         bool dlssInputs = true,
         string? hotkey = null,
-        string variant = "Stable");
+        string variant = "Stable",
+        string? nightlyBuildHint = null);
 
     /// <summary>
     /// Uninstalls OptiScaler from the specified game folder.
@@ -126,7 +181,8 @@ public interface IOptiScalerService
     Task UpdateAsync(
         GameCardViewModel card,
         IProgress<(string message, double percent)>? progress = null,
-        string? variantHint = null);
+        string? variantHint = null,
+        string? nightlyBuildHint = null);
 
     // ── INI management ────────────────────────────────────────────────────────
 
@@ -140,7 +196,7 @@ public interface IOptiScalerService
     /// Copies OptiScaler.ini from the INIs_Folder to the game folder,
     /// enforcing LoadReshade=true.
     /// </summary>
-    void CopyIniToGame(GameCardViewModel card, string? hotkey = null);
+    void CopyIniToGame(GameCardViewModel card, string? hotkey = null, string gpuType = "NVIDIA", bool dlssInputs = true);
 
     // ── Detection ─────────────────────────────────────────────────────────────
 
@@ -170,12 +226,6 @@ public interface IOptiScalerService
     AuxInstalledRecord? FindRecord(string gameName, string installPath);
 
     // ── DLL naming ────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Resolves the effective OptiScaler DLL filename for a game,
-    /// following the priority chain: user override &gt; manifest override &gt; dxgi.dll.
-    /// </summary>
-    string GetEffectiveOsDllName(string gameName);
 
     // ── Hotkey ────────────────────────────────────────────────────────────────
 

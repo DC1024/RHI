@@ -15,6 +15,7 @@ public partial class GameCardViewModel
         {
             if (IsInstalling) return L("Installing...");
             if (IsRtxHdrEnabled) return L("Configure RTX HDR");
+            if (IsAutoHdrEnabled) return L("Configure Auto HDR");
             if (!IsRsInstalled && !ExcludeFromUpdateAllReShade && Mod?.SnapshotUrl != null && !IsExternalOnly)
                 return L("⚠  ReShade required");
             // No mod available and nothing manually installed
@@ -27,7 +28,7 @@ public partial class GameCardViewModel
         }
     }
 
-    public bool CanInstall => IsRtxHdrEnabled || (Mod?.SnapshotUrl != null && !IsInstalling && !IsExternalOnly && (IsRsInstalled || ExcludeFromUpdateAllReShade));
+    public bool CanInstall => IsRtxHdrEnabled || IsAutoHdrEnabled || (Mod?.SnapshotUrl != null && !IsInstalling && !IsExternalOnly && (IsRsInstalled || ExcludeFromUpdateAllReShade));
 
     public string GenericModLabel => IsGenericMod
         ? (EngineHint.Contains("Unity")
@@ -54,9 +55,6 @@ public partial class GameCardViewModel
             ? Visibility.Visible : Visibility.Collapsed;
 
     // ── Combined status for simplified card ──────────────────────────────────────
-    /// <summary>True when all components that are relevant are installed (or N/A).</summary>
-    private bool AllInstalled => (Mod == null || Status == GameStatus.Installed || Status == GameStatus.UpdateAvailable)
-                              && (RsStatus == GameStatus.Installed || RsStatus == GameStatus.UpdateAvailable || RsStatus == GameStatus.NotInstalled);
 
     private bool AnyInstalling => IsInstalling || RsIsInstalling;
 
@@ -108,11 +106,28 @@ public partial class GameCardViewModel
     public string RdxStatusText => IsInstalling ? L("Installing…")
         : Status == GameStatus.UpdateAvailable ? (RdxInstalledVersion ?? L("Update"))
         : Status == GameStatus.Installed       ? (RdxInstalledVersion ?? L("Installed"))
+        : HdrToggleName != null                ? $"{HdrToggleName} on"
         : Mod?.SnapshotUrl != null             ? L("Ready") : "—";
     public string RdxStatusColor => IsInstalling ? "#D4A856"
         : Status == GameStatus.UpdateAvailable ? "#B898E8"
         : Status == GameStatus.Installed       ? "#5ECB7D"
+        : HdrToggleName != null                ? "#5ECB7D"
         : Mod?.SnapshotUrl != null             ? "#A0AABB" : "#404858";
+
+    /// <summary>
+    /// "RTX HDR" / "Auto HDR" when one of them gives this game its HDR instead of a RenoDX mod
+    /// (both are set on the RenoDX row), else null. A mod installed alongside still shows the mod.
+    /// </summary>
+    public string? HdrToggleName => IsRtxHdrEnabled ? "RTX HDR" : IsAutoHdrEnabled ? "Auto HDR" : null;
+
+    partial void OnIsRtxHdrEnabledChanged(bool value) => NotifyHdrToggle();
+    partial void OnIsAutoHdrEnabledChanged(bool value) => NotifyHdrToggle();
+    private void NotifyHdrToggle()
+    {
+        OnPropertyChanged(nameof(HdrToggleName));
+        OnPropertyChanged(nameof(RdxStatusText));
+        OnPropertyChanged(nameof(RdxStatusColor));
+    }
     public string RdxShortAction => IsInstalling ? "…"
         : Status == GameStatus.UpdateAvailable ? L("⬆ Update")
         : Status == GameStatus.Installed       ? L("↺ Reinstall")

@@ -89,8 +89,8 @@ public class AddonPackService : IAddonPackService
     public AddonPackService(HttpClient http)
     {
         _http = http;
-        try { Directory.CreateDirectory(StagingDir); } catch { }
-        try { Directory.CreateDirectory(CustomAddonsDir); } catch { }
+        try { Directory.CreateDirectory(StagingDir); } catch (Exception ex) { CrashReporter.Log($"[AddonPackService.ctor] Failed to create staging folder — {ex.Message}"); }
+        try { Directory.CreateDirectory(CustomAddonsDir); } catch (Exception ex) { CrashReporter.Log($"[AddonPackService.ctor] Failed to create custom addons folder — {ex.Message}"); }
 
         // One-time migration: eagerly remove stale "RenoDX DLSS5.addon64" at construction time
         // so it can't be deployed before EnsureLatestAsync runs.
@@ -101,7 +101,7 @@ public class AddonPackService : IAddonPackService
             var staleCustom = Path.Combine(CustomAddonsDir, "RenoDX DLSS5.addon64");
             if (File.Exists(staleCustom)) File.Delete(staleCustom);
         }
-        catch { }
+        catch (Exception ex) { CrashReporter.Log($"[AddonPackService.ctor] Stale 'RenoDX DLSS5.addon64' cleanup failed — {ex.Message}"); }
     }
 
     // ── Public properties ─────────────────────────────────────────────────────────
@@ -233,7 +233,7 @@ public class AddonPackService : IAddonPackService
             {
                 if (!files.Contains(staleName)) continue;
                 var gameFile = Path.Combine(path, staleName);
-                try { if (File.Exists(gameFile)) { File.Delete(gameFile); CrashReporter.Log($"[AddonPackService] Removed stale '{staleName}' from '{path}'"); } } catch { }
+                try { if (File.Exists(gameFile)) { File.Delete(gameFile); CrashReporter.Log($"[AddonPackService] Removed stale '{staleName}' from '{path}'"); } } catch (Exception ex) { CrashReporter.Log($"[AddonPackService.EnsureLatestAsync] Failed to remove stale '{staleName}' from '{path}' — {ex.Message}"); }
                 files.Remove(staleName);
                 deploymentsChanged = true;
             }
@@ -261,11 +261,11 @@ public class AddonPackService : IAddonPackService
                     foreach (var installPath in allPaths)
                     {
                         var staleGame = Path.Combine(installPath, staleName);
-                        try { if (File.Exists(staleGame)) { File.Delete(staleGame); CrashReporter.Log($"[AddonPackService] Removed stale '{staleName}' from game folder '{installPath}'"); } } catch { }
+                        try { if (File.Exists(staleGame)) { File.Delete(staleGame); CrashReporter.Log($"[AddonPackService] Removed stale '{staleName}' from game folder '{installPath}'"); } } catch (Exception ex) { CrashReporter.Log($"[AddonPackService.EnsureLatestAsync] Failed to remove stale '{staleName}' from '{installPath}' — {ex.Message}"); }
                     }
                 }
             }
-            catch { }
+            catch (Exception ex) { CrashReporter.Log($"[AddonPackService.EnsureLatestAsync] Library scan for stale addon failed — {ex.Message}"); }
         }
         catch (Exception ex) { CrashReporter.Log($"[AddonPackService] Stale file migration failed — {ex.Message}"); }
 
@@ -289,7 +289,7 @@ public class AddonPackService : IAddonPackService
                 bool nrSectionOwnsGame = string.Equals(nrMethod, "ShortFuse", StringComparison.OrdinalIgnoreCase);
                 if (!nrSectionOwnsGame) continue;
                 var gameFile = Path.Combine(path, dlss5Addon);
-                try { if (File.Exists(gameFile)) { File.Delete(gameFile); CrashReporter.Log($"[AddonPackService] Removed spurious '{dlss5Addon}' (NR={nrMethod}) from '{path}'"); } } catch { }
+                try { if (File.Exists(gameFile)) { File.Delete(gameFile); CrashReporter.Log($"[AddonPackService] Removed spurious '{dlss5Addon}' (NR={nrMethod}) from '{path}'"); } } catch (Exception ex) { CrashReporter.Log($"[AddonPackService.EnsureLatestAsync] Failed to remove spurious '{dlss5Addon}' from '{path}' — {ex.Message}"); }
                 files.Remove(dlss5Addon);
                 deploymentsChanged = true;
             }
@@ -517,17 +517,16 @@ public class AddonPackService : IAddonPackService
             // If releaseApiUrl is set, resolve the actual asset URL + version tag dynamically
             if (!string.IsNullOrEmpty(entry.ReleaseApiUrl))
             {
-                var (resolvedUrl, resolvedTag) = await ResolveDownloadUrlFromApiAsync(entry.ReleaseApiUrl).ConfigureAwait(false);
-                if (resolvedUrl == null)
+                var (resolvedUrl64, resolvedUrl32, resolvedTag) = await ResolveDownloadUrlFromApiAsync(entry.ReleaseApiUrl).ConfigureAwait(false);
+                if (resolvedUrl64 == null && resolvedUrl32 == null)
                 {
                     CrashReporter.Log($"[AddonPackService.DownloadAddonAsync] Could not resolve asset URL from API for '{entry.PackageName}'");
                     progress?.Report(($"❌ Failed to resolve download URL for {entry.PackageName}", 0));
                     return;
                 }
-                // Use the tag as the version token unless the caller already supplied one
                 versionOverride ??= resolvedTag;
-                var ext = ClassifyUrlExtension(resolvedUrl);
-                downloads.Add((resolvedUrl, ext));
+                if (resolvedUrl64 != null) downloads.Add((resolvedUrl64, ClassifyUrlExtension(resolvedUrl64)));
+                if (resolvedUrl32 != null) downloads.Add((resolvedUrl32, ".addon32"));
             }
             else if (!string.IsNullOrEmpty(entry.DownloadUrl32) && !string.IsNullOrEmpty(entry.DownloadUrl64))
             {
@@ -632,7 +631,31 @@ public class AddonPackService : IAddonPackService
     public async Task CheckAndUpdateAllAsync()
     {
         var versions = LoadVersions();
-        var downloadedNames = DownloadedAddonNames;
+        var downloadedNames = DownloadedAddonNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Also include addons that are deployed to game folders but whose staging file was
+        // deleted or never persisted (e.g. MFG Ada Unlock installed on a previous session).
+        // Match deployed filenames against OriginalName64/32 in versions.json.
+        var deployments = LoadDeployments();
+        var deployedOriginalNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var deploymentSnapshot = LoadDeployments();
+        foreach (var (_, trackedFiles) in deploymentSnapshot)
+        {
+            foreach (var trackedFile in trackedFiles)
+            {
+                var nameNoExt = Path.GetFileNameWithoutExtension(trackedFile);
+                deployedOriginalNames.Add(nameNoExt);
+            }
+        }
+        foreach (var (pkgName, info) in versions)
+        {
+            if (deployedOriginalNames.Contains(info.OriginalName64 ?? "")
+                || deployedOriginalNames.Contains(info.OriginalName32 ?? "")
+                || deployedOriginalNames.Contains(SanitizeFileName(pkgName)))
+            {
+                downloadedNames.Add(SanitizeFileName(pkgName));
+            }
+        }
 
         if (downloadedNames.Count == 0)
         {
@@ -661,7 +684,7 @@ public class AddonPackService : IAddonPackService
                 string remoteVersion;
                 if (!string.IsNullOrEmpty(entry.ReleaseApiUrl))
                 {
-                    var (_, tag) = await ResolveDownloadUrlFromApiAsync(entry.ReleaseApiUrl).ConfigureAwait(false);
+                    var (_, _, tag) = await ResolveDownloadUrlFromApiAsync(entry.ReleaseApiUrl).ConfigureAwait(false);
                     if (tag == null)
                     {
                         CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Could not resolve version from API for '{entry.PackageName}', skipping.");
@@ -712,7 +735,15 @@ public class AddonPackService : IAddonPackService
                     continue;
                 }
 
+                // If remote version resolved to "unknown" (HEAD failed), skip — don't overwrite a valid stored version with unknown
+                if (remoteVersion == "unknown")
+                {
+                    CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] '{entry.PackageName}' remote version resolved to 'unknown' — skipping update to avoid false update.");
+                    continue;
+                }
+                // If stored version is "unknown" and remote is now valid, allow re-download to establish a baseline
                 CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Update available for '{entry.PackageName}': {storedVersion} → {remoteVersion}. Downloading...");
+
                 await _downloadLock.WaitAsync();
                 try { await DownloadAddonAsync(entry, versionOverride: remoteVersion); }
                 finally { _downloadLock.Release(); }
@@ -729,54 +760,7 @@ public class AddonPackService : IAddonPackService
                 // Auto-redeploy the updated file to all game folders that have it installed.
                 // Without this, the staged file is updated but game folders keep the old version
                 // until the user manually reinstalls (reported as "update shows as latest but wasn't").
-                try
-                {
-                    var safeName = SanitizeFileName(entry.PackageName);
-                    var staged64 = Path.Combine(StagingDir, safeName + ".addon64");
-                    var staged32 = Path.Combine(StagingDir, safeName + ".addon32");
-                    var deployments = LoadDeployments();
-                    int redeployed = 0;
-                    foreach (var (gamePath, trackedFiles) in deployments)
-                    {
-                        foreach (var trackedFile in trackedFiles.ToList())
-                        {
-                            var ext = Path.GetExtension(trackedFile);
-                            string? staged = ext.Equals(".addon64", StringComparison.OrdinalIgnoreCase) ? staged64
-                                           : ext.Equals(".addon32", StringComparison.OrdinalIgnoreCase) ? staged32
-                                           : null;
-                            if (staged == null || !File.Exists(staged)) continue;
-
-                            // Only redeploy if the deployed filename matches this addon's known names
-                            var vData = LoadVersions();
-                            vData.TryGetValue(entry.PackageName, out var vInfo);
-                            var knownName64 = vInfo?.OriginalName64;
-                            var knownName32 = vInfo?.OriginalName32;
-                            var trackedNoExt = Path.GetFileNameWithoutExtension(trackedFile);
-                            bool matches = trackedNoExt.Equals(safeName, StringComparison.OrdinalIgnoreCase)
-                                        || (!string.IsNullOrEmpty(knownName64) && trackedNoExt.Equals(knownName64, StringComparison.OrdinalIgnoreCase))
-                                        || (!string.IsNullOrEmpty(knownName32) && trackedNoExt.Equals(knownName32, StringComparison.OrdinalIgnoreCase));
-                            if (!matches) continue;
-
-                            var dest = Path.Combine(gamePath, trackedFile);
-                            if (!Directory.Exists(gamePath)) continue;
-                            try
-                            {
-                                File.Copy(staged, dest, overwrite: true);
-                                redeployed++;
-                            }
-                            catch (Exception copyEx)
-                            {
-                                CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeploy failed for '{trackedFile}' at '{gamePath}' — {copyEx.Message}");
-                            }
-                        }
-                    }
-                    if (redeployed > 0)
-                        CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeployed '{entry.PackageName}' to {redeployed} game folder(s).");
-                }
-                catch (Exception redeployEx)
-                {
-                    CrashReporter.Log($"[AddonPackService.CheckAndUpdateAllAsync] Auto-redeploy pass failed for '{entry.PackageName}' — {redeployEx.Message}");
-                }
+                RedeployToTrackedGames(entry, onlyIfStale: false);
             }
             catch (Exception ex)
             {
@@ -785,7 +769,83 @@ public class AddonPackService : IAddonPackService
             }
         }
 
+        // Catch-up pass: the redeploy above only runs in the session that downloads an update.
+        // If a copy failed then (game running, file locked), the game kept the old addon forever
+        // while RHI showed the new version. Refresh any tracked copy that differs from staging.
+        foreach (var name in downloadedNames)
+        {
+            var entry = _packs.FirstOrDefault(e =>
+                SanitizeFileName(e.PackageName).Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (entry != null) RedeployToTrackedGames(entry, onlyIfStale: true);
+        }
+
         CrashReporter.Log("[AddonPackService.CheckAndUpdateAllAsync] Update check complete.");
+    }
+
+    /// <summary>
+    /// Copies the staged addon over every tracked copy of it in game folders.
+    /// Copies that no longer exist are skipped (the user removed them; never reinstall).
+    /// With <paramref name="onlyIfStale"/>, copies already matching staging are left alone.
+    /// A file RHI copied keeps the staged file's size and modified time, so comparing
+    /// those two is enough to spot an outdated copy without reading either file.
+    /// </summary>
+    private int RedeployToTrackedGames(AddonEntry entry, bool onlyIfStale)
+    {
+        int redeployed = 0;
+        try
+        {
+            var safeName = SanitizeFileName(entry.PackageName);
+            var staged64 = Path.Combine(StagingDir, safeName + ".addon64");
+            var staged32 = Path.Combine(StagingDir, safeName + ".addon32");
+
+            // Deployed filenames that belong to this addon
+            LoadVersions().TryGetValue(entry.PackageName, out var vInfo);
+            var knownNames = new[] { safeName, vInfo?.OriginalName64, vInfo?.OriginalName32 }
+                .Where(n => !string.IsNullOrEmpty(n))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (gamePath, trackedFiles) in LoadDeployments())
+            {
+                foreach (var trackedFile in trackedFiles)
+                {
+                    if (!knownNames.Contains(Path.GetFileNameWithoutExtension(trackedFile))) continue;
+
+                    var ext = Path.GetExtension(trackedFile);
+                    string? staged = ext.Equals(".addon64", StringComparison.OrdinalIgnoreCase) ? staged64
+                                   : ext.Equals(".addon32", StringComparison.OrdinalIgnoreCase) ? staged32
+                                   : null;
+                    if (staged == null || !File.Exists(staged)) continue;
+
+                    var dest = Path.Combine(gamePath, trackedFile);
+                    if (!File.Exists(dest)) continue;
+
+                    try
+                    {
+                        if (onlyIfStale)
+                        {
+                            var s = new FileInfo(staged);
+                            var d = new FileInfo(dest);
+                            if (s.Length == d.Length && s.LastWriteTimeUtc == d.LastWriteTimeUtc) continue;
+                        }
+                        File.Copy(staged, dest, overwrite: true);
+                        redeployed++;
+                        if (onlyIfStale)
+                            CrashReporter.Log($"[AddonPackService.RedeployToTrackedGames] Refreshed outdated '{trackedFile}' at '{gamePath}'");
+                    }
+                    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                    {
+                        CrashReporter.Log($"[AddonPackService.RedeployToTrackedGames] Could not update '{trackedFile}' at '{gamePath}' (will retry next launch) — {ex.Message}");
+                    }
+                }
+            }
+            if (redeployed > 0)
+                CrashReporter.Log($"[AddonPackService.RedeployToTrackedGames] {(onlyIfStale ? "Caught up" : "Auto-redeployed")} '{entry.PackageName}' in {redeployed} game folder(s).");
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Log($"[AddonPackService.RedeployToTrackedGames] Pass failed for '{entry.PackageName}' — {ex.Message}");
+        }
+        return redeployed;
     }
 
     /// <inheritdoc />
@@ -802,16 +862,24 @@ public class AddonPackService : IAddonPackService
         // 2. Determine correct bitness extension
         var bitnessExt = is32Bit ? ".addon32" : ".addon64";
 
-        // 3. Create deploy directory if missing
+        // 3. Resolve where ReShade loads addons from (reshade.ini AddonPath, else the game folder)
+        //    and create it if missing. Game-root files (e.g. nvngx_dlssnr.dll) are still checked in installPath.
+        string deployDir;
         try
         {
             Directory.CreateDirectory(installPath);
+            deployDir = ModInstallService.GetAddonDeployPath(installPath);
+            Directory.CreateDirectory(deployDir);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] Failed to create deploy directory '{installPath}' — {ex.Message}");
+            CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] Failed to create deploy directory for '{installPath}' — {ex.Message}");
             return;
         }
+        bool usesAddonPath = !string.Equals(Path.TrimEndingDirectorySeparator(Path.GetFullPath(deployDir)),
+            Path.TrimEndingDirectorySeparator(Path.GetFullPath(installPath)), StringComparison.OrdinalIgnoreCase);
+        if (usesAddonPath)
+            CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] reshade.ini AddonPath in use — deploying to '{deployDir}'");
 
         // 4. Deploy each addon in the active selection
         var deployedFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -915,12 +983,22 @@ public class AddonPackService : IAddonPackService
                 deployName = packageName;
             }
 
-            var destFile = Path.Combine(installPath, deployName + bitnessExt);
+            var destFile = Path.Combine(deployDir, deployName + bitnessExt);
             try
             {
-                File.Copy(stagingFile, destFile, overwrite: true);
-                deployedFileNames.Add(deployName + bitnessExt);
-                CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] Deployed '{deployName}{bitnessExt}' to '{installPath}'.");
+                // File.Copy keeps the source's modified time, so same size + time means this copy is already current.
+                var src = new FileInfo(stagingFile);
+                var dst = new FileInfo(destFile);
+                if (dst.Exists && dst.Length == src.Length && dst.LastWriteTimeUtc == src.LastWriteTimeUtc)
+                {
+                    deployedFileNames.Add(deployName + bitnessExt);
+                }
+                else
+                {
+                    File.Copy(stagingFile, destFile, overwrite: true);
+                    deployedFileNames.Add(deployName + bitnessExt);
+                    CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] Deployed '{deployName}{bitnessExt}' to '{deployDir}'.");
+                }
             }
             catch (Exception ex)
             {
@@ -928,21 +1006,26 @@ public class AddonPackService : IAddonPackService
             }
         }
 
-        // Record deployed files in the tracker
+        // Record deployed files in the tracker (keyed by the folder the files are actually in)
         var deployments = LoadDeployments();
-        if (!deployments.TryGetValue(installPath, out var trackedFiles))
+        if (!deployments.TryGetValue(deployDir, out var trackedFiles))
         {
             trackedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            deployments[installPath] = trackedFiles;
+            deployments[deployDir] = trackedFiles;
         }
         foreach (var f in deployedFileNames)
             trackedFiles.Add(f);
+
+        // With AddonPath set, ReShade ignores addons in the game folder. Remove copies RHI
+        // put there earlier for addons that now live in the AddonPath folder.
+        if (usesAddonPath)
+            MoveOutOfGameRoot(deployments, installPath, deployDir, deployedFileNames);
 
         // 5. Remove stale addon files — only remove files that RHI previously deployed to this path
         //    and that are no longer in the active selection. User-placed files are never touched.
         try
         {
-            foreach (var file in Directory.EnumerateFiles(installPath))
+            foreach (var file in Directory.EnumerateFiles(deployDir))
             {
                 var ext = Path.GetExtension(file);
                 if (!ext.Equals(".addon32", StringComparison.OrdinalIgnoreCase) &&
@@ -1003,7 +1086,7 @@ public class AddonPackService : IAddonPackService
                 {
                     File.Delete(file);
                     trackedFiles.Remove(fileName);
-                    CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] Removed stale addon '{fileName}' from '{installPath}'.");
+                    CrashReporter.Log($"[AddonPackService.DeployAddonsForGame] Removed stale addon '{fileName}' from '{deployDir}'.");
 
                 // If DLSS5 Tool addon was removed, also clean up the NR dll via sentinel pattern.
                     if (fileName.Equals("renodx-dlss5.addon64", StringComparison.OrdinalIgnoreCase)
@@ -1066,22 +1149,6 @@ public class AddonPackService : IAddonPackService
         return results.AsReadOnly();
     }
 
-    /// <inheritdoc />
-    public bool IsCustomAddon(string packageName)
-    {
-        if (!Directory.Exists(CustomAddonsDir)) return false;
-        return File.Exists(Path.Combine(CustomAddonsDir, packageName + ".addon64"))
-            || File.Exists(Path.Combine(CustomAddonsDir, packageName + ".addon32"));
-    }
-
-    /// <inheritdoc />
-    public string? GetCustomAddonPath(string packageName, bool is32Bit)
-    {
-        var ext = is32Bit ? ".addon32" : ".addon64";
-        var path = Path.Combine(CustomAddonsDir, packageName + ext);
-        return File.Exists(path) ? path : null;
-    }
-
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     // ── Download helpers ──────────────────────────────────────────────────────────
@@ -1128,7 +1195,7 @@ public class AddonPackService : IAddonPackService
         }
         catch
         {
-            if (File.Exists(tempPath)) try { File.Delete(tempPath); } catch { }
+            if (File.Exists(tempPath)) try { File.Delete(tempPath); } catch (Exception) { /* best-effort temp cleanup; the original exception is rethrown below */ }
             throw;
         }
     }
@@ -1211,7 +1278,7 @@ public class AddonPackService : IAddonPackService
         }
         finally
         {
-            if (File.Exists(tempZip)) try { File.Delete(tempZip); } catch { }
+            if (File.Exists(tempZip)) try { File.Delete(tempZip); } catch (Exception ex) { CrashReporter.Log($"[AddonPackService.DownloadAndExtractZipAsync] Failed to delete temp zip '{tempZip}' — {ex.Message}"); }
         }
     }
 
@@ -1228,30 +1295,25 @@ public class AddonPackService : IAddonPackService
 
     /// <summary>
     /// Resolves the latest release asset download URL and version tag from a GitHub releases API URL.
-    /// Prefers .addon64 > .addon32 > .zip assets in that order.
-    /// Returns (downloadUrl, versionTag) or (null, null) on failure.
+    /// Prefers .addon64 > .addon32 > .zip assets. Returns both addon64 and addon32 URLs when both exist.
+    /// Returns (downloadUrl64, downloadUrl32, versionTag) or (null, null, null) on failure.
     /// </summary>
-    internal async Task<(string? downloadUrl, string? versionTag)> ResolveDownloadUrlFromApiAsync(string releaseApiUrl)
+    internal async Task<(string? downloadUrl64, string? downloadUrl32, string? versionTag)> ResolveDownloadUrlFromApiAsync(string releaseApiUrl)
     {
         try
         {
-            // /releases/latest only returns full releases, missing pre-releases.
-            // Rewrite to /releases?per_page=1 which returns the newest release regardless of type.
             var effectiveUrl = releaseApiUrl;
-            if (effectiveUrl.EndsWith("/releases/latest", StringComparison.OrdinalIgnoreCase))
-                effectiveUrl = effectiveUrl[..^"/latest".Length] + "?per_page=1";
 
             using var req = new HttpRequestMessage(HttpMethod.Get, effectiveUrl);
             req.Headers.Add("User-Agent", "RHI");
             req.Headers.Add("Accept", "application/vnd.github+json");
-            var token = DevUnlockService.GitHubApiToken;
-            if (!string.IsNullOrEmpty(token))
-                req.Headers.Add("Authorization", $"Bearer {token}");
+            // GitHub token is attached by GitHubTokenHandler for GitHub hosts only
+            // (releaseApiUrl comes from the manifest and could point anywhere).
             using var resp = await _http.SendAsync(req).ConfigureAwait(false);
             if (!resp.IsSuccessStatusCode)
             {
                 CrashReporter.Log($"[AddonPackService.ResolveDownloadUrlFromApiAsync] HTTP {(int)resp.StatusCode} for {effectiveUrl}");
-                return (null, null);
+                return (null, null, null);
             }
 
             var json = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -1268,8 +1330,8 @@ public class AddonPackService : IAddonPackService
             if (releaseEl.TryGetProperty("tag_name", out var tagEl))
                 tag = tagEl.GetString();
 
-            // Find best asset: prefer .addon64, then .addon32, then .zip
-            if (!releaseEl.TryGetProperty("assets", out var assetsEl)) return (null, tag);
+            // Find assets: collect both .addon64 and .addon32 when available, with .zip as fallback
+            if (!releaseEl.TryGetProperty("assets", out var assetsEl)) return (null, null, tag);
 
             string? addon64 = null, addon32 = null, zip = null;
             foreach (var asset in assetsEl.EnumerateArray())
@@ -1283,18 +1345,19 @@ public class AddonPackService : IAddonPackService
                 else if (name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) zip ??= url;
             }
 
-            var chosen = addon64 ?? addon32 ?? zip;
-            if (chosen != null)
-                CrashReporter.Log($"[AddonPackService.ResolveDownloadUrlFromApiAsync] Resolved '{chosen}' (tag={tag}) from {releaseApiUrl}");
+            // Primary URL: addon64 (or zip fallback when no explicit addon64)
+            var primary = addon64 ?? zip;
+            if (primary != null || addon32 != null)
+                CrashReporter.Log($"[AddonPackService.ResolveDownloadUrlFromApiAsync] Resolved 64='{primary}' 32='{addon32}' (tag={tag}) from {releaseApiUrl}");
             else
                 CrashReporter.Log($"[AddonPackService.ResolveDownloadUrlFromApiAsync] No suitable asset found at {releaseApiUrl}");
 
-            return (chosen, tag);
+            return (primary, addon32, tag);
         }
         catch (Exception ex)
         {
             CrashReporter.Log($"[AddonPackService.ResolveDownloadUrlFromApiAsync] Failed — {ex.Message}");
-            return (null, null);
+            return (null, null, null);
         }
     }
 
@@ -1450,14 +1513,89 @@ public class AddonPackService : IAddonPackService
 
     // Expose paths for testing and other services
     internal static string GetStagingDir() => StagingDir;
-    internal static string GetCachePath() => CachePath;
-    internal static string GetVersionsJsonPath() => VersionsJsonPath;
 
     /// <summary>
     /// Adds a deployed addon filename to the tracker for the given install path.
     /// Called by components (e.g. Neural Rendering section) that deploy addons directly
     /// without going through DeployAddonsForGame.
     /// </summary>
+    /// <summary>
+    /// Deletes RHI-tracked copies of <paramref name="fileNames"/> from the game folder once they
+    /// have been deployed to the reshade.ini AddonPath folder instead, and untracks them there.
+    /// Only files RHI tracked in the game folder are touched; user-placed files are left alone.
+    /// </summary>
+    internal static void MoveOutOfGameRoot(Dictionary<string, HashSet<string>> deployments,
+        string installPath, string deployDir, IEnumerable<string> fileNames)
+    {
+        if (!deployments.TryGetValue(installPath, out var rootTracked)) return;
+        foreach (var fileName in fileNames)
+        {
+            if (!rootTracked.Contains(fileName)) continue;
+            var oldCopy = Path.Combine(installPath, fileName);
+            try
+            {
+                if (File.Exists(oldCopy) && File.Exists(Path.Combine(deployDir, fileName)))
+                    File.Delete(oldCopy);
+                if (!File.Exists(oldCopy))
+                {
+                    rootTracked.Remove(fileName);
+                    CrashReporter.Log($"[AddonPackService.MoveOutOfGameRoot] Moved '{fileName}' from '{installPath}' to AddonPath '{deployDir}'");
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                CrashReporter.Log($"[AddonPackService.MoveOutOfGameRoot] Could not remove old '{fileName}' from '{installPath}' — {ex.Message}");
+            }
+        }
+        if (rootTracked.Count == 0) deployments.Remove(installPath);
+    }
+
+    /// <summary>Addon file names the tracker lists for a folder (trailing-slash differences ignored).</summary>
+    public static List<string> GetTrackedAddons(string folder)
+    {
+        var key = folder.Replace('/', '\\').TrimEnd('\\');
+        return LoadDeployments()
+            .Where(kv => kv.Key.Replace('/', '\\').TrimEnd('\\').Equals(key, StringComparison.OrdinalIgnoreCase))
+            .SelectMany(kv => kv.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Install folder migration: moves the tracked addon names for <paramref name="oldFolder"/> to
+    /// <paramref name="newFolder"/> (merged with any already tracked there). Only call once the files moved.
+    /// </summary>
+    public static void RepointDeployments(string oldFolder, string newFolder)
+    {
+        try
+        {
+            lock (_deploymentsLock)
+            {
+                var deployments = LoadDeployments();
+                var oldKey = oldFolder.Replace('/', '\\').TrimEnd('\\');
+                var keys = deployments.Keys
+                    .Where(k => k.Replace('/', '\\').TrimEnd('\\').Equals(oldKey, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                if (keys.Count == 0) return;
+                var newKey = newFolder.Replace('/', '\\').TrimEnd('\\');
+                if (!deployments.TryGetValue(newKey, out var target))
+                    deployments[newKey] = target = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var k in keys)
+                {
+                    if (k.Equals(newKey, StringComparison.OrdinalIgnoreCase)) continue;
+                    target.UnionWith(deployments[k]);
+                    deployments.Remove(k);
+                }
+                SaveDeployments(deployments);
+                CrashReporter.Log($"[AddonPackService.RepointDeployments] '{oldFolder}' → '{newFolder}' ({target.Count} addons tracked)");
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            CrashReporter.Log($"[AddonPackService.RepointDeployments] Failed — {ex.Message}");
+        }
+    }
+
     public static void TrackAddonDeployment(string installPath, string addonFileName)
     {
         try
@@ -1478,6 +1616,27 @@ public class AddonPackService : IAddonPackService
         }
     }
 
+    /// <summary>
+    /// Removes a deployed addon filename from the tracker, so updates stop redeploying it there.
+    /// Counterpart to <see cref="TrackAddonDeployment"/> for components that remove addons directly.
+    /// </summary>
+    public static void UntrackAddonDeployment(string installPath, string addonFileName)
+    {
+        try
+        {
+            var deployments = LoadDeployments();
+            if (deployments.TryGetValue(installPath, out var tracked) && tracked.Remove(addonFileName))
+            {
+                SaveDeployments(deployments);
+                CrashReporter.Log($"[AddonPackService.UntrackAddonDeployment] Untracked '{addonFileName}' at '{installPath}'");
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Log($"[AddonPackService.UntrackAddonDeployment] Failed — {ex.Message}");
+        }
+    }
+
     // ── Deployment tracker ────────────────────────────────────────────────────────
 
     private static readonly object _deploymentsLock = new();
@@ -1494,7 +1653,7 @@ public class AddonPackService : IAddonPackService
             if (deployments.TryGetValue(installPath, out var files))
                 return files.Contains(addonFileName);
         }
-        catch { }
+        catch (Exception) { /* unreadable deployments data: treat as not tracked (called per game) */ }
         return false;
     }
 
@@ -1562,7 +1721,7 @@ public class AddonPackService : IAddonPackService
                     raw[path] = files.ToList();
             }
             var json = JsonSerializer.Serialize(raw, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(DeploymentsJsonPath, json);
+            FileHelper.WriteAllTextAtomic(DeploymentsJsonPath, json, "AddonPackService.SaveDeployments");
             _staticDeploymentCache = null; // invalidate cache so AutoRedeployAsync reads fresh data
         }
         catch (Exception ex)
